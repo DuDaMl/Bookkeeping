@@ -1,6 +1,5 @@
 <?php
 namespace bookkeeping\Models;
-use \PDO;
 
 class Pay
 {
@@ -30,7 +29,7 @@ class Pay
        {
            $result = $this->DB->prepare($sql);
            $result->execute();
-           return $result->fetchAll(PDO::FETCH_CLASS);
+           return $result->fetchAll($this->DB::FETCH_CLASS);
        }
        catch(PDOException $e)
        {
@@ -60,10 +59,10 @@ class Pay
 
         $stmt = $this->DB->prepare($sql);
 
-        $stmt->bindParam(':amount', $_POST['amount'], PDO::PARAM_INT);
-        $stmt->bindParam(':description', $_POST['description'], PDO::PARAM_STR);
-        $stmt->bindParam(':category_id', $_POST['category_id'], PDO::PARAM_INT);
-        $stmt->bindParam(':date', date('Y-m-d'), PDO::PARAM_STR);
+        $stmt->bindParam(':amount', $_POST['amount'], $this->DB::PARAM_INT);
+        $stmt->bindParam(':description', $_POST['description'], $this->DB::PARAM_STR);
+        $stmt->bindParam(':category_id', $_POST['category_id'], $this->DB::PARAM_INT);
+        $stmt->bindParam(':date', date('Y-m-d'), $this->DB::PARAM_STR);
         $stmt->execute();
         //echo   $this->DB->lastInsertId();
     }
