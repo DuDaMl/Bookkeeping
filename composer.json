@@ -1,0 +1,16 @@
+{
+    "name": "vendor/test",
+    "description": "test composer using",
+    "authors": [
+        {
+            "name": "Denys Duvanov",
+            "email": "duda.ml1986@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+      "psr-4": {
+          "bookkeeping\\" : ""
+      }
+    }
+}
