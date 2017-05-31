@@ -6,43 +6,49 @@ use bookkeeping\Models\Category as M_Category;
 class Pay
 {
     const MAIN_TEAMPLATE = 'Main';
+    private $output_data;
+    private $M_Pay;
 
     function __construct()
     {
+        $this->M_Pay = new M_Pay();
+
         $this->input();
         $this->output();
     }
 
     function input()
     {
-        if(!empty($_POST)){
+        if(!empty($_POST) && $_POST['category_id'] != ''){
            $this->isPost();
         }
-
-        /*
-        */
-
     }
     function isPost()
     {
-        $M_Pay = new M_Pay();
-       /* $M_Pay->date = $_POST['date'];
-        $M_Pay->amount = $_POST['amount'];
-        $M_Pay->category_id = $_POST['category_id'];
-        $M_Pay->description = $_POST['description'];*/
-        $M_Pay->save();
 
+
+        if($this->M_Pay->save()){
+            header("Location: /");
+            exit();
+        }
+
+        $this->output_data['error'] = $this->M_Pay->error_validation;
     }
 
     function output()
     {
-        $M_Pay = new M_Pay();
-        $data['pays'] = $M_Pay->getAll();
+
+        $this->output_data['pays'] = $this->M_Pay->getAll();
 
         $M_Category = new M_Category();
-        $data['categories'] = $M_Category->getAll();
+        $this->output_data['categories'] = $M_Category->getAll();
 
-        $this->getTeamplate($data);
+        $this->output_data['error'] = $this->M_Pay->error_validation;
+        //print_r($this->output_data['pays']);
+
+
+
+        $this->getTeamplate($this->output_data);
     }
 
     function getTeamplate($data)

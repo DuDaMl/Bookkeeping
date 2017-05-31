@@ -5,6 +5,7 @@
 <!-- Static navbar -->
 <nav class="navbar navbar-default">
     <div class="container-fluid">
+
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
@@ -44,6 +45,7 @@
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <h1>Расходы</h1>
+
     <form action="/" method="post">
         <div class="row">
             <div class="col-lg-3">
@@ -85,8 +87,19 @@
 
 
         <button type="submit" class="btn btn-default">Submit</button>
+        <br/>
+        <br/>
     </form>
+    <?php
 
+    $form_error = $data['error'];
+    if($form_error['error'] == 1) {
+        unset($form_error['error']);
+        foreach ($form_error as $item){
+            echo '<div class="alert alert-danger" role="alert">' . $item . '</div>';
+        }
+    }
+    ?>
     <div class="container">
         <div class="row">
             <div class='col-sm-6'>

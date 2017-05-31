@@ -2,6 +2,7 @@
 require('vendor/autoload.php');
 header('Content-type: text/html; charset=utf-8');
 
+
 $Route = new bookkeeping\Models\Route($_SERVER['REQUEST_URI']);
 $controller = $Route->getController();
 
