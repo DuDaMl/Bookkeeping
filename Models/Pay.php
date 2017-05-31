@@ -61,8 +61,6 @@ class Pay
                 'error' => true,
                 'amount' => 'Ошибка в указанной сумме',
             );
-            $error = true;
-
         } else {
             $amount = str_replace('+','',$_POST['amount']);
             $this->amount = str_replace('-','',$amount);
@@ -73,7 +71,6 @@ class Pay
                 'error' => true,
                 'category_id' => 'Ошибка в выбранной категории',
             );
-            $error = true;
         } else {
             $category_id = str_replace('+','',$_POST['category_id']);
             $this->category_id = str_replace('-','',$category_id);
@@ -84,17 +81,15 @@ class Pay
                 'error' => true,
                 'date' =>  'Ошибка в выбранной дате'
             );
-            $error = true;
         } else {
             $this->date = $_POST['date'];
         }
 
-        if($error == true){
+        if($this->error_validation['error'] == true){
             return false;
         }
 
         $this->description = htmlspecialchars($_POST['description']);
-
         return true;
     }
 
@@ -117,10 +112,7 @@ class Pay
             :date
             )";
 
-        //echo $sql; exit();
-
         $stmt = $this->DB->prepare($sql);
-
         $stmt->bindParam(':amount',  $this->amount, $this->DB::PARAM_INT);
         $stmt->bindParam(':description', $this->description , $this->DB::PARAM_STR);
         $stmt->bindParam(':category_id', $this->category_id , $this->DB::PARAM_INT);
