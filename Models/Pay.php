@@ -52,9 +52,6 @@ class Pay
      */
     function validate()
     {
-        // Указатель наличия ошибка в массиве $_POST
-        $error = false;
-
         // валидация введенной суммы
         if(! filter_var($_POST['amount'], FILTER_VALIDATE_INT)){
             $this->error_validation = array(
