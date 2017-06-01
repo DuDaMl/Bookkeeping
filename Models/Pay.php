@@ -5,6 +5,7 @@ class Pay
 {
     const TABLE_NAME = 'pay';
     protected $DB;
+    public $id;
     public $amount;
     public $description;
     public $category_id;
@@ -22,7 +23,8 @@ class Pay
      */
    function getAll()
    {
-       $sql = "SELECT * FROM `" . self::TABLE_NAME . "`     
+       $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.date, category.name
+               FROM `" . self::TABLE_NAME . "`     
                LEFT JOIN category
                ON pay.category_id = category.id 
                ORDER BY date DESC";
@@ -40,6 +42,40 @@ class Pay
        }
    }
 
+    /**
+     * @return array|bool
+     */
+    function getById($id)
+    {
+        if(filter_var($id, FILTER_VALIDATE_INT)){
+            $id = str_replace('+', '', $id);
+            $id = str_replace('-', '', $id);
+        } else {
+            $this->error_validation = array(
+                'error' => true,
+                'text' => 'Ошибка в передаваемом id',
+            );
+            return false;
+        }
+
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`     
+               WHERE  id = :id";
+
+        try
+        {
+            $result = $this->DB->prepare($sql);
+            $result->execute(array(
+                ':id' => $id
+            ));
+            return $result->fetch($this->DB::FETCH_OBJ);
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
     public function select($sql)
     {
        // return $this->DB->select($sql);
@@ -52,8 +88,23 @@ class Pay
      */
     function validate()
     {
+
+        // валидация переданного id
+        if(isset($_POST['id'])){
+            if(! filter_var($_POST['id'], FILTER_VALIDATE_INT)){
+                $this->error_validation = array(
+                    'error' => true,
+                    'amount' => 'Ошибка в указанном id',
+                );
+            } else {
+                $id = str_replace('+','',$_POST['id']);
+                $this->id = str_replace('-','',$id);
+            }
+        }
+
         // валидация введенной суммы
-        if(! filter_var($_POST['amount'], FILTER_VALIDATE_INT)){
+        if(! filter_var($_POST['amount'], FILTER_VALIDATE_INT)
+        || $_POST['amount'] == 0){
             $this->error_validation = array(
                 'error' => true,
                 'amount' => 'Ошибка в указанной сумме',
@@ -86,7 +137,7 @@ class Pay
             return false;
         }
 
-        $this->description = htmlspecialchars($_POST['description']);
+        $this->description = strip_tags($_POST['description']);
         return true;
     }
 
@@ -97,24 +148,42 @@ class Pay
             return false;
         }
 
-        $sql = "INSERT INTO `" . self::TABLE_NAME . "`
-            (amount,
-            description,
-            category_id,
-            date)
-             VALUES (
-            :amount,
-            :description,
-            :category_id,
-            :date
-            )";
+        if(isset($this->id) && $this->id != ''){
+            // Update
+            $sql = "UPDATE `" . self::TABLE_NAME . "` SET
+                    amount = :amount,
+                    description = :description,
+                    category_id = :category_id,
+                    date = :date
+                    WHERE id = :id
+                    ";
+        } else {
+            // Create
+            $sql = "INSERT INTO `" . self::TABLE_NAME . "`
+                    (amount,
+                    description,
+                    category_id,
+                    date)
+                     VALUES (
+                    :amount,
+                    :description,
+                    :category_id,
+                    :date
+                    )";
+        }
 
         $stmt = $this->DB->prepare($sql);
         $stmt->bindParam(':amount',  $this->amount, $this->DB::PARAM_INT);
         $stmt->bindParam(':description', $this->description , $this->DB::PARAM_STR);
         $stmt->bindParam(':category_id', $this->category_id , $this->DB::PARAM_INT);
         $stmt->bindParam(':date', $this->date , $this->DB::PARAM_STR);
+
+        if(isset($this->id) && $this->id != ''){
+            $stmt->bindParam(':id',  $this->id, $this->DB::PARAM_INT);
+        }
+
         $stmt->execute();
+
         return true;
     }
 

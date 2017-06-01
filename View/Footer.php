@@ -9,7 +9,7 @@
     $(function () {
         $('#datetimepicker1').datepicker({
             format: "yyyy-mm-dd",
-            startDate: "<?=date('Y-m-d');?>"
+            //startDate: "<?=date('Y-m-d');?>"
         });
     });
 </script>

@@ -1,12 +1,11 @@
 <?php
-/*
 require('vendor/autoload.php');
 header('Content-type: text/html; charset=utf-8');
 
 $Route = new bookkeeping\Models\Route($_SERVER['REQUEST_URI']);
-$controller = $Route->getController();
-*/
+$Route->start();
 
+/*
 class Pay {
     static $a = 5;
 
@@ -46,6 +45,8 @@ $pay2 = new Pay;
 //$pay2->a = '2123';
 $pay2->setA(5242423);// = 1;
 */
+
+/*
 $pay1 = new Pay;
 $pay2 = new Pay2;
 echo $pay1->getA() . "<br/>";
@@ -67,4 +68,4 @@ class User extends Model {
     public static $table = 'users';
 }
 
-echo User::getTable(); // 'table'
+echo User::getTable(); // 'table'*/
