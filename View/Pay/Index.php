@@ -89,7 +89,7 @@
             $output .= '<li class="list-group-item">
                 <a href="/edit/' . $pay->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
                 <a href="/delete/' . $pay->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                <span class="badge">' . $pay->amount . '</span> <strong>' . $pay->name . "</strong> Описанеи:'" . $pay->description .'\'
+                <span class="badge">' . $pay->amount . '</span> <strong>' . $pay->name . "</strong> Описание:'" . $pay->description .'\'
             
             </li>';
             $date_current = $pay->date;

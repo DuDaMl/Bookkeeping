@@ -23,12 +23,16 @@ class Pay
      */
    function getAll()
    {
+       $month_start = date('Y-m-01');
+       $month_end = date('Y-m-30');
+
        $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.date, category.name
                FROM `" . self::TABLE_NAME . "`     
                LEFT JOIN category
                ON pay.category_id = category.id 
-               ORDER BY date DESC";
-
+               WHERE pay.date BETWEEN  '" . $month_start ."' AND '" . $month_end ."'  
+               ORDER BY date DESC, id DESC
+               ";
        try
        {
            $result = $this->DB->prepare($sql);
@@ -76,79 +80,23 @@ class Pay
         }
     }
 
-    public function select($sql)
-    {
-       // return $this->DB->select($sql);
-    }
-
     /**
-     * Валидация данных формы. Инициализация переменных класса
-     * @input $_POST data
-     * @return bool true/false
+     * @return bool
      */
-    function validate()
-    {
-
-        // валидация переданного id
-        if(isset($_POST['id'])){
-            if(! filter_var($_POST['id'], FILTER_VALIDATE_INT)){
-                $this->error_validation = array(
-                    'error' => true,
-                    'amount' => 'Ошибка в указанном id',
-                );
-            } else {
-                $id = str_replace('+','',$_POST['id']);
-                $this->id = str_replace('-','',$id);
-            }
-        }
-
-        // валидация введенной суммы
-        if(! filter_var($_POST['amount'], FILTER_VALIDATE_INT)
-        || $_POST['amount'] == 0){
-            $this->error_validation = array(
-                'error' => true,
-                'amount' => 'Ошибка в указанной сумме',
-            );
-        } else {
-            $amount = str_replace('+','',$_POST['amount']);
-            $this->amount = str_replace('-','',$amount);
-        }
-
-        if(! filter_var($_POST['category_id'], FILTER_VALIDATE_INT)){
-            $this->error_validation = array(
-                'error' => true,
-                'category_id' => 'Ошибка в выбранной категории',
-            );
-        } else {
-            $category_id = str_replace('+','',$_POST['category_id']);
-            $this->category_id = str_replace('-','',$category_id);
-        }
-
-        if(! self::validateDate($_POST['date'])){
-            $this->error_validation = array(
-                'error' => true,
-                'date' =>  'Ошибка в выбранной дате'
-            );
-        } else {
-            $this->date = $_POST['date'];
-        }
-
-        if($this->error_validation['error'] == true){
-            return false;
-        }
-
-        $this->description = strip_tags($_POST['description']);
-        return true;
-    }
-
     function save()
     {
-        if(! self::validate()){
-
+        if(! self::validate())
+        {
             return false;
         }
 
-        if(isset($this->id) && $this->id != ''){
+        if(! empty($this->amount)
+            && ! empty($this->category_id)
+            && ! empty($this->date)
+        )
+
+        if(isset($this->id) && $this->id != '')
+        {
             // Update
             $sql = "UPDATE `" . self::TABLE_NAME . "` SET
                     amount = :amount,
@@ -182,9 +130,43 @@ class Pay
             $stmt->bindParam(':id',  $this->id, $this->DB::PARAM_INT);
         }
 
-        $stmt->execute();
+        if($stmt->execute()){
+            return true;
+        } else {
+            return false;
+        }
 
-        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    function delete()
+    {
+        if(! self::validate()){
+
+            return false;
+        }
+
+        if(isset($this->id) && $this->id != '')
+        {
+            // Delete
+            $sql = "DELETE FROM `" . self::TABLE_NAME . "` 
+                    WHERE id = :id
+                    ";
+        } else {
+            // ошибка, попытка удаления без id
+            return false;
+        }
+
+        $stmt = $this->DB->prepare($sql);
+        $stmt->bindParam(':id',  $this->id, $this->DB::PARAM_INT);
+
+        if($stmt->execute()){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -198,6 +180,78 @@ class Pay
         return $d && $d->format($format) == $date;
     }
 
+    /**
+     * Валидация данных формы. Инициализация переменных класса
+     * @input $_POST data
+     * @return bool true/false
+     */
+    function validate()
+    {
+        // валидация переданного id
+        if(isset($_POST['id']))
+        {
+            if(! filter_var($_POST['id'], FILTER_VALIDATE_INT))
+            {
+                $this->error_validation = array(
+                    'error' => true,
+                    'amount' => 'Ошибка в указанном id',
+                );
+            } else {
+                $id = str_replace('+','',$_POST['id']);
+                $this->id = str_replace('-','',$id);
+            }
+        }
 
+        // валидация введенной суммы
+        if(isset($_POST['amount']))
+        {
+            if(! filter_var($_POST['amount'], FILTER_VALIDATE_INT)
+                || $_POST['amount'] == 0)
+            {
+                $this->error_validation = array(
+                    'error' => true,
+                    'amount' => 'Ошибка в указанной сумме',
+                );
+            } else {
+                $amount = str_replace('+','',$_POST['amount']);
+                $this->amount = str_replace('-','',$amount);
+            }
+        }
+
+        if(isset($_POST['category_id']))
+        {
+            if(! filter_var($_POST['category_id'], FILTER_VALIDATE_INT))
+            {
+                $this->error_validation = array(
+                    'error' => true,
+                    'category_id' => 'Ошибка в выбранной категории',
+                );
+            } else {
+                $category_id = str_replace('+','',$_POST['category_id']);
+                $this->category_id = str_replace('-','',$category_id);
+            }
+        }
+
+        if(isset($_POST['date']))
+        {
+            if(! self::validateDate($_POST['date']))
+            {
+                $this->error_validation = array(
+                    'error' => true,
+                    'date' =>  'Ошибка в выбранной дате'
+                );
+            } else {
+                $this->date = $_POST['date'];
+            }
+
+            if($this->error_validation['error'] == true)
+            {
+                return false;
+            }
+        }
+
+        $this->description = strip_tags($_POST['description']);
+        return true;
+    }
 
 }
