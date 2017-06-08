@@ -21,11 +21,8 @@ class Pay
         $this->output();
     }
 
+    function input(){}
 
-    function input()
-    {
-
-    }
     function isPost($action)
     {
         if($this->M_Pay->$action()){
@@ -33,7 +30,6 @@ class Pay
         } else {
             return false;
         }
-
     }
 
     function output(){}

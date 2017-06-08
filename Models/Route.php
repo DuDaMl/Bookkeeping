@@ -22,12 +22,21 @@ final class Route {
         {
             // для любого контроллера
             self::$controller_name = '' . ucfirst(str_replace('/', '', $uri)[1]);
-            self::$controller_method = '' . ucfirst(str_replace('/', '', $uri)[2]);
+            if(isset($uri[2]))
+            {
+                self::$controller_method = '' . ucfirst(str_replace('/', '', $uri)[2]);
+            }
+
         } else {
             // дял дефолтного контроллера
             self::$controller_name = '';
             self::$controller_method = '' . str_replace('/', '', $uri)[1];
-            self::$var = $uri[2];
+
+            if(isset($uri[2]))
+            {
+                self::$var = $uri[2];
+            }
+
         }
     }
 
@@ -38,10 +47,15 @@ final class Route {
 
         switch(self::$controller_name){
             case 'Category':
-                if(self::$ontroller_method != '')
+                if(self::$controller_method != '')
                 {
                     $M_Category =  new C_Category();
-                    $M_Category->$controller_method(self::$var);
+                    if(method_exists($M_Category, $controller_method))
+                    {
+                        $M_Category->$controller_method(self::$var);
+                    } else {
+                        $M_Category->index();
+                    }
                 } else {
                     $M_Category =  new C_Category();
                     $M_Category->index(self::$var);

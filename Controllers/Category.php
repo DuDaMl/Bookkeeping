@@ -1,18 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: user
- * Date: 21.05.2017
- * Time: 13:44
- */
-
 namespace bookkeeping\Controllers;
+use bookkeeping\Models\Pay as M_Pay;
+use bookkeeping\Models\Category as M_Category;
 
 
 class Category
 {
+    const MAIN_TEAMPLATE = 'Category';
+    private $M_Category;
+
     public function __construct()
     {
-        echo "Controller Category";
+        echo " __construct Controller Pay <br/>";
+        $this->M_Category = new M_Category();
+    }
+
+    public function index()
+    {
+
     }
 }
