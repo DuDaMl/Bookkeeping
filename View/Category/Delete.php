@@ -4,14 +4,12 @@
 ?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
-    <h1>Расходы</h1>
-    <h2>Удаление расходов</h2>
+    <h1>Категория</h1>
+    <h2>Удаление Категории</h2>
 
-    <p><?= $pay->description; ?> </p>
-    <p><?= $pay->amount; ?> грн </p>
-    <p><?= $pay->date; ?> </p>
-    <form action="/delete/<?=$pay->id?>" method="post">
-        <input type="hidden" min="0" step="1" name="id" value="<?=$pay->id?>">
+    <p><?= $category->name; ?>   </p>
+    <form action="/Category/delete/<?=$category->id?>" method="post">
+        <input type="hidden" min="0" step="1" name="id" value="<?=$category->id?>">
         <button type="submit" class="btn btn-default">Удалить</button>
         <br/>
         <br/>

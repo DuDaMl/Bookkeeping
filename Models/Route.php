@@ -27,6 +27,11 @@ final class Route {
                 self::$controller_method = '' . ucfirst(str_replace('/', '', $uri)[2]);
             }
 
+            if(isset($uri[3]))
+            {
+                self::$var = $uri[3];
+            }
+
         } else {
             // дял дефолтного контроллера
             self::$controller_name = '';
@@ -49,6 +54,7 @@ final class Route {
             case 'Category':
                 if(self::$controller_method != '')
                 {
+                    echo self::$var . "<<<";
                     $M_Category =  new C_Category();
                     if(method_exists($M_Category, $controller_method))
                     {

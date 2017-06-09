@@ -1,11 +1,13 @@
 <?php
 namespace bookkeeping\Controllers;
+use bookkeeping\Controllers\Controller as Controller;
 use bookkeeping\Models\Pay as M_Pay;
 use bookkeeping\Models\Category as M_Category;
 
 class Pay
+    extends Controller
 {
-    const MAIN_TEAMPLATE = 'Pay';
+    protected $main_teamplate = 'Pay';
     private $M_Pay;
 
     function __construct()
@@ -107,14 +109,5 @@ class Pay
 
         $this->render($data, 'Delete');
         $this->start();
-    }
-
-    function render($data, $view = 'Index')
-    {
-        foreach ($data as $k => $v) {
-            $$k = $v;
-        }
-
-        return include (__DIR__ . '\..\View\\' . self::MAIN_TEAMPLATE . '\\' . $view . '.php');
     }
 }

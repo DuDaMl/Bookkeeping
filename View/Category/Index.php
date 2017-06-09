@@ -3,48 +3,17 @@
 
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
-    <h1>Расходы</h1>
+    <h1>Категории</h1>
 
-    <form action="/" method="post">
+    <form action="/Category/" method="post">
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">
-                    <div class='input-group date' id='datetimepicker1'>
-                        <input type='text' class="form-control" value="<?=date('Y-m-d');?>" name="date"/>
-                        <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="form-group">
-                    <input type="number" min="0" step="1" class="form-control" id="exampleInputEmail1" placeholder="Сумма" name="amount">
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="dropdown">
-                    <select class="selectpicker" data-live-search="true" name="category_id" data-width="100%">
-
-                        <?php
-                            $output = '';
-                            foreach ($categories as $category){
-                                $output .= ' <option data-tokens="' . $category->name . '" value="' . $category->id . '">' . $category->name . '</option>';
-                            }
-                            echo $output;
-                        ?>
-                    </select>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="form-group">
-                    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Описание" name="description">
+                    <input type="text" min="0" step="1" class="form-control" id="exampleInputEmail1" placeholder="Название категории" name="name">
                 </div>
             </div>
         </div>
-
-
-        <button type="submit" class="btn btn-default">Submit</button>
+        <button type="submit" class="btn btn-default">Добавить</button>
         <br/>
         <br/>
     </form>
@@ -77,22 +46,12 @@
         <?php
         $output = '';
         $date_current = 0;
-        foreach ($pays as $pay){
-
-            $date = $pay->date;
-            if($date != $date_current){
-                $output .= ' <span href="#" class="list-group-item active">
-                           ' . $pay->date . '
-                        </span>';
-            }
+        foreach ($categories as $category){
 
             $output .= '<li class="list-group-item">
-                <a href="/edit/' . $pay->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
-                <a href="/delete/' . $pay->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                <span class="badge">' . $pay->amount . '</span> <strong>' . $pay->name . "</strong> Описание:'" . $pay->description .'\'
-            
-            </li>';
-            $date_current = $pay->date;
+                <a href="/Category/edit/' . $category->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                <a href="/Category/delete/' . $category->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                 <strong>' . $category->name . '</strong> </li>';
         }
         echo $output;
         ?>

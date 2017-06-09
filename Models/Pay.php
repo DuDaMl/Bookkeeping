@@ -1,6 +1,8 @@
 <?php
 namespace bookkeeping\Models;
 use \DateTime;
+use \PDO;
+
 class Pay
 {
     const TABLE_NAME = 'pay';
@@ -37,7 +39,7 @@ class Pay
        {
            $result = $this->DB->prepare($sql);
            $result->execute();
-           return $result->fetchAll($this->DB::FETCH_CLASS);
+           return $result->fetchAll(PDO::FETCH_CLASS);
        }
        catch(PDOException $e)
        {
@@ -71,7 +73,7 @@ class Pay
             $result->execute(array(
                 ':id' => $id
             ));
-            return $result->fetch($this->DB::FETCH_OBJ);
+            return $result->fetch(PDO::FETCH_OBJ);
         }
         catch(PDOException $e)
         {
@@ -94,6 +96,7 @@ class Pay
             && ! empty($this->category_id)
             && ! empty($this->date)
         )
+            // todo contionue?
 
         if(isset($this->id) && $this->id != '')
         {
@@ -121,13 +124,13 @@ class Pay
         }
 
         $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':amount',  $this->amount, $this->DB::PARAM_INT);
-        $stmt->bindParam(':description', $this->description , $this->DB::PARAM_STR);
-        $stmt->bindParam(':category_id', $this->category_id , $this->DB::PARAM_INT);
-        $stmt->bindParam(':date', $this->date , $this->DB::PARAM_STR);
+        $stmt->bindParam(':amount',  $this->amount, PDO::PARAM_INT);
+        $stmt->bindParam(':description', $this->description , PDO::PARAM_STR);
+        $stmt->bindParam(':category_id', $this->category_id , PDO::PARAM_INT);
+        $stmt->bindParam(':date', $this->date , PDO::PARAM_STR);
 
         if(isset($this->id) && $this->id != ''){
-            $stmt->bindParam(':id',  $this->id, $this->DB::PARAM_INT);
+            $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
         }
 
         if($stmt->execute()){
@@ -160,7 +163,7 @@ class Pay
         }
 
         $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':id',  $this->id, $this->DB::PARAM_INT);
+        $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
 
         if($stmt->execute()){
             return true;
