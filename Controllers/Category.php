@@ -22,8 +22,10 @@ class Category
 
     public function index()
     {
-        if(isset($_POST['name'])){
-            if($this->isPost('save')){
+        if(isset($_POST['name']))
+        {
+            if($this->isPost('save'))
+            {
                 header("Location: /Category/");
                 exit();
             }
@@ -36,17 +38,22 @@ class Category
 
     function edit($id)
     {
-        if(isset($_POST['name'])){
-            if($this->isPost('save')){
+        if(isset($_POST['name']))
+        {
+            if($this->isPost('save'))
+            {
                 header("Location: /edit/" . $id);
                 exit();
             }
+            $data['error'] = $this->M_Category->error_validation;
         }
-        $data['category'] = $this->M_Category->getById($id);
-        $data['error'] = $this->M_Category->error_validation;
 
-        if(empty($data['category'])){
-            if(! empty($data['error'])){
+        $data['category'] = $this->M_Category->getById($id);
+
+        if(empty($data['category']))
+        {
+            if(! empty($data['error']))
+            {
                 $data['error']['text'] = $data['error']['text'] . ' <br/> нет такой записи';
             } else {
                 $data['error'] =  array(
@@ -55,7 +62,6 @@ class Category
                 );
             }
         }
-
 
         $this->render($data, 'Edit');
         $this->start();
@@ -66,9 +72,8 @@ class Category
      */
     function delete($id)
     {
-
-
-        if(!empty($_POST) && $_POST['id'] != ''){
+        if(!empty($_POST) && $_POST['id'] != '')
+        {
             if($this->isPost('delete')){
                 header("Location: /Category/");
                 exit();
@@ -78,8 +83,10 @@ class Category
         $data['category'] = $this->M_Category->getById($id);
         $data['error'] = $this->M_Category->error_validation;
 
-        if(empty($data['category'])){
-            if(! empty($data['error'])){
+        if(empty($data['category']))
+        {
+            if(! empty($data['error']))
+            {
                 $data['error']['text'] = $data['error']['text'] . ' <br/> нет такой записи';
             } else {
                 $data['error'] =  array(

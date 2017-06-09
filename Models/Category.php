@@ -41,7 +41,6 @@ class Category
      */
     function getById($id)
     {
-        echo ">> " . $id . ">>";
         if(filter_var($id, FILTER_VALIDATE_INT)){
             $id = str_replace('+', '', $id);
             $id = str_replace('-', '', $id);

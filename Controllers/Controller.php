@@ -24,6 +24,9 @@ abstract class Controller
             $$k = $v;
         }
 
+        // переменная для указания активного пункта главного меню
+        $current_page = $this->main_teamplate;
+
         return include (__DIR__ . '\..\View\\' . $this->main_teamplate . '\\' . $view . '.php');
     }
 }

@@ -6,6 +6,7 @@
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <h1>Категории</h1>
+    <h2>Редактирование</h2>
 
     <form action="/Category/" method="post">
         <div class="row">

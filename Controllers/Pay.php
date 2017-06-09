@@ -14,16 +14,7 @@ class Pay
     {
         echo " __construct Controller Pay <br/>";
         $this->M_Pay = new M_Pay();
-
     }
-
-    function start()
-    {
-        $this->input();
-        $this->output();
-    }
-
-    function input(){}
 
     function isPost($action)
     {
@@ -34,8 +25,6 @@ class Pay
         }
     }
 
-    function output(){}
-
     function index()
     {
         if(!empty($_POST) && $_POST['category_id'] != ''){
@@ -43,12 +32,18 @@ class Pay
                 header("Location: /");
                 exit();
             }
+
+            // ошибки добавления новой записи расходов
+            $data['error'] = $this->M_Pay->error_validation;
         }
 
+        // загрузка всех платежей текущего месяца
         $data['pays'] = $this->M_Pay->getAll();
-        $M_Category = new M_Category();
-        $data['categories'] = $M_Category->getAll();
-        $data['error'] = $this->M_Pay->error_validation;
+
+        // загрузка всех категорий расходов
+        $data['categories'] =  (new M_Category())->getAll();
+
+
         $this->render($data);
     }
 
@@ -56,7 +51,7 @@ class Pay
     {
         if(!empty($_POST) && $_POST['category_id'] != ''){
             if($this->isPost('save')){
-                header("Location: /edit/" . $id);
+                header("Location: /");
                 exit();
             }
         }
@@ -78,7 +73,6 @@ class Pay
         $M_Category = new M_Category();
         $data['categories'] = $M_Category->getAll();
         $this->render($data, 'Edit');
-        $this->start();
     }
 
     /**
@@ -108,6 +102,5 @@ class Pay
         }
 
         $this->render($data, 'Delete');
-        $this->start();
     }
 }

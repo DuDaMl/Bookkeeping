@@ -38,9 +38,9 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="/">Расходы</a></li>
-                    <li><a href="#">Доходы</a></li>
-                    <li><a href="/Category">Категории</a></li>
+                    <li <?php if($current_page == 'Pay') { echo 'class="active"';}?>><a href="/Pay">Расходы</a></li>
+                    <li <?php if($current_page == 'Pay2') { echo 'class="active"';}?>><a href="#">Доходы</a></li>
+                    <li <?php if($current_page == 'Category') { echo 'class="active"';}?>><a href="/Category">Категории</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
                         <ul class="dropdown-menu">
@@ -62,3 +62,5 @@
             </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
     </nav>
+
+    <?php // echo $current_page;?>

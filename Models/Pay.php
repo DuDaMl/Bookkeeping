@@ -64,8 +64,7 @@ class Pay
             return false;
         }
 
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`     
-               WHERE  id = :id";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = :id";
 
         try
         {
@@ -256,5 +255,4 @@ class Pay
         $this->description = strip_tags($_POST['description']);
         return true;
     }
-
 }

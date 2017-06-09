@@ -4,7 +4,6 @@
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <h1>Расходы</h1>
-
     <form action="/" method="post">
         <div class="row">
             <div class="col-lg-3">
@@ -42,19 +41,22 @@
                 </div>
             </div>
         </div>
-
-
-        <button type="submit" class="btn btn-default">Submit</button>
+        <button type="submit" class="btn btn-default">Добавить</button>
         <br/>
         <br/>
     </form>
     <?php
+    // Отображение ошибок добавления новой записи
+    if(isset($data['error']))
+    {
+        $form_error = $data['error'];
 
-    $form_error = $data['error'];
-    if($form_error['error'] == 1) {
-        unset($form_error['error']);
-        foreach ($form_error as $item){
-            echo '<div class="alert alert-danger" role="alert">' . $item . '</div>';
+        if($form_error['error'] == 1)
+        {
+            unset($form_error['error']);
+            foreach ($form_error as $item){
+                echo '<div class="alert alert-danger" role="alert">' . $item . '</div>';
+            }
         }
     }
     ?>
@@ -67,13 +69,6 @@
         </div>
     </div>
     <ul class="list-group">
-        <?php
-        /*
-        ?><span href="#" class="list-group-item active">
-            Cras justo odio
-        </span>
-        <?php */ ?>
-
         <?php
         $output = '';
         $date_current = 0;
@@ -89,9 +84,14 @@
             $output .= '<li class="list-group-item">
                 <a href="/edit/' . $pay->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
                 <a href="/delete/' . $pay->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                <span class="badge">' . $pay->amount . '</span> <strong>' . $pay->name . "</strong> Описание:'" . $pay->description .'\'
-            
-            </li>';
+                <span class="badge">' . $pay->amount . '</span> <strong>' . $pay->name . '</strong>';
+
+            if(! empty($pay->description))
+            {
+                $output .= ' ' . $pay->description;
+            }
+
+            $output .= '</li>';
             $date_current = $pay->date;
         }
         echo $output;

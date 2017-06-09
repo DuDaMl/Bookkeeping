@@ -54,7 +54,6 @@ final class Route {
             case 'Category':
                 if(self::$controller_method != '')
                 {
-                    echo self::$var . "<<<";
                     $M_Category =  new C_Category();
                     if(method_exists($M_Category, $controller_method))
                     {
