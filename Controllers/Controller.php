@@ -20,6 +20,8 @@ abstract class Controller
 
     function render($data, $view = 'Index')
     {
+
+
         foreach ($data as $k => $v) {
             $$k = $v;
         }

@@ -17,21 +17,20 @@
         <br/>
     </form>
     <?php
+    // Отображение ошибок добавления новой записи
+    if(isset($data['error']))
+    {
+        $form_error = $data['error'];
 
-
-    /*f($error['error'] == 1) {
-        echo '<div class="alert alert-danger" role="alert">' . $error['text'] . '</div>';
-    }
-    */
-    if($error['error'] == 1) {
-        unset($error['error']);
-        foreach ($error as $item){
-            echo '<div class="alert alert-danger" role="alert">' . $item . '</div>';
+        if($form_error['error'] == 1)
+        {
+            unset($form_error['error']);
+            foreach ($form_error as $item){
+                echo '<div class="alert alert-danger" role="alert">' . $item . '</div>';
+            }
         }
     }
-
     ?>
-
 </div>
 
 </div> <!-- /container -->

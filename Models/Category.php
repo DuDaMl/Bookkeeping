@@ -7,10 +7,8 @@ class Category
 
     const TABLE_NAME = 'category';
     protected $DB;
-    public $amount;
-    public $description;
-    public $category_id;
-    public $date_create;
+    public $name;
+    public $type;
 
     public $error_validation;
 
@@ -19,14 +17,13 @@ class Category
         $this->DB = DB::getInstance()->getConnection();
     }
 
-    function getAll()
+    protected function get($sql)
     {
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`";
-
         try
         {
             $result = $this->DB->prepare($sql);
             $result->execute();
+
             return $result->fetchAll(PDO::FETCH_CLASS);
         }
         catch(PDOException $e)
@@ -34,6 +31,24 @@ class Category
             echo $e->getMessage();
             return false;
         }
+    }
+
+    function getAll()
+    {
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`";
+        return $this->get($sql);
+    }
+
+    function getAllPays()
+    {
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE type = 'Pay'";
+        return $this->get($sql);
+    }
+
+    function getAllIncomes()
+    {
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE type = 'Income'";
+        return $this->get($sql);
     }
 
     /**
@@ -52,22 +67,11 @@ class Category
             return false;
         }
 
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`     
-               WHERE  id = :id";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
 
-        try
-        {
-            $result = $this->DB->prepare($sql);
-            $result->execute(array(
-                ':id' => $id
-            ));
-            return $result->fetch(PDO::FETCH_OBJ);
-        }
-        catch(PDOException $e)
-        {
-            echo $e->getMessage();
-            return false;
-        }
+        $answer = $this->get($sql);
+        return $answer[0];
+
     }
 
     /**
@@ -75,7 +79,6 @@ class Category
      */
     function save()
     {
-
         if(! self::validate())
         {
             return false;
@@ -94,20 +97,24 @@ class Category
             {
                 // Update
                 $sql = "UPDATE `" . self::TABLE_NAME . "` SET
-                    name = :name
+                    name = :name,
+                    type = :type
                     WHERE id = :id
                     ";
             } else {
                 // Create
                 $sql = "INSERT INTO `" . self::TABLE_NAME . "`
-                    (name)
+                    (name,
+                    type)
                      VALUES (
-                    :name
+                    :name,
+                    :type
                     )";
             }
 
         $stmt = $this->DB->prepare($sql);
         $stmt->bindParam(':name', $this->name , PDO::PARAM_STR);
+        $stmt->bindParam(':type', $this->type , PDO::PARAM_STR);
 
         if(isset($this->id) && $this->id != ''){
             $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
@@ -162,13 +169,25 @@ class Category
                     'error' => true,
                     'amount' => 'Ошибка в указанном id',
                 );
+                return false;
             } else {
                 $id = str_replace('+','',$_POST['id']);
                 $this->id = str_replace('-','',$id);
             }
         }
 
+        if($_POST['type'] != 'Pay'
+            && $_POST['type'] != 'Income')
+        {
+            $this->error_validation = array(
+                'error' => true,
+                'amount' => 'Ошибка в указанном типе категории',
+            );
+            return false;
+        }
+
         $this->name = strip_tags($_POST['name']);
+        $this->type = strip_tags($_POST['type']);
         return true;
     }
 }

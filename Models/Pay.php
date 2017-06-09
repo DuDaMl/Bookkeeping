@@ -23,6 +23,22 @@ class Pay
     /**
      * @return array|bool
      */
+
+   protected function get($sql)
+   {
+       try
+       {
+           $result = $this->DB->prepare($sql);
+           $result->execute();
+           return $result->fetchAll(PDO::FETCH_CLASS);
+       }
+       catch(PDOException $e)
+       {
+           echo $e->getMessage();
+           return false;
+       }
+   }
+
    function getAll()
    {
        $month_start = date('Y-m-01');
@@ -35,17 +51,8 @@ class Pay
                WHERE pay.date BETWEEN  '" . $month_start ."' AND '" . $month_end ."'  
                ORDER BY date DESC, id DESC
                ";
-       try
-       {
-           $result = $this->DB->prepare($sql);
-           $result->execute();
-           return $result->fetchAll(PDO::FETCH_CLASS);
-       }
-       catch(PDOException $e)
-       {
-           echo $e->getMessage();
-           return false;
-       }
+
+       return $this->get($sql);
    }
 
     /**
@@ -64,21 +71,10 @@ class Pay
             return false;
         }
 
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = :id";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
 
-        try
-        {
-            $result = $this->DB->prepare($sql);
-            $result->execute(array(
-                ':id' => $id
-            ));
-            return $result->fetch(PDO::FETCH_OBJ);
-        }
-        catch(PDOException $e)
-        {
-            echo $e->getMessage();
-            return false;
-        }
+        $answer = $this->get($sql);
+        return $answer[0];
     }
 
     /**

@@ -31,7 +31,8 @@ class Category
             }
         }
 
-        $data['categories'] = $this->M_Category->getAll();
+        $data['categories_pays'] = $this->M_Category->getAllPays();
+        $data['categories_incomes'] = $this->M_Category->getAllIncomes();
         $data['error'] = $this->M_Category->error_validation;
         $this->render($data);
     }
@@ -50,6 +51,8 @@ class Category
 
         $data['category'] = $this->M_Category->getById($id);
 
+        //print_r($data['category']);
+
         if(empty($data['category']))
         {
             if(! empty($data['error']))
@@ -63,8 +66,9 @@ class Category
             }
         }
 
+        print_r($data);
+
         $this->render($data, 'Edit');
-        $this->start();
     }
 
     /**
