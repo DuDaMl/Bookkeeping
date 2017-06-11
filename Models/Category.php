@@ -23,7 +23,6 @@ class Category
         {
             $result = $this->DB->prepare($sql);
             $result->execute();
-
             return $result->fetchAll(PDO::FETCH_CLASS);
         }
         catch(PDOException $e)
@@ -33,9 +32,9 @@ class Category
         }
     }
 
-    function getAll()
+    function getAll($type = 'Pay')
     {
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" . " WHERE type = '" . $type . "' ORDER BY name ASC";
         return $this->get($sql);
     }
 
@@ -68,10 +67,8 @@ class Category
         }
 
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-
         $answer = $this->get($sql);
         return $answer[0];
-
     }
 
     /**
@@ -175,7 +172,7 @@ class Category
                 $this->id = str_replace('-','',$id);
             }
         }
-
+        /*
         if($_POST['type'] != 'Pay'
             && $_POST['type'] != 'Income')
         {
@@ -185,7 +182,7 @@ class Category
             );
             return false;
         }
-
+        */
         $this->name = strip_tags($_POST['name']);
         $this->type = strip_tags($_POST['type']);
         return true;

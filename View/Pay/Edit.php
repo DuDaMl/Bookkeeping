@@ -7,7 +7,7 @@
     <h1>Расходы</h1>
     <h2>Редактирование расходов</h2>
 
-    <form action="/edit/<?=$pay->id?>" method="post">
+    <form action="/<?= $controller_name ?>/edit/" method="post">
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">

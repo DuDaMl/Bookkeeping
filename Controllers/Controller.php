@@ -28,6 +28,8 @@ abstract class Controller
 
         // переменная для указания активного пункта главного меню
         $current_page = $this->main_teamplate;
+        //echo get_class();
+        $controller_name = $this->main_teamplate;
 
         return include (__DIR__ . '\..\View\\' . $this->main_teamplate . '\\' . $view . '.php');
     }

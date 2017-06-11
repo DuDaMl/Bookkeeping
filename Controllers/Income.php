@@ -1,24 +1,24 @@
 <?php
 namespace bookkeeping\Controllers;
 use bookkeeping\Controllers\Controller as Controller;
-use bookkeeping\Models\Pay as M_Pay;
+use bookkeeping\Models\Income as M_Income;
 use bookkeeping\Models\Category as M_Category;
 
-class Pay
+class Income
     extends Controller
 {
-    protected $main_teamplate = 'Pay';
-    private $M_Pay;
+    protected $main_teamplate = 'Income';
+    private $M_Income;
 
     function __construct()
     {
-        echo " __construct Controller Pay <br/>";
-        $this->M_Pay = new M_Pay();
+        echo " __construct Controller Income <br/>";
+        $this->M_Income = new M_Income();
     }
 
     function isPost($action)
     {
-        if($this->M_Pay->$action())
+        if($this->M_Income->$action())
         {
             return true;
         } else {
@@ -32,35 +32,37 @@ class Pay
         {
             if($this->isPost('save'))
             {
-                header("Location: /");
+                header("Location: /" . $this->main_teamplate);
                 exit();
             }
 
             // ошибки добавления новой записи расходов
-            $data['error'] = $this->M_Pay->error_validation;
+            $data['error'] = $this->M_Income->error_validation;
         }
 
         // загрузка всех платежей текущего месяца
-        $data['pays'] = $this->M_Pay->getAll();
+        $data['incomes'] = $this->M_Income->getAll();
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category())->getAll();
+        $data['categories'] =  (new M_Category())->getAll('Income');
+
         $this->render($data);
     }
 
     function edit($id)
     {
-        if(!empty($_POST) && $_POST['category_id'] != ''){
+        if(!empty($_POST) && $_POST['category_id'] != '')
+        {
             if($this->isPost('save')){
-                header("Location: /");
+                header("Location: /" . $this->main_teamplate);
                 exit();
             }
         }
 
-        $data['pay'] = $this->M_Pay->getById($id);
-        $data['error'] = $this->M_Pay->error_validation;
+        $data['income'] = $this->M_Income->getById($id);
+        $data['error'] = $this->M_Income->error_validation;
 
-        if(empty($data['pay']))
+        if(empty($data['income']))
         {
             if(! empty($data['error']))
             {
@@ -74,7 +76,7 @@ class Pay
         }
 
         $M_Category = new M_Category();
-        $data['categories'] = $M_Category->getAll();
+        $data['categories'] = $M_Category->getAll('Income');
         $this->render($data, 'Edit');
     }
 
@@ -85,16 +87,17 @@ class Pay
     {
         if(!empty($_POST) && $_POST['id'] != '')
         {
-            if($this->isPost('delete')){
-                header("Location: /");
+            if($this->isPost('delete'))
+            {
+                header("Location: /" . $this->main_teamplate);
                 exit();
             }
         }
 
-        $data['pay'] = $this->M_Pay->getById($id);
-        $data['error'] = $this->M_Pay->error_validation;
+        $data['income'] = $this->M_Income->getById($id);
+        $data['error'] = $this->M_Income->error_validation;
 
-        if(empty($data['pay']))
+        if(empty($data['income']))
         {
             if(! empty($data['error']))
             {

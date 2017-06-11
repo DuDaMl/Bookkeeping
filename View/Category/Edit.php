@@ -1,14 +1,10 @@
 <?php include_once(__DIR__ . '\..\Header.php'); ?>
-
-<?php
-    //print_r($category);
-?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <h1>Категории</h1>
     <h2>Редактирование</h2>
 
-    <form action="/Category/" method="post">
+    <form action="/<?= $controller_name ?>/edit/" method="post">
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">

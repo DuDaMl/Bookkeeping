@@ -1,10 +1,9 @@
 <?php include_once(__DIR__ . '\..\Header.php'); ?>
 
-
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
-    <h1>Расходы</h1>
-    <form action="/" method="post">
+    <h1>Доходы</h1>
+    <form action="/<?= $controller_name ?>/" method="post">
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">
@@ -72,27 +71,27 @@
         <?php
         $output = '';
         $date_current = 0;
-        foreach ($pays as $pay){
+        foreach ($incomes as $income){
 
-            $date = $pay->date;
+            $date = $income->date;
             if($date != $date_current){
                 $output .= ' <span href="#" class="list-group-item active">
-                           ' . $pay->date . '
+                           ' . $income->date . '
                         </span>';
             }
 
             $output .= '<li class="list-group-item">
-                <a href="/' . $controller_name . '/edit/' . $pay->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
-                <a href="/' . $controller_name . '/delete/' . $pay->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                <span class="badge">' . $pay->amount . '</span> <strong>' . $pay->name . '</strong>';
+                <a href="/' . $controller_name .'/edit/' . $income->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                <a href="/' . $controller_name .'/delete/' . $income->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                <span class="badge">' . $income->amount . '</span> <strong>' . $income->name . '</strong>';
 
-            if(! empty($pay->description))
+            if(! empty($income->description))
             {
-                $output .= ' ' . $pay->description;
+                $output .= ' ' . $income->description;
             }
 
             $output .= '</li>';
-            $date_current = $pay->date;
+            $date_current = $income->date;
         }
         echo $output;
         ?>

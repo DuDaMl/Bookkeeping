@@ -3,9 +3,9 @@ namespace bookkeeping\Models;
 use \DateTime;
 use \PDO;
 
-class Pay
+class Income
 {
-    const TABLE_NAME = 'pay';
+    const TABLE_NAME = 'income';
     protected $DB;
     public $id;
     public $amount;
@@ -44,14 +44,15 @@ class Pay
        $month_start = date('Y-m-01');
        $month_end = date('Y-m-30');
 
-       $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.date, category.name, category.type
+       $sql = "SELECT income.id, income.amount, income.category_id, income.description, income.date, category.name, category.type
                FROM `" . self::TABLE_NAME . "`     
                LEFT JOIN category
-               ON pay.category_id = category.id 
-               WHERE pay.date BETWEEN  '" . $month_start ."' AND '" . $month_end ."'  
-               AND category.type = 'Pay'
+               ON income.category_id = category.id 
+               WHERE income.date BETWEEN  '" . $month_start ."' AND '" . $month_end ."'  
+               AND category.type = 'Income'
                ORDER BY date DESC, id DESC
                ";
+
        return $this->get($sql);
    }
 
@@ -141,8 +142,8 @@ class Pay
      */
     function delete()
     {
-        if(! self::validate()){
-
+        if(! self::validate())
+        {
             return false;
         }
 

@@ -5,7 +5,7 @@
 <div class="jumbotron">
     <h1>Категории</h1>
 
-    <form action="/Category/" method="post">
+    <form action="/<?= $controller_name ?>/" method="post">
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">
@@ -50,8 +50,8 @@
                     foreach ($categories_pays as $category){
 
                         $output .= '<li class="list-group-item">
-                                    <a href="/Category/edit/' . $category->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
-                                    <a href="/Category/delete/' . $category->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                                    <a href="/'. $controller_name .'/edit/' . $category->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                                    <a href="/'. $controller_name .'/delete/' . $category->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                                     <strong>' . $category->name . '</strong> </li>';
                     }
                     echo $output;
@@ -68,8 +68,8 @@
                     foreach ($categories_incomes as $category){
 
                         $output .= '<li class="list-group-item">
-                                    <a href="/Category/edit/' . $category->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
-                                    <a href="/Category/delete/' . $category->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                                    <a href="/'. $controller_name .'/edit/' . $category->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                                    <a href="/'. $controller_name .'/delete/' . $category->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                                     <strong>' . $category->name . '</strong> </li>';
                     }
                     echo $output;
