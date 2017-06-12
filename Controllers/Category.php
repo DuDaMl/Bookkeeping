@@ -66,8 +66,6 @@ class Category
             }
         }
 
-        print_r($data);
-
         $this->render($data, 'Edit');
     }
 

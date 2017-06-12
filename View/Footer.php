@@ -9,7 +9,29 @@
     $(function () {
         $('#datetimepicker1').datepicker({
             format: "yyyy-mm-dd",
-            //startDate: "<?=date('Y-m-d');?>"
+        });
+
+        // ��������� ���
+       //Default: 'days'
+        $('#datetimepicker_day').datepicker({
+            format: "yyyy-mm-dd",
+            viewMode: 'days',
+        });
+
+        // ��������� ������
+        //months
+        $('#datetimepicker_months').datepicker({
+            format: "yyyy-mm",
+            viewMode: "months",
+            minViewMode: "months"
+        });
+
+        // ��������� ����
+        // viewMode: 'years'
+        $('#datetimepicker_years').datepicker({
+            format: "yyyy",
+            viewMode: "years",
+            minViewMode: "years"
         });
     });
 </script>

@@ -40,13 +40,13 @@ class Category
 
     function getAllPays()
     {
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE type = 'Pay'";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE type = 'Pay' ORDER BY name ASC";
         return $this->get($sql);
     }
 
     function getAllIncomes()
     {
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE type = 'Income'";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE type = 'Income'  ORDER BY name ASC";
         return $this->get($sql);
     }
 
