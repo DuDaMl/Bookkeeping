@@ -12,7 +12,8 @@ class Income
 
     function __construct()
     {
-        echo " __construct Controller Income <br/>";
+        parent::__construct();
+       // echo " __construct Controller Income <br/>";
         $this->M_Income = new M_Income();
     }
 

@@ -5,6 +5,7 @@ use bookkeeping\Models\Setting as M_Setting;
 use bookkeeping\Models\Pay as M_Pay;
 use bookkeeping\Models\Category as M_Category;
 
+
 class Pay
     extends Controller
 {
@@ -22,10 +23,15 @@ class Pay
 
     function __construct()
     {
-        echo " __construct Controller Pay <br/>";
+        parent::__construct();
+        //echo " __construct Controller Pay <br/>";
+
+
         $this->M_Pay = new M_Pay();
         $this->M_Setting = new M_Setting();
         $this->setting();
+
+
     }
 
     public function setting()

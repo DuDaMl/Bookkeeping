@@ -13,7 +13,8 @@ class Category
 
     public function __construct()
     {
-        echo " __construct Controller Category <br/>";
+        parent::__construct();
+        //echo " __construct Controller Category <br/>";
         $this->M_Category = new M_Category();
     }
 

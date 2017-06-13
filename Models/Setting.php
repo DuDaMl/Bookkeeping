@@ -18,26 +18,24 @@ class Setting
     {
         $this->DB = DB::getInstance()->getConnection();
     }
-
     /**
      * @return array|bool
      */
 
-   protected function get($sql)
-   {
-       try
-       {
-           $result = $this->DB->prepare($sql);
-           $result->execute();
-           return $result->fetchAll(PDO::FETCH_CLASS);
-       }
-       catch(PDOException $e)
-       {
-           echo $e->getMessage();
-           return false;
-       }
-   }
-
+    protected function get($sql)
+    {
+        try
+        {
+            $result = $this->DB->prepare($sql);
+            $result->execute();
+            return $result->fetchAll(PDO::FETCH_CLASS);
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+            return false;
+        }
+    }
     /**
      * @return array|bool
      */
@@ -111,39 +109,5 @@ class Setting
         } else {
             return false;
         }
-    }
-
-    /**
-     * @return bool
-     */
-    function delete()
-    {
-        /*
-        if(! self::validate()){
-
-            return false;
-        }
-
-        if(isset($this->id) && $this->id != '')
-        {
-            // Delete
-            $sql = "DELETE FROM `" . self::TABLE_NAME . "` 
-                    WHERE id = :id
-                    ";
-        } else {
-            // ошибка, попытка удаления без id
-            return false;
-        }
-
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
-
-        if($stmt->execute())
-        {
-            return true;
-        } else {
-            return false;
-        }
-        */
     }
 }

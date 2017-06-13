@@ -1,6 +1,7 @@
 <?php
 namespace bookkeeping\Models;
 
+use bookkeeping\Controllers\Index;// as Pay;
 use bookkeeping\Controllers\Pay;// as Pay;
 use bookkeeping\Controllers\Income;// as Income;
 use bookkeeping\Controllers\Category;// as Category;
@@ -10,7 +11,8 @@ final class Route {
     static $allow_controller_name = array(
         0 => 'Category',
         1 => 'Pay',
-        2 => 'Income'
+        2 => 'Income',
+        3 => 'Index'
     );
     static $controller_name;
     static $controller_method;
@@ -18,9 +20,22 @@ final class Route {
 
     public function __construct($uri)
     {
+        // clear get request
+        $pos = strpos($uri,'?');
+        $uri = substr($uri, 0, $pos);
+
         $uri = explode('/', $uri);
 
-        if(in_array($uri[1], self::$allow_controller_name))
+
+        // for google oauth on XAMPP
+        // todo delete on hosting
+        if($uri[1] == 'bookkeeping.com')
+        {
+            array_splice($uri,0, 1);
+        }
+       // print_R($uri);// . "<<";
+
+        if(in_array(ucfirst($uri[1]), self::$allow_controller_name))
         {
             // для любого контроллера
             self::$controller_name = '' . ucfirst(str_replace('/', '', $uri)[1]);
@@ -52,7 +67,7 @@ final class Route {
     {
         // ToDo валидация инициализируемого класса.
         $controller_method = self::$controller_method;
-
+        echo self::$controller_name;
         if(in_array(self::$controller_name, self::$allow_controller_name))
         {
             $controller_name = trim(self::$controller_name);
@@ -66,6 +81,9 @@ final class Route {
                     break;
                 case 'Income':
                     $C_Controller = new Income();
+                    break;
+                case 'Index':
+                    $C_Controller = new Index();
                     break;
             }
 

@@ -7,7 +7,7 @@
  */
 
 namespace bookkeeping\Controllers;
-
+use bookkeeping\Models\User as M_User;
 
 abstract class Controller
 {
@@ -15,13 +15,31 @@ abstract class Controller
 
     function __construct()
     {
-        echo " __construct Controller Controller <br/>";
+
+        //echo " __construct Controller Controller <br/>";
+
+        $this->M_User = new M_User();
+
+        // auth
+        if(isset($_SESSION['user_id']))
+        {
+            if(! $this->M_User->checkSession($_SESSION['user_id'], $_SESSION['token']))
+            {
+                // todo not auth user;
+                echo 'not auth user' . '<br/>';
+            }
+
+        } else {
+            // todo not auth user;
+            echo 'not auth user' . '<br/>';
+        }
+
+        print_r($_SESSION);
+
     }
 
     function render($data, $view = 'Index')
     {
-
-
         foreach ($data as $k => $v) {
             $$k = $v;
         }

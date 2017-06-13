@@ -7,7 +7,6 @@
             "email": "duda.ml1986@gmail.com"
         }
     ],
-    "require": {},
     "autoload": {
       "psr-4": {
           "bookkeeping\\" : ""
