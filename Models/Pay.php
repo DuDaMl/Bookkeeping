@@ -39,16 +39,16 @@ class Pay
        }
    }
 
-   function getAll()
+   function getAll($start, $end)
    {
-       $month_start = date('Y-m-01');
-       $month_end = date('Y-m-30');
+       //$month_start = date('Y-m-01');
+       //$month_end = date('Y-m-30');
 
        $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.date, category.name, category.type
                FROM `" . self::TABLE_NAME . "`     
                LEFT JOIN category
                ON pay.category_id = category.id 
-               WHERE pay.date BETWEEN  '" . $month_start ."' AND '" . $month_end ."'  
+               WHERE pay.date BETWEEN  '" . $start ."' AND '" . $end ."'
                AND category.type = 'Pay'
                ORDER BY date DESC, id DESC
                ";

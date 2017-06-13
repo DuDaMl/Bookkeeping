@@ -11,14 +11,12 @@
             format: "yyyy-mm-dd",
         });
 
-        // ��������� ���
        //Default: 'days'
         $('#datetimepicker_day').datepicker({
             format: "yyyy-mm-dd",
             viewMode: 'days',
         });
 
-        // ��������� ������
         //months
         $('#datetimepicker_months').datepicker({
             format: "yyyy-mm",
@@ -26,7 +24,6 @@
             minViewMode: "months"
         });
 
-        // ��������� ����
         // viewMode: 'years'
         $('#datetimepicker_years').datepicker({
             format: "yyyy",
