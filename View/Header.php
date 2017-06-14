@@ -58,7 +58,19 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li class="active"><a href="./">Default <span class="sr-only">(current)</span></a></li>
                     <li><a href="https://accounts.google.com/o/oauth2/auth?redirect_uri=http://localhost/bookkeeping.com/index&amp;response_type=code&amp;client_id=344999880236-avemoshdfile1s78mqugngj1suf0urrq.apps.googleusercontent.com&amp;scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile">Аутентификация через Google</a></li>
-                    <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+                    <li><a href="../navbar-fixed-top/">
+                            <?php
+                            if(isset($user) && ! empty($user))
+                            {
+                                echo "<img src='" . $user->picture . "' height=18px> ";
+                                //echo $user->given_name . " " .$user->family_name;
+                                // todo exit();
+                            }
+
+
+
+                            ?>
+                        </a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->

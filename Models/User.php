@@ -40,8 +40,10 @@ class User
             return false;
         }
     }
+
     /**
-     * @return array|bool
+     * @param $id
+     * @return Obj
      */
     function getById($id)
     {
@@ -52,12 +54,12 @@ class User
     /**
      * @return array|bool
      */
-    function getTokenById($id)
+    /*function getTokenById($id)
     {
         $sql = "SELECT `token` FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
         $answer = $this->get($sql);
         return $answer[0];
-    }
+    }*/
     /**
      * @return array|bool
      */
@@ -68,16 +70,14 @@ class User
         return $answer[0];
     }
 
-    function checkSession($user_id)
+    function checkToken($user_id)
     {
-        // token from db by user id
-        $token = $this->getTokenById($user_id);
+        // user from db by user id as Obj
+        $user = $this->getById($user_id);
 
-
-
-        if($token != $_SESSION['token'])
+        if($user->token != $_SESSION['token'])
         {
-            session_destroy();
+            //session_destroy();
             return false;
         }
 
@@ -95,7 +95,6 @@ class User
         if($stmt->execute())
         {
             $_SESSION['token'] =  $token;
-            echo $token . " << <br/>" . $_SESSION['token'];
             return true;
         } else {
             return false;

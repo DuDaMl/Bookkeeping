@@ -24,20 +24,13 @@ class Pay
     function __construct()
     {
         parent::__construct();
-        //echo " __construct Controller Pay <br/>";
-
-
         $this->M_Pay = new M_Pay();
         $this->M_Setting = new M_Setting();
         $this->setting();
-
-
     }
 
     public function setting()
     {
-
-
         if(isset($_POST['format']))
         {
             switch($_POST['format'])
@@ -75,6 +68,7 @@ class Pay
             // Валидация даты
             if(! $this->M_Pay->validateDate($date, $format))
             {
+                echo "<h1>false</h1>";
                 // в случае неправльно указанных данных устанавливается значение по умолчанию
                 $this->data_report_start = date('Y-m-01');
                 $this->data_report_end = date('Y-m-31');

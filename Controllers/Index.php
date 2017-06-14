@@ -10,7 +10,6 @@ class Index
 
     function __construct()
     {
-        echo " __construct Controller Index <br/>";
         $this->M_User = new M_User();
     }
 
@@ -23,6 +22,7 @@ class Index
     function index()
     {
 
+/*
         $client_id = '344999880236-avemoshdfile1s78mqugngj1suf0urrq.apps.googleusercontent.com'; // Client ID
         $client_secret = 'cudU-7d6CKd_fBZ-WD9Bvgtz'; // Client secret
         $redirect_uri = 'http://localhost/bookkeeping.com/index'; // Redirect URIs
@@ -72,6 +72,21 @@ class Index
                 }
             }
         }
+*/
+
+$userInfo = array (
+'id' => 110665724950086710524,
+'email' => 'duda.ml1986@gmail.com',
+'verified_email' => 1 ,
+'name' => 'Denys Duvanov',
+'given_name' => 'Denys ',
+'family_name' => 'Duvanov' ,
+'link' => 'https://plus.google.com/+DenysDuvanov',
+'picture' => 'https://lh3.googleusercontent.com/-bTbce9eGjJU/AAAAAAAAAAI/AAAAAAAABKM/JgsGM1YiM_Y/photo.jpg',
+'gender' => 'male ',
+'locale' => 'ru' );
+
+//var_dump($userInfo);
 
         if(! empty($userInfo['email']))
         {
@@ -96,22 +111,19 @@ class Index
                     // todo false action
                 }
 
-                header('Location: /');
+                //header('Location: /');
 
             } else {
-                // session create
-                if(! $this->M_User->setSession($user->id))
-                {
-                    //echo 'false';
-                    // todo false action
-                }
 
+                // Если данный пользователь уже существует то создаём сессию
+                $this->M_User->setSession($user->id);
                 header('Location: /');
             }
-        } else {
-            // redirect to homepage
-            header('Location: /');
 
+
+        } else {
+            // не удалось авторизоваться, вывод сообщения об ошибке.
+            // todo error show. Can not Auth
         }
 
     }

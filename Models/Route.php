@@ -20,12 +20,16 @@ final class Route {
 
     public function __construct($uri)
     {
+
         // clear get request
         $pos = strpos($uri,'?');
-        $uri = substr($uri, 0, $pos);
+
+        if($pos > 0)
+        {
+            $uri = substr($uri, 0, $pos);
+        }
 
         $uri = explode('/', $uri);
-
 
         // for google oauth on XAMPP
         // todo delete on hosting
@@ -33,7 +37,6 @@ final class Route {
         {
             array_splice($uri,0, 1);
         }
-       // print_R($uri);// . "<<";
 
         if(in_array(ucfirst($uri[1]), self::$allow_controller_name))
         {
@@ -67,7 +70,7 @@ final class Route {
     {
         // ToDo валидация инициализируемого класса.
         $controller_method = self::$controller_method;
-        echo self::$controller_name;
+
         if(in_array(self::$controller_name, self::$allow_controller_name))
         {
             $controller_name = trim(self::$controller_name);

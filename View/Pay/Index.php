@@ -24,7 +24,7 @@
                             <span>За день: </span>
                         </div>
                         <div class='input-group date col-lg-3' id='datetimepicker_day'>
-                            <input type='text' class="form-control" value=" <?php if($settings->format == 'day'){ echo $settings->date_start;} else { echo date('Y-m-d');} ?>" name="day"/>
+                            <input type='text' class="form-control" value="<?php if($settings->format == 'day'){ echo $settings->date_start;} else { echo date('Y-m-d');} ?>" name="day"/>
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -70,9 +70,6 @@
             </div>
         </div>
     </div>
-
-
-
 
 
     <h1>Расходы</h1>

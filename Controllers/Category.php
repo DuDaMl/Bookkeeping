@@ -14,7 +14,6 @@ class Category
     public function __construct()
     {
         parent::__construct();
-        //echo " __construct Controller Category <br/>";
         $this->M_Category = new M_Category();
     }
 
