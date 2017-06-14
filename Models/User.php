@@ -161,28 +161,9 @@ class User
             return false;
         }
     }
-    /**
-     * @return bool
-     */
-    function edit($id, $value)
+
+    function logout()
     {
-        /*
-        // Update
-        $sql = "UPDATE `" . self::TABLE_NAME . "` SET
-                value = :value
-                WHERE id = :id
-                ";
-
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':value', $value, PDO::PARAM_STR);
-        $stmt->bindParam(':id',  $id, PDO::PARAM_INT);
-
-        if($stmt->execute())
-        {
-            return true;
-        } else {
-            return false;
-        }
-        */
+        session_destroy();
     }
 }

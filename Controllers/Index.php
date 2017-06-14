@@ -19,6 +19,12 @@ class Index
 
     }
 
+    function logout()
+    {
+        $this->M_User->logout();
+        header('Location: /');
+    }
+
     function index()
     {
 
