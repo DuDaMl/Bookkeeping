@@ -11,6 +11,7 @@ class Pay
     public $amount;
     public $description;
     public $category_id;
+    public $user_id;
     public $date;
 
     public $error_validation;
@@ -41,9 +42,6 @@ class Pay
 
    function getAll($start, $end)
    {
-       //$month_start = date('Y-m-01');
-       //$month_end = date('Y-m-30');
-
        $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.date, category.name, category.type
                FROM `" . self::TABLE_NAME . "`     
                LEFT JOIN category
@@ -168,16 +166,6 @@ class Pay
         }
     }
 
-    /**
-     * @param $date
-     * @param string $format
-     * @return bool
-     */
-    function validateDate($date, $format = 'Y-m-d')
-    {
-        $d = DateTime::createFromFormat($format, $date);
-        return $d && $d->format($format) == $date;
-    }
 
     /**
      * Валидация данных формы. Инициализация переменных класса

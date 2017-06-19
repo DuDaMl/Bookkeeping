@@ -1,6 +1,5 @@
-<?php include_once(__DIR__ . '\..\Header.php'); ?>
+<?php include_once(__DIR__ . '/../Header.php'); ?>
 <?php
-    //print_r($settings);
 ?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
@@ -16,6 +15,7 @@
                 <h2>Отображать расходы за:</h2>
                     <hr/>
                 <ul>
+                    <!-- Поле выбора дня -->
                     <li>
                         <div class='col-lg-1'>
                            <input type="radio" aria-label="1" name="format" value="day" <?php if($settings->format == 'day'){ echo 'checked';} ?>>
@@ -31,6 +31,7 @@
                         </div>
                     </li>
                     <hr/>
+                    <!-- Поле выбора месяца -->
                     <li>
                         <div class='col-lg-1'>
                             <input type="radio" aria-label="2" name="format" value="month" <?php if($settings->format == 'month'){ echo 'checked';} ?>>
@@ -46,6 +47,7 @@
                         </div>
                     </li>
                     <hr/>
+                    <!-- Поле выбора года -->
                     <li>
                         <div class='col-lg-1'>
                             <input type="radio" aria-label="3" name="format" value="year" <?php if($settings->format == 'year'){ echo 'checked';} ?>>
@@ -163,7 +165,7 @@
 
 </div> <!-- /container -->
 
-<?php include_once(__DIR__ . '\..\Footer.php'); ?>
+<?php include_once(__DIR__ . '/../Footer.php'); ?>
 
 
 </body>

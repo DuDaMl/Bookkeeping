@@ -32,6 +32,7 @@ class Index
         $client_id = '344999880236-avemoshdfile1s78mqugngj1suf0urrq.apps.googleusercontent.com'; // Client ID
         $client_secret = 'cudU-7d6CKd_fBZ-WD9Bvgtz'; // Client secret
         $redirect_uri = 'http://localhost/bookkeeping.com/index'; // Redirect URIs
+        $redirect_uri = 'https://dudaml1986.000webhostapp.com/index'; // Redirect URIs
         $url = 'https://accounts.google.com/o/oauth2/auth';
 
         $params = array(

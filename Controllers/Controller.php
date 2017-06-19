@@ -12,6 +12,8 @@ use bookkeeping\Models\User as M_User;
 abstract class Controller
 {
     protected $main_teamplate;
+
+    // Сохраненный пользователь из БД найденный по id и авторизированный
     protected $user;
 
     function __construct()
@@ -47,6 +49,7 @@ abstract class Controller
 
         $user = $this->user;
 
-        return include (__DIR__ . '\..\View\\' . $this->main_teamplate . '\\' . $view . '.php');
+        //return include (__DIR__ . '\..\View\\' . $this->main_teamplate . '\\' . $view . '.php');
+        return include (__DIR__ . '/../View/' . $this->main_teamplate . '/' . $view . '.php');
     }
 }

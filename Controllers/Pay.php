@@ -12,15 +12,6 @@ class Pay
     protected $main_teamplate = 'Pay';
     private $M_Pay;
 
-    // Начало формирования отчёта
-    public $data_report_start;
-
-    // Конец формирования отчёта
-    public $data_report_end;
-
-    // Формат диапазона: Год|Месяц|День
-    public $format;
-
     function __construct()
     {
         parent::__construct();
@@ -29,74 +20,82 @@ class Pay
         $this->setting();
     }
 
+    /**
+     * установка времени отчета контроллера
+     */
     public function setting()
     {
         if(isset($_POST['format']))
         {
+            $format_value = $_POST['format'];
+
             switch($_POST['format'])
             {
                 case 'day':
-                    $format_value = 'day';
                     $date = $_POST['day'];
-                    $format = 'Y-m-d';
-                    $this->data_report_start = $date;
-                    $this->data_report_end = $date;
+                    $data_report_start = $date;
+                    $data_report_end = $date;
                     break;
                 case 'month':
-                    $format_value = 'month';
                     $date = $_POST['month'];
-                    $format = 'Y-m';
-                    $this->data_report_start = $date . "-01";
-                    $this->data_report_end = $date . "-31";
+                    $data_report_start = $date . "-01";
+                    $data_report_end = $date . "-31";
                     break;
                 case 'year':
-                    $format_value = 'year';
                     $date = $_POST['year'];
-                    $format = 'Y';
-                    $this->data_report_start = $date . "-01-01";
-                    $this->data_report_end = $date . "-12-31";
+                    $data_report_start = $date . "-01-01";
+                    $data_report_end = $date . "-12-31";
                     break;
                 default:
                     $format_value = 'month';
-                    $date = 'Y-m-01';
-                    $format = 'Y-m-d';
-                    $this->data_report_start = date('Y-m-01');
-                    $this->data_report_end = date('Y-m-31');
+                    $data_report_start = date('Y-m-01');
+                    $data_report_end = date('Y-m-31');
                     break;
             }
 
-            // Валидация даты
-            if(! $this->M_Pay->validateDate($date, $format))
+            $params = array(
+                'date_start' => $data_report_start,
+                'date_end' => $data_report_end,
+                'format' => $format_value
+            );
+
+            // изменения параметров представления контроллера
+           $result =  $this->M_Setting->setFormat($this->main_teamplate, $params);
+
+            if(! $result)
             {
-                echo "<h1>false</h1>";
-                // в случае неправльно указанных данных устанавливается значение по умолчанию
-                $this->data_report_start = date('Y-m-01');
-                $this->data_report_end = date('Y-m-31');
+                // todo записать в лог.
+                $this->M_Setting->error_validation;
             }
-
-            // Запись параметров в БД
-            $date_start = $this->M_Setting->getByControllerAndParam($this->main_teamplate, 'date_start');
-            $date_end = $this->M_Setting->getByControllerAndParam($this->main_teamplate, 'date_end');
-            $date_formate = $this->M_Setting->getByControllerAndParam($this->main_teamplate, 'format');
-
-            // todo check the isset param
-
-            $this->M_Setting->edit($date_start->id, $this->data_report_start);
-            $this->M_Setting->edit($date_end->id, $this->data_report_end);
-            $this->M_Setting->edit($date_formate->id, $format_value);
 
             header("Location: /" . $this->main_teamplate);
             exit();
+
+        }
+    }
+
+    /**
+     * получение данных даты отчета контроллера
+     * @return object
+     */
+    function getSettings()
+    {
+        // загрузка параметров контроллера
+        $params = $this->M_Setting->getByController($this->main_teamplate);
+
+        // если данных нет, то загрузка данных по умолчанию
+        if(empty($params))
+        {
+            $data_params = array(
+                'date_start' => date('Y-m-01'),
+                'date_end' => date('Y-m-31'),
+                'format' => 'month'
+            );
+        } else {
+            $data_params = unserialize($params->value);
         }
 
-        // Init data
-        $date_start = $this->M_Setting->getByControllerAndParam($this->main_teamplate, 'date_start');
-        $date_end = $this->M_Setting->getByControllerAndParam($this->main_teamplate, 'date_end');
-        $date_formate = $this->M_Setting->getByControllerAndParam($this->main_teamplate, 'format');
-
-        $this->data_report_start = $date_start->value;
-        $this->data_report_end = $date_end->value;
-        $this->date_formate = $date_formate->value;
+       return (object) $data_params;
     }
 
     function isPost($action)
@@ -123,12 +122,14 @@ class Pay
             $data['error'] = $this->M_Pay->error_validation;
         }
 
+        // параметры контроллера
+        $data['settings'] =  $this->getSettings();
+
         // загрузка всех платежей текущего месяца
-        $data['pays'] = $this->M_Pay->getAll($this->data_report_start, $this->data_report_end);
+        $data['pays'] = $this->M_Pay->getAll($data['settings']->date_start, $data['settings']->date_end);
 
         // загрузка всех категорий расходов
         $data['categories'] =  (new M_Category())->getAll();
-        $data['settings'] =  $this->M_Setting->getAllParamByController($this->main_teamplate);
         $this->render($data);
     }
 

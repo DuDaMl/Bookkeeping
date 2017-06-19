@@ -9,7 +9,6 @@ class Setting
     protected $DB;
     public $id;
     public $controller;
-    public $param;
     public $value;
 
     public $error_validation;
@@ -60,32 +59,20 @@ class Setting
     /**
      * @return int|id
      */
-    function getByControllerAndParam($controller, $param)
+    function getByController($controller)
     {
        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" .
-              " WHERE  controller = '" . $controller . "'" .
-              " AND param = '" . $param . "'";
-        $answer = $this->get($sql);
-        return $answer[0];
-    }
+              " WHERE  controller = '" . $controller . "'";
 
-    /**
-     * @return int|id
-     */
-    function getAllParamByController($controller)
-    {
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" .
-            " WHERE  controller = '" . $controller . "'";
         $answer = $this->get($sql);
 
-        $settings = array();
-
-        // todo обработка false
-        foreach($answer as $item)
+        if(! empty($answer))
         {
-            $settings[$item->param] = $item->value;
+            return $answer[0];
+        } else {
+            return false;
         }
-        return (object)$settings;
+
     }
 
     /**
@@ -109,5 +96,84 @@ class Setting
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    function create($controller, $value)
+    {
+        $sql = "INSERT INTO  `" . self::TABLE_NAME . "` (
+                `controller`,
+                `value`)
+                VALUES (
+                :controller,
+                :value )
+                ";
+
+        $stmt = $this->DB->prepare($sql);
+        $stmt->bindParam(':controller', $controller, PDO::PARAM_STR);
+        $stmt->bindParam(':value',  $value, PDO::PARAM_STR);
+
+        if($stmt->execute())
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function setFormat($controller, array $params)
+    {
+        // проверка на существование значений
+        if(empty($controller))
+        {
+            // todo отобразить данную ошибку в логах
+            $this->error_validation .= "нельзя сохранить парметры без имени контроллера";
+            return false;
+        }
+
+        // валидация введенных дат по переданной маске из контроллера
+        if(! $this->validateDate($params['date_start'], 'Y-m-d'))
+        {
+            // в случае неправльно указанных данных устанавливается значение по умолчанию
+            $params['date_start']= date('Y-m-01');
+            $params['date_end'] = date('Y-m-31');
+        }
+
+        // проверка существования записи для выбора действия INSERT/DELETE
+        $controller_db = $this->getByController($controller);
+
+
+        if(! empty ($controller_db))
+        {
+            // update
+            $result = $this->edit($controller_db->id, serialize($params));
+            $this->error_validation .= " no update";
+        } else {
+            // insert
+            $result = $this->create($controller, serialize($params));
+            $this->error_validation .= " no insert";
+        }
+
+        if(! $result)
+        {
+            // todo записать в лог.
+            return false;
+        }
+        return true;
+
+    }
+
+
+    /**
+     * @param $date
+     * @param string $format
+     * @return bool false если формат не верен, дату в формате если верно
+     */
+    function validateDate($date, $format = 'Y-m-d')
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) == $date;
     }
 }
