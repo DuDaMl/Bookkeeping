@@ -8,13 +8,15 @@ class Setting
     const TABLE_NAME = 'setting';
     protected $DB;
     public $id;
+    public $user_id;
     public $controller;
     public $value;
 
     public $error_validation;
 
-    function __construct()
+    function __construct($user_id)
     {
+        $this->user_id = $user_id;
         $this->DB = DB::getInstance()->getConnection();
     }
     /**
@@ -62,7 +64,9 @@ class Setting
     function getByController($controller)
     {
        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" .
-              " WHERE  controller = '" . $controller . "'";
+              " WHERE  controller = '" . $controller . "'
+               AND user_id = " . $this->user_id . "
+              ";
 
         $answer = $this->get($sql);
 
@@ -82,11 +86,13 @@ class Setting
     {
         // Update
         $sql = "UPDATE `" . self::TABLE_NAME . "` SET
+                user_id = :user_id,
                 value = :value
                 WHERE id = :id
                 ";
 
         $stmt = $this->DB->prepare($sql);
+        $stmt->bindParam(':user_id', $this->user_id, PDO::PARAM_INT);
         $stmt->bindParam(':value', $value, PDO::PARAM_STR);
         $stmt->bindParam(':id',  $id, PDO::PARAM_INT);
 
@@ -104,14 +110,17 @@ class Setting
     function create($controller, $value)
     {
         $sql = "INSERT INTO  `" . self::TABLE_NAME . "` (
+                `user_id`,
                 `controller`,
                 `value`)
                 VALUES (
+                :user_id,
                 :controller,
                 :value )
                 ";
 
         $stmt = $this->DB->prepare($sql);
+        $stmt->bindParam(':user_id', $this->user_id, PDO::PARAM_STR);
         $stmt->bindParam(':controller', $controller, PDO::PARAM_STR);
         $stmt->bindParam(':value',  $value, PDO::PARAM_STR);
 

@@ -15,7 +15,7 @@ class Pay
     {
         parent::__construct();
         $this->M_Pay = new M_Pay($this->user->id);
-        $this->M_Setting = new M_Setting();
+        $this->M_Setting = new M_Setting($this->user->id);
         $this->setting();
     }
 
@@ -113,7 +113,7 @@ class Pay
         {
             if($this->isPost('create'))
             {
-                header("Location: /");
+                header("Location: /" . $this->main_teamplate);
                 exit();
             }
 
@@ -136,7 +136,7 @@ class Pay
     {
         if(!empty($_POST) && $_POST['category_id'] != ''){
             if($this->isPost('update')){
-                header("Location: /");
+                header("Location: /" . $this->main_teamplate);
                 exit();
             }
         }
@@ -157,7 +157,7 @@ class Pay
             }
         }
 
-        $M_Category = new M_Category();
+        $M_Category = new M_Category($this->user->id);
         $data['categories'] = $M_Category->getAll();
         $this->render($data, 'Edit');
     }
@@ -170,7 +170,7 @@ class Pay
         if(!empty($_POST) && $_POST['id'] != '')
         {
             if($this->isPost('delete')){
-                header("Location: /");
+                header("Location: /" . $this->main_teamplate);
                 exit();
             }
         }

@@ -36,19 +36,28 @@ class Category
 
     function getAll($type = 'Pay')
     {
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" . " WHERE type = '" . $type . "' ORDER BY name ASC";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" . " 
+        WHERE type = '" . $type . "' 
+        AND user_id = " . $this->user_id . "
+        ORDER BY name ASC";
         return $this->get($sql);
     }
 
     function getAllPays()
     {
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE type = 'Pay' ORDER BY name ASC";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` 
+        WHERE type = 'Pay' 
+        AND user_id = " . $this->user_id . "
+        ORDER BY name ASC";
         return $this->get($sql);
     }
 
     function getAllIncomes()
     {
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE type = 'Income'  ORDER BY name ASC";
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` 
+        WHERE type = 'Income'  
+        AND user_id = " . $this->user_id . "
+        ORDER BY name ASC";
         return $this->get($sql);
     }
 
@@ -78,6 +87,7 @@ class Category
      */
     protected function save($sql)
     {
+
         if($this->user_id == false || ! self::validate())
         {
             return false;
@@ -95,11 +105,12 @@ class Category
         $stmt = $this->DB->prepare($sql);
         $stmt->bindParam(':name', $this->name , PDO::PARAM_STR);
         $stmt->bindParam(':type', $this->type , PDO::PARAM_STR);
-        $stmt->bindParam(':user_id', $this->type , PDO::PARAM_STR);
+        $stmt->bindParam(':user_id', $this->user_id , PDO::PARAM_STR);
 
         if(isset($this->id) && $this->id != ''){
             $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
         }
+
 
         if($stmt->execute()){
             return true;

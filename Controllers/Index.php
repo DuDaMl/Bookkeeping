@@ -27,6 +27,11 @@ class Index
 
     function index()
     {
+        $this->render(array('1' => 1), 'Index');
+    }
+
+    function login()
+    {
 
 /*
         $client_id = '344999880236-avemoshdfile1s78mqugngj1suf0urrq.apps.googleusercontent.com'; // Client ID
@@ -92,7 +97,7 @@ $userInfo = array (
 'picture' => 'https://lh3.googleusercontent.com/-bTbce9eGjJU/AAAAAAAAAAI/AAAAAAAABKM/JgsGM1YiM_Y/photo.jpg',
 'gender' => 'male ',
 'locale' => 'ru' );
-/*
+
 $userInfo = array (
     'id' => 110665724950086710524,
     'email' => 'chubaka_lenochka@gmail.com',
@@ -104,7 +109,7 @@ $userInfo = array (
     'picture' => 'http://s1.iconbird.com/ico/2013/12/505/w450h4001385925286User.png',
     'gender' => 'female ',
     'locale' => 'ru' );
-*/
+
 //var_dump($userInfo);
 
         if(! empty($userInfo['email']))
@@ -136,13 +141,13 @@ $userInfo = array (
 
                 // Если данный пользователь уже существует то создаём сессию
                 $this->M_User->setSession($user->id);
-                header('Location: /');
+                header('Location: /Pay/');
             }
 
 
         } else {
             // не удалось авторизоваться, вывод сообщения об ошибке.
-            // todo error show. Can not Auth
+            header('Location: /');
         }
 
     }

@@ -72,7 +72,10 @@ class Pay
             return false;
         }
 
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` 
+        WHERE  id = " . $id . "
+        AND pay.user_id = " . $this->user_id;
+
         $answer = $this->get($sql);
         return $answer[0];
     }
@@ -82,7 +85,7 @@ class Pay
      */
     public function save($sql)
     {
-        if($this->user_id == false || ! self::validate())
+        if($this->user_id == false)
         {
             return false;
         }
@@ -117,6 +120,11 @@ class Pay
 
     public function create()
     {
+        if(! self::validate())
+        {
+            return false;
+        }
+
         $sql = "INSERT INTO `" . self::TABLE_NAME . "`
                     (amount,
                     description,
@@ -136,6 +144,10 @@ class Pay
 
     public function update()
     {
+        if(! self::validate())
+        {
+            return false;
+        }
 
         if(! isset($this->id) || $this->id == '')
         {

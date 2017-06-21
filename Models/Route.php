@@ -90,9 +90,6 @@ final class Route {
                     break;
             }
 
-            //$C_Controller = new $controller_name();
-
-
             if(self::$controller_method != '')
             {
                 if(method_exists($C_Controller, $controller_method))
@@ -107,69 +104,17 @@ final class Route {
         } else {
             if(self::$controller_method != '')
             {
-                $C_Pay = new Pay();
-                if(method_exists($C_Pay, $controller_method))
+                $C_Index = new Index();
+                if(method_exists($C_Index, $controller_method))
                 {
-                    $C_Pay->$controller_method(self::$var);
+                    $C_Index->$controller_method(self::$var);
                 } else {
-                    $C_Pay->index();
+                    $C_Index->index();
                 }
             } else {
-                $C_Pay = new Pay();
-                $C_Pay->index();
+                $C_Index = new Index();
+                $C_Index->index();
             }
         }
-        /*
-        switch(self::$controller_name){
-            case 'Category':
-                if(self::$controller_method != '')
-                {
-                    $M_Category =  new C_Category();
-                    if(method_exists($M_Category, $controller_method))
-                    {
-                        $M_Category->$controller_method(self::$var);
-                    } else {
-                        $M_Category->index();
-                    }
-                } else {
-                    $M_Category =  new C_Category();
-                    $M_Category->index(self::$var);
-                }
-
-                break;
-            case 'Income':
-                if(self::$controller_method != '')
-                {
-                    $M_Income =  new C_Income();
-                    if(method_exists($M_Income, $controller_method))
-                    {
-                        $M_Income->$controller_method(self::$var);
-                    } else {
-                        $M_Income->index();
-                    }
-                } else {
-                    $M_Income =  new C_Income();
-                    $M_Income->index(self::$var);
-                }
-
-                break;
-            default:
-
-                if(self::$controller_method != '')
-                {
-                    $C_Pay = new C_Pay();
-                    if(method_exists($C_Pay, $controller_method))
-                    {
-                        $C_Pay->$controller_method(self::$var);
-                    } else {
-                        $C_Pay->index();
-                    }
-                } else {
-                    $C_Pay = new C_Pay();
-                    $C_Pay->index();
-                }
-                break;
-        }
-       */
     }
 }

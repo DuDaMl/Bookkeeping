@@ -25,23 +25,24 @@ abstract class Controller
         {
             if(! $this->M_User->checkToken($_SESSION['user_id'], $_SESSION['token']))
             {
-                // todo not auth user;
-                echo 'not auth user' . '<br/>';
+                echo "no auth";
+                //header('Location: /');
             } else {
                 $this->user = $this->M_User->getById($_SESSION['user_id']);
             }
 
         } else {
-            // todo not auth user;
-            echo 'not auth user' . '<br/>';
+            echo "no auth";
+            //header('Location: /');
         }
     }
 
-    function render($data, $view = 'Index')
+    function render(array $data, $view = 'Index')
     {
         foreach ($data as $k => $v) {
             $$k = $v;
         }
+
 
         // переменная для указания активного пункта главного меню
         $current_page = $this->main_teamplate;

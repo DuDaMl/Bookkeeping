@@ -10,7 +10,7 @@
     <p><?= $pay->description; ?> </p>
     <p><?= $pay->amount; ?> грн </p>
     <p><?= $pay->date; ?> </p>
-    <form action="/delete/<?=$pay->id?>" method="post">
+    <form action="/<?= $controller_name ?>/delete/<?=$pay->id?>" method="post">
         <input type="hidden" min="0" step="1" name="id" value="<?=$pay->id?>">
         <button type="submit" class="btn btn-default">Удалить</button>
         <br/>

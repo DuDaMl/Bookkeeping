@@ -74,9 +74,8 @@
         </div>
     </div>
 
-
     <h1>Расходы</h1>
-    <form action="/" method="post">
+    <form action="/<?= $controller_name ?>/" method="post">
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">

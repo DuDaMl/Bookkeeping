@@ -86,10 +86,7 @@ class Income
      */
     function save($sql)
     {
-        if(! self::validate())
-        {
-            return false;
-        }
+
 
         if(empty($this->amount)
             || empty($this->category_id)
@@ -120,6 +117,11 @@ class Income
 
     public function create()
     {
+        if(! self::validate())
+        {
+            return false;
+        }
+
         $sql = "INSERT INTO `" . self::TABLE_NAME . "`
                     (amount,
                     description,
@@ -139,6 +141,11 @@ class Income
 
     public function update()
     {
+        if(! self::validate())
+        {
+            return false;
+        }
+
         if(! isset($this->id) || $this->id == '')
         {
            return false;

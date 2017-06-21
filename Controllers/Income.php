@@ -75,7 +75,7 @@ class Income
             }
         }
 
-        $M_Category = new M_Category();
+        $M_Category = new M_Category($this->user->id);
         $data['categories'] = $M_Category->getAll('Income');
         $this->render($data, 'Edit');
     }

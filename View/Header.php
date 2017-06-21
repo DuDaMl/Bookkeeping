@@ -56,9 +56,23 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/index/logout">Logout</a></li>
+
+                    <?php
+
+                    if ($user == false)
+                    {
+                    ?>
+                        <li><a href="/index/login">Аутентификация через Google</a></li>
+                    <?php
+                    } else {
+                    ?>
+                        <li><a href="/index/logout">Logout</a></li>
+                    <?php
+                    }
+                    ?>
+
                     <!--<li><a href="https://accounts.google.com/o/oauth2/auth?redirect_uri=http://localhost/bookkeeping.com/index&amp;response_type=code&amp;client_id=344999880236-avemoshdfile1s78mqugngj1suf0urrq.apps.googleusercontent.com&amp;scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile">Аутентификация через Google</a></li>-->
-                    <li><a href="/index/index">Аутентификация через Google</a></li>
+
                     <li><a href="../navbar-fixed-top/">
                             <?php
                             if(isset($user) && ! empty($user))
