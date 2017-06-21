@@ -8,12 +8,14 @@ class Category
     const TABLE_NAME = 'category';
     protected $DB;
     public $name;
+    public $user_id;
     public $type;
 
     public $error_validation;
 
-    function __construct()
+    function __construct($user_id)
     {
+        $this->user_id = $user_id;
         $this->DB = DB::getInstance()->getConnection();
     }
 
@@ -74,9 +76,9 @@ class Category
     /**
      * @return bool
      */
-    function save()
+    protected function save($sql)
     {
-        if(! self::validate())
+        if($this->user_id == false || ! self::validate())
         {
             return false;
         }
@@ -90,28 +92,10 @@ class Category
            return false;
         }
 
-            if(isset($this->id) && $this->id != '')
-            {
-                // Update
-                $sql = "UPDATE `" . self::TABLE_NAME . "` SET
-                    name = :name,
-                    type = :type
-                    WHERE id = :id
-                    ";
-            } else {
-                // Create
-                $sql = "INSERT INTO `" . self::TABLE_NAME . "`
-                    (name,
-                    type)
-                     VALUES (
-                    :name,
-                    :type
-                    )";
-            }
-
         $stmt = $this->DB->prepare($sql);
         $stmt->bindParam(':name', $this->name , PDO::PARAM_STR);
         $stmt->bindParam(':type', $this->type , PDO::PARAM_STR);
+        $stmt->bindParam(':user_id', $this->type , PDO::PARAM_STR);
 
         if(isset($this->id) && $this->id != ''){
             $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
@@ -124,6 +108,37 @@ class Category
         }
     }
 
+    public function update()
+    {
+        if(! isset($this->id) && $this->id == '')
+        {
+            return false;
+        }
+
+        $sql = "UPDATE `" . self::TABLE_NAME . "` SET
+                    name = :name,
+                    type = :type
+                    user_id = :user_id
+                    WHERE id = :id
+                    ";
+
+        return $this->save($sql);
+    }
+
+    public function create()
+    {
+        $sql = "INSERT INTO `" . self::TABLE_NAME . "`
+                    (name,
+                    user_id,
+                    type)
+                     VALUES (
+                    :name,
+                    :user_id,
+                    :type
+                    )";
+
+        return $this->save($sql);
+    }
     /**
      * @return bool
      */
@@ -157,6 +172,18 @@ class Category
 
     function validate()
     {
+        if(! filter_var($this->user_id, FILTER_VALIDATE_INT))
+        {
+            $this->error_validation = array(
+                'error' => true,
+                'amount' => 'Ошибка в указанном user_id',
+            );
+            return false;
+        } else {
+            $id = str_replace('+','',$this->user_id);
+            $this->user_id = str_replace('-','',$id);
+        }
+
         // валидация переданного id
         if(isset($_POST['id']))
         {
@@ -172,17 +199,7 @@ class Category
                 $this->id = str_replace('-','',$id);
             }
         }
-        /*
-        if($_POST['type'] != 'Pay'
-            && $_POST['type'] != 'Income')
-        {
-            $this->error_validation = array(
-                'error' => true,
-                'amount' => 'Ошибка в указанном типе категории',
-            );
-            return false;
-        }
-        */
+
         $this->name = strip_tags($_POST['name']);
         $this->type = strip_tags($_POST['type']);
         return true;

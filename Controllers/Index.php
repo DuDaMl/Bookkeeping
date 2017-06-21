@@ -92,7 +92,19 @@ $userInfo = array (
 'picture' => 'https://lh3.googleusercontent.com/-bTbce9eGjJU/AAAAAAAAAAI/AAAAAAAABKM/JgsGM1YiM_Y/photo.jpg',
 'gender' => 'male ',
 'locale' => 'ru' );
-
+/*
+$userInfo = array (
+    'id' => 110665724950086710524,
+    'email' => 'chubaka_lenochka@gmail.com',
+    'verified_email' => 1 ,
+    'name' => 'Lenochka Duvanova',
+    'given_name' => 'Lenochka ',
+    'family_name' => 'Duvanova' ,
+    'link' => 'https://plus.google.com/+LenochkaDuvanova',
+    'picture' => 'http://s1.iconbird.com/ico/2013/12/505/w450h4001385925286User.png',
+    'gender' => 'female ',
+    'locale' => 'ru' );
+*/
 //var_dump($userInfo);
 
         if(! empty($userInfo['email']))

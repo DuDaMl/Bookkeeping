@@ -14,7 +14,7 @@ class Category
     public function __construct()
     {
         parent::__construct();
-        $this->M_Category = new M_Category();
+        $this->M_Category = new M_Category($this->user->id);
     }
 
     function input(){}
@@ -24,7 +24,7 @@ class Category
     {
         if(isset($_POST['name']))
         {
-            if($this->isPost('save'))
+            if($this->isPost('create'))
             {
                 header("Location: /Category/");
                 exit();
@@ -41,7 +41,7 @@ class Category
     {
         if(isset($_POST['name']))
         {
-            if($this->isPost('save'))
+            if($this->isPost('update'))
             {
                 header("Location: /edit/" . $id);
                 exit();

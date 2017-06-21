@@ -8,6 +8,7 @@ class Income
     const TABLE_NAME = 'income';
     protected $DB;
     public $id;
+    public $user_id;
     public $amount;
     public $description;
     public $category_id;
@@ -15,8 +16,9 @@ class Income
 
     public $error_validation;
 
-    function __construct()
+    function __construct($user_id)
     {
+        $this->user_id = $user_id;
         $this->DB = DB::getInstance()->getConnection();
     }
 
@@ -44,12 +46,14 @@ class Income
        $month_start = date('Y-m-01');
        $month_end = date('Y-m-30');
 
-       $sql = "SELECT income.id, income.amount, income.category_id, income.description, income.date, category.name, category.type
+       $sql = "SELECT income.id, income.amount, income.user_id, income.category_id, income.description, income.date, category.name, category.type
                FROM `" . self::TABLE_NAME . "`     
                LEFT JOIN category
                ON income.category_id = category.id 
-               WHERE income.date BETWEEN  '" . $month_start ."' AND '" . $month_end ."'  
+               WHERE income.date BETWEEN  '" . $month_start ."' 
+               AND '" . $month_end ."'  
                AND category.type = 'Income'
+               AND income.user_id = " . $this->user_id . "
                ORDER BY date DESC, id DESC
                ";
 
@@ -80,47 +84,24 @@ class Income
     /**
      * @return bool
      */
-    function save()
+    function save($sql)
     {
         if(! self::validate())
         {
             return false;
         }
 
-        if(! empty($this->amount)
-            && ! empty($this->category_id)
-            && ! empty($this->date)
-        )
-            // todo contionue?
-
-        if(isset($this->id) && $this->id != '')
+        if(empty($this->amount)
+            || empty($this->category_id)
+            || empty($this->date))
         {
-            // Update
-            $sql = "UPDATE `" . self::TABLE_NAME . "` SET
-                    amount = :amount,
-                    description = :description,
-                    category_id = :category_id,
-                    date = :date
-                    WHERE id = :id
-                    ";
-        } else {
-            // Create
-            $sql = "INSERT INTO `" . self::TABLE_NAME . "`
-                    (amount,
-                    description,
-                    category_id,
-                    date)
-                     VALUES (
-                    :amount,
-                    :description,
-                    :category_id,
-                    :date
-                    )";
+            return false;
         }
 
         $stmt = $this->DB->prepare($sql);
         $stmt->bindParam(':amount',  $this->amount, PDO::PARAM_INT);
         $stmt->bindParam(':description', $this->description , PDO::PARAM_STR);
+        $stmt->bindParam(':user_id', $this->user_id , PDO::PARAM_INT);
         $stmt->bindParam(':category_id', $this->category_id , PDO::PARAM_INT);
         $stmt->bindParam(':date', $this->date , PDO::PARAM_STR);
 
@@ -135,6 +116,44 @@ class Income
         } else {
             return false;
         }
+    }
+
+    public function create()
+    {
+        $sql = "INSERT INTO `" . self::TABLE_NAME . "`
+                    (amount,
+                    description,
+                    category_id,
+                    user_id,
+                    date)
+                     VALUES (
+                    :amount,
+                    :description,
+                    :category_id,
+                    :user_id,
+                    :date
+                    )";
+
+        return $this->save($sql);
+    }
+
+    public function update()
+    {
+        if(! isset($this->id) || $this->id == '')
+        {
+           return false;
+        }
+
+        $sql = "UPDATE `" . self::TABLE_NAME . "` SET
+                    amount = :amount,
+                    description = :description,
+                    category_id = :category_id,
+                    user_id = :user_id,
+                    date = :date
+                    WHERE id = :id
+                    ";
+
+        return $this->save($sql);
     }
 
     /**

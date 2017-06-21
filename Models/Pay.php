@@ -16,8 +16,9 @@ class Pay
 
     public $error_validation;
 
-    function __construct()
+    function __construct($user_id)
     {
+        $this->user_id = $user_id;
         $this->DB = DB::getInstance()->getConnection();
     }
 
@@ -42,11 +43,13 @@ class Pay
 
    function getAll($start, $end)
    {
-       $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.date, category.name, category.type
+       $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.user_id, pay.date, category.name, category.type
                FROM `" . self::TABLE_NAME . "`     
                LEFT JOIN category
                ON pay.category_id = category.id 
-               WHERE pay.date BETWEEN  '" . $start ."' AND '" . $end ."'
+               WHERE pay.date BETWEEN  '" . $start ."' 
+               AND '" . $end ."'
+               AND pay.user_id = " . $this->user_id . "
                AND category.type = 'Pay'
                ORDER BY date DESC, id DESC
                ";
@@ -77,48 +80,25 @@ class Pay
     /**
      * @return bool
      */
-    function save()
+    public function save($sql)
     {
-        if(! self::validate())
+        if($this->user_id == false || ! self::validate())
         {
             return false;
         }
 
-        if(! empty($this->amount)
-            && ! empty($this->category_id)
-            && ! empty($this->date)
-        )
-            // todo contionue?
-
-        if(isset($this->id) && $this->id != '')
+        if(empty($this->amount)
+            || empty($this->category_id)
+            || empty($this->date))
         {
-            // Update
-            $sql = "UPDATE `" . self::TABLE_NAME . "` SET
-                    amount = :amount,
-                    description = :description,
-                    category_id = :category_id,
-                    date = :date
-                    WHERE id = :id
-                    ";
-        } else {
-            // Create
-            $sql = "INSERT INTO `" . self::TABLE_NAME . "`
-                    (amount,
-                    description,
-                    category_id,
-                    date)
-                     VALUES (
-                    :amount,
-                    :description,
-                    :category_id,
-                    :date
-                    )";
+            return false;
         }
 
         $stmt = $this->DB->prepare($sql);
         $stmt->bindParam(':amount',  $this->amount, PDO::PARAM_INT);
         $stmt->bindParam(':description', $this->description , PDO::PARAM_STR);
         $stmt->bindParam(':category_id', $this->category_id , PDO::PARAM_INT);
+        $stmt->bindParam(':user_id', $this->user_id , PDO::PARAM_INT);
         $stmt->bindParam(':date', $this->date , PDO::PARAM_STR);
 
         if(isset($this->id) && $this->id != '')
@@ -132,8 +112,46 @@ class Pay
         } else {
             return false;
         }
+
     }
 
+    public function create()
+    {
+        $sql = "INSERT INTO `" . self::TABLE_NAME . "`
+                    (amount,
+                    description,
+                    user_id,
+                    category_id,
+                    date)
+                     VALUES (
+                    :amount,
+                    :description,
+                    :user_id,
+                    :category_id,
+                    :date
+                    )";
+
+        return $this->save($sql);
+    }
+
+    public function update()
+    {
+
+        if(! isset($this->id) || $this->id == '')
+        {
+            return false;
+        }
+
+        $sql = "UPDATE `" . self::TABLE_NAME . "` SET
+                    amount = :amount,
+                    description = :description,
+                    category_id = :category_id,
+                    user_id = :user_id,
+                    date = :date
+                    WHERE id = :id";
+
+        return $this->save($sql);
+    }
     /**
      * @return bool
      */
@@ -174,6 +192,17 @@ class Pay
      */
     function validate()
     {
+        if(! filter_var($this->user_id, FILTER_VALIDATE_INT))
+        {
+            $this->error_validation = array(
+                'error' => true,
+                'amount' => 'Ошибка в указанном user_id',
+            );
+        } else {
+            $id = str_replace('+','',$this->user_id);
+            $this->user_id = str_replace('-','',$id);
+        }
+
         // валидация переданного id
         if(isset($_POST['id']))
         {
@@ -239,5 +268,16 @@ class Pay
 
         $this->description = strip_tags($_POST['description']);
         return true;
+    }
+
+    /**
+     * @param $date
+     * @param string $format
+     * @return bool
+     */
+    function validateDate($date, $format = 'Y-m-d')
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) == $date;
     }
 }

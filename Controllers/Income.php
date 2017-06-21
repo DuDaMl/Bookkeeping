@@ -13,7 +13,7 @@ class Income
     function __construct()
     {
         parent::__construct();
-        $this->M_Income = new M_Income();
+        $this->M_Income = new M_Income($this->user->id);
     }
 
     function isPost($action)
@@ -30,7 +30,7 @@ class Income
     {
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
-            if($this->isPost('save'))
+            if($this->isPost('create'))
             {
                 header("Location: /" . $this->main_teamplate);
                 exit();
@@ -44,7 +44,7 @@ class Income
         $data['incomes'] = $this->M_Income->getAll();
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category())->getAll('Income');
+        $data['categories'] =  (new M_Category($this->user->id))->getAll('Income');
 
         $this->render($data);
     }
@@ -53,7 +53,7 @@ class Income
     {
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
-            if($this->isPost('save')){
+            if($this->isPost('update')){
                 header("Location: /" . $this->main_teamplate);
                 exit();
             }

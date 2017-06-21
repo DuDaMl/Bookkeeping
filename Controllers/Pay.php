@@ -5,7 +5,6 @@ use bookkeeping\Models\Setting as M_Setting;
 use bookkeeping\Models\Pay as M_Pay;
 use bookkeeping\Models\Category as M_Category;
 
-
 class Pay
     extends Controller
 {
@@ -15,7 +14,7 @@ class Pay
     function __construct()
     {
         parent::__construct();
-        $this->M_Pay = new M_Pay();
+        $this->M_Pay = new M_Pay($this->user->id);
         $this->M_Setting = new M_Setting();
         $this->setting();
     }
@@ -112,7 +111,7 @@ class Pay
     {
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
-            if($this->isPost('save'))
+            if($this->isPost('create'))
             {
                 header("Location: /");
                 exit();
@@ -129,14 +128,14 @@ class Pay
         $data['pays'] = $this->M_Pay->getAll($data['settings']->date_start, $data['settings']->date_end);
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category())->getAll();
+        $data['categories'] =  (new M_Category($this->user->id))->getAll();
         $this->render($data);
     }
 
     function edit($id)
     {
         if(!empty($_POST) && $_POST['category_id'] != ''){
-            if($this->isPost('save')){
+            if($this->isPost('update')){
                 header("Location: /");
                 exit();
             }
