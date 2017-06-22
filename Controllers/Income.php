@@ -7,7 +7,7 @@ use bookkeeping\Models\Category as M_Category;
 class Income
     extends Controller
 {
-    protected $main_teamplate = 'Income';
+    protected static $main_teamplate = 'Income';
     private $M_Income;
 
     function __construct()

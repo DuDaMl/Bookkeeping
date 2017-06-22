@@ -8,7 +8,7 @@ use bookkeeping\Models\Category as M_Category;
 class Pay
     extends Controller
 {
-    protected $main_teamplate = 'Pay';
+    protected static $main_teamplate = 'Pay';
     private $M_Pay;
 
     function __construct()
@@ -80,7 +80,7 @@ class Pay
     function getSettings()
     {
         // загрузка параметров контроллера
-        $params = $this->M_Setting->getByController($this->main_teamplate);
+        $params = $this->M_Setting->getByController(self::getMainTeamplate());
 
         // если данных нет, то загрузка данных по умолчанию
         if(empty($params))

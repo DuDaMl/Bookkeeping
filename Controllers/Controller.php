@@ -9,9 +9,9 @@
 namespace bookkeeping\Controllers;
 use bookkeeping\Models\User as M_User;
 
-abstract class Controller
+class Controller
 {
-    protected $main_teamplate;
+    protected static $main_teamplate;
 
     // Сохраненный пользователь из БД найденный по id и авторизированный
     protected $user;
@@ -37,6 +37,13 @@ abstract class Controller
         }
     }
 
+    public static function getMainTeamplate()
+    {
+        return static::$main_teamplate;
+    }
+
+
+
     function render(array $data, $view = 'Index')
     {
         foreach ($data as $k => $v) {
@@ -45,12 +52,12 @@ abstract class Controller
 
 
         // переменная для указания активного пункта главного меню
-        $current_page = $this->main_teamplate;
-        $controller_name = $this->main_teamplate;
+        $current_page = self::getMainTeamplate();
+        $controller_name = self::getMainTeamplate();
 
         $user = $this->user;
 
         //return include (__DIR__ . '\..\View\\' . $this->main_teamplate . '\\' . $view . '.php');
-        return include (__DIR__ . '/../View/' . $this->main_teamplate . '/' . $view . '.php');
+        return include (__DIR__ . '/../View/' . self::getMainTeamplate() . '/' . $view . '.php');
     }
 }

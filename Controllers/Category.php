@@ -8,7 +8,7 @@ use bookkeeping\Models\Category as M_Category;
 class Category
     extends Controller
 {
-    protected $main_teamplate = 'Category';
+    protected static $main_teamplate = 'Category';
     private $M_Category;
 
     public function __construct()

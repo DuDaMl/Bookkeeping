@@ -6,7 +6,7 @@ use bookkeeping\Models\User as M_User;
 class Index
     extends Controller
 {
-    protected $main_teamplate = 'Index';
+    protected static $main_teamplate = 'Index';
 
     function __construct()
     {

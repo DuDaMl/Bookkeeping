@@ -8,7 +8,7 @@ use bookkeeping\Models\Category as M_Category;
 class Family
     extends Controller
 {
-    protected $main_teamplate = 'Family';
+    protected static $main_teamplate = 'Family';
     private $M_Family;
 
     function __construct()
