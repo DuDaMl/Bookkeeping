@@ -5,6 +5,7 @@ use bookkeeping\Controllers\Index;// as Pay;
 use bookkeeping\Controllers\Pay;// as Pay;
 use bookkeeping\Controllers\Income;// as Income;
 use bookkeeping\Controllers\Category;// as Category;
+use bookkeeping\Controllers\Family;// as Family;
 
 final class Route {
 
@@ -12,7 +13,8 @@ final class Route {
         0 => 'Category',
         1 => 'Pay',
         2 => 'Income',
-        3 => 'Index'
+        3 => 'Index',
+        3 => 'Family'
     );
     static $controller_name;
     static $controller_method;
@@ -87,6 +89,9 @@ final class Route {
                     break;
                 case 'Index':
                     $C_Controller = new Index();
+                    break;
+                case 'Family':
+                    $C_Controller = new Family();
                     break;
             }
 

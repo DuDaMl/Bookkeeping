@@ -53,6 +53,7 @@ class Pay
                AND category.type = 'Pay'
                ORDER BY date DESC, id DESC
                ";
+
        return $this->get($sql);
    }
 
