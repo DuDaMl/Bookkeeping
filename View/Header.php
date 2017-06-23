@@ -42,6 +42,7 @@
                     <li <?php if($current_page == 'Pay') { echo 'class="active"';}?>><a href="/Pay">Расходы</a></li>
                     <li <?php if($current_page == 'Income') { echo 'class="active"';}?>><a href="/Income">Доходы</a></li>
                     <li <?php if($current_page == 'Category') { echo 'class="active"';}?>><a href="/Category">Категории</a></li>
+                    <li <?php if($current_page == 'Family') { echo 'class="active"';}?>><a href="/Family">Семья</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
                         <ul class="dropdown-menu">

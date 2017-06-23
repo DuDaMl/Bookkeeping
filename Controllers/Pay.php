@@ -59,7 +59,7 @@ class Pay
             );
 
             // изменения параметров представления контроллера
-           $result =  $this->M_Setting->setFormat($this->main_teamplate, $params);
+           $result =  $this->M_Setting->setFormat(self::getMainTeamplate(), $params);
 
             if(! $result)
             {
@@ -67,7 +67,7 @@ class Pay
                 $this->M_Setting->error_validation;
             }
 
-            header("Location: /" . $this->main_teamplate);
+            header("Location: /" . self::getMainTeamplate());
             exit();
 
         }
@@ -113,7 +113,7 @@ class Pay
         {
             if($this->isPost('create'))
             {
-                header("Location: /" . $this->main_teamplate);
+                header("Location: /" . self::getMainTeamplate());
                 exit();
             }
 
@@ -136,7 +136,7 @@ class Pay
     {
         if(!empty($_POST) && $_POST['category_id'] != ''){
             if($this->isPost('update')){
-                header("Location: /" . $this->main_teamplate);
+                header("Location: /" . self::getMainTeamplate());
                 exit();
             }
         }
@@ -170,7 +170,7 @@ class Pay
         if(!empty($_POST) && $_POST['id'] != '')
         {
             if($this->isPost('delete')){
-                header("Location: /" . $this->main_teamplate);
+                header("Location: /" . self::getMainTeamplate());
                 exit();
             }
         }

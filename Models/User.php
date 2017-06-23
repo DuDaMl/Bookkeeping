@@ -31,7 +31,9 @@ class User
         try
         {
             $result = $this->DB->prepare($sql);
+
             $result->execute();
+
             return $result->fetchAll(PDO::FETCH_CLASS);
         }
         catch(PDOException $e)
@@ -39,6 +41,7 @@ class User
             echo $e->getMessage();
             return false;
         }
+
     }
 
     /**
@@ -67,7 +70,14 @@ class User
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  email = '" . $email ."'";
         $answer = $this->get($sql);
-        return $answer[0];
+
+        if(! empty($answer))
+        {
+            return $answer[0];
+        } else {
+            return false;
+        }
+
     }
 
     function checkToken($user_id)

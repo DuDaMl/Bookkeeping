@@ -33,6 +33,7 @@ class Index
     function login()
     {
 
+
 /*
         $client_id = '344999880236-avemoshdfile1s78mqugngj1suf0urrq.apps.googleusercontent.com'; // Client ID
         $client_secret = 'cudU-7d6CKd_fBZ-WD9Bvgtz'; // Client secret
@@ -98,7 +99,7 @@ $userInfo = array (
 'gender' => 'male ',
 'locale' => 'ru' );
 
-$userInfo = array (
+$userInfo2 = array (
     'id' => 110665724950086710524,
     'email' => 'chubaka_lenochka@gmail.com',
     'verified_email' => 1 ,
@@ -110,7 +111,7 @@ $userInfo = array (
     'gender' => 'female ',
     'locale' => 'ru' );
 
-//var_dump($userInfo);
+var_dump($userInfo);
 
         if(! empty($userInfo['email']))
         {

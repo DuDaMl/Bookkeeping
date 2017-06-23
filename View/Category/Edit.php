@@ -4,7 +4,7 @@
     <h1>Категории</h1>
     <h2>Редактирование</h2>
 
-    <form action="/<?= $controller_name ?>/edit/" method="post">
+    <form action="/<?= $controller_name ?>/edit/<?=$category->id?>" method="post">
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">

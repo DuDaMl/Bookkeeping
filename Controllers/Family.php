@@ -14,7 +14,7 @@ class Family
     function __construct()
     {
         parent::__construct();
-        //$this->M_Family = new M_Family($this->user->id);
+        $this->M_Family = new M_Family();
         //$this->M_Setting = new M_Setting($this->user->id);
         //$this->setting();
     }
@@ -29,27 +29,40 @@ class Family
         }
     }
 
+    /**
+     * Лобби запросов на добавление расходов/категорий/ другого пользователя
+     */
     function index()
     {
         if(!empty($_POST))
         {
-            if($this->isPost('create'))
+            if($this->M_Family->create($this->user->id, $_POST['email']))
             {
-                header("Location: /" . $this->main_teamplate);
+                header("Location: /" . self::getMainTeamplate());
                 exit();
             }
 
             // ошибки добавления новой записи расходов
             $data['error'] = $this->M_Family->error_validation;
         }
+        $request = $this->M_Family->getAllSendedRequestBySenderIdWithReseiverEmail($this->user->id);
 
-        $data = array(
-            1 => 1
-        );
+        if($request == false)
+        {
+            $data['error'] = $this->M_Family->error_validation;
+        } else {
+            $data['waiting_request'] = $request;
+        }
+
+        print_r($request);
 
         $this->render($data);
     }
 
+    /**
+     * Подтверждение доступа к данных
+     * @param $id
+     */
     function confirm($id)
     {
         if(!empty($_POST) && $_POST['category_id'] != ''){
@@ -67,9 +80,31 @@ class Family
     }
 
     /**
+     * Удаление своих запросов
      * @param $id
      */
     function delete($id)
+    {
+        if(!empty($_POST) && $_POST['id'] != '')
+        {
+            if($this->isPost('delete')){
+                header("Location: /" . $this->main_teamplate);
+                exit();
+            }
+        }
+
+        $data = array(
+            1 => 1
+        );
+
+        $this->render($data, 'Delete');
+    }
+
+    /**
+     * Отмена запросов от других пользователей
+     * @param $id
+     */
+    function cancel($id)
     {
         if(!empty($_POST) && $_POST['id'] != '')
         {

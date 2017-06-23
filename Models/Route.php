@@ -14,7 +14,7 @@ final class Route {
         1 => 'Pay',
         2 => 'Income',
         3 => 'Index',
-        3 => 'Family'
+        4 => 'Family'
     );
     static $controller_name;
     static $controller_method;
@@ -66,6 +66,7 @@ final class Route {
             }
 
         }
+
     }
 
     public static function start()

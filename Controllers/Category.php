@@ -43,7 +43,7 @@ class Category
         {
             if($this->isPost('update'))
             {
-                header("Location: /edit/" . $id);
+                header("Location: /Category/edit/" . $id);
                 exit();
             }
             $data['error'] = $this->M_Category->error_validation;
