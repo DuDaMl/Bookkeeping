@@ -25,14 +25,14 @@ class Controller
         {
             if(! $this->M_User->checkToken($_SESSION['user_id'], $_SESSION['token']))
             {
-                echo "no auth";
+                echo "<h1>no auth</h1>";
                 //header('Location: /');
             } else {
                 $this->user = $this->M_User->getById($_SESSION['user_id']);
             }
 
         } else {
-            echo "no auth";
+            echo "<h1>no auth</h1>";
             //header('Location: /');
         }
     }

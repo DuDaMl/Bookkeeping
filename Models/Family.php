@@ -36,75 +36,148 @@ class Family
     }
 
     /**
-     * Все отправленные запросы пользователя
-     * @param $receiver_id
-     * @return array|bool
+     * Получение запросов на связи по id Отправителя и статусу операции
+     * @param $sender_id
+     * @param $status
+     * @return array
      */
-    public function getAllSendedRequestBySenderIdWithReseiverEmail($sender_id)
+    public function getRequestByStatus($sender_id, $status)
     {
-        if(! $this->setSenderById($sender_id))
-        {
-            $this->error_validation = array(
-                'error' => true,
-                'text' => 'Не определен получатель по переданному ID',
-            );
-
-            return false;
-        }
-
         $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
         FROM `family` 
-        LEFT JOIN user
+        LEFT JOIN `user`
         ON user.id = family.receiver_id
-        WHERE family.sender_id = " . $this->sender_id . "
-        AND family.status = " . Family::WAITING;
-echo $sql;
-        try
-        {
-            $result = $this->DB->prepare($sql);
-            $result->execute();
-            $sender_data = $result->fetchAll(PDO::FETCH_CLASS);
-        }
-        catch(PDOException $e)
-        {
-            echo $e->getMessage();
-            return false;
-        }
+        WHERE family.sender_id = " . $sender_id . "
+        AND family.status = " . $status;
 
-        return $sender_data;
+        $result = $this->DB->prepare($sql);
+        $result->execute();
+        return $result->fetchAll(PDO::FETCH_CLASS);
     }
 
     /**
-     * Установка id отправителя
-     * @param $sender_id
+     * Подтверждение связи получателем
+     * @param $id
      * @return bool
      */
-
-    public function setSenderById($sender_id)
+    function confirmeRelationshiop($id)
     {
+        $relationship = $this->getRelationshipById($id);
 
-        $sender = $this->M_User->getById($sender_id);
 
-        // Проверка существования отправителя
-        if(isset($sender) && $sender->id != '')
+        if($relationship)
         {
-            $this->sender_id = $sender->id;
-            return true;
+            $result = $this->updateStatus($relationship->id, Family::CONFIRMED);
         } else {
             $this->error_validation = array(
                 'error' => true,
-                'text' => 'Нет такого отправителя',
+                'text' => 'Нет такого запроса',
+            );
+            return false;
+        }
+
+        if($result)
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Отказ от установки связи
+     * @param $id
+     * @return bool
+     */
+    function refusedRelationshiop($id)
+    {
+        $this->getRelationshipById($id);
+
+        if($this->id != '')
+        {
+            $result = $this->updateStatus($this->id, Family::REFUSED);
+        }
+
+        if($result)
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Удаление запроса связи
+     * @param $id
+     * @return bool
+     */
+    function deletedRelationshiop($id)
+    {
+    }
+
+    /**
+     * Обновление статуса операции связи аккаунтов
+     * @param $id
+     * @param $status
+     * @return bool
+     */
+    public function updateStatus($id, $status)
+    {
+        $sql = "UPDATE `" . self::TABLE_NAME . "` SET
+                    status = " . $status . "
+                    WHERE id = :id";
+
+        $stmt = $this->DB->prepare($sql);
+        $stmt->bindParam(':id',  $id, PDO::PARAM_INT);
+
+        if(isset($this->id) && $this->id != '')
+        {
+            $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
+        }
+
+        if($stmt->execute())
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Получение записи запроса на добавление
+     * @param $id
+     *
+     * @return array|bool
+     */
+    public function getRelationshipById($id)
+    {
+        $sql = "SELECT *
+        FROM `family` 
+        WHERE id = " . $id . "
+        LIMIT 1";
+
+        $result = $this->DB->prepare($sql);
+        $result->execute();
+        $relationship = $result->fetchAll(PDO::FETCH_CLASS);
+
+        // Проверка существования отправителя
+        if($relationship)
+        {
+            return $relationship[0];
+        } else {
+            $this->error_validation = array(
+                'error' => true,
+                'text' => 'Нет такого запроса',
             );
             return false;
         }
     }
 
     /**
-     * Установка id получателя
+     * Получение id пользователя по Email
      * @param $receiver_email
      * @return bool
      */
-
     public function setReceiverByEmail($receiver_email)
     {
         $receiver = $this->M_User->getByEmail($receiver_email);
@@ -141,6 +214,49 @@ echo $sql;
         }
     }
 
+    public function getReceiverEmailById($receiver_id)
+    {
+        $receiver = $this->M_User->getById($receiver_id);
+
+        // Проверка существования получателя
+        if(isset($receiver) && $receiver->id != '')
+        {
+            return $receiver;
+        } else {
+            $this->error_validation = array(
+                'error' => true,
+                'text' =>  'Нет такого получателя',
+            );
+            return false;
+        }
+    }
+
+    public function checkRelationshipByIds($sender_id, $receiver_id)
+    {
+        $sql = "SELECT id
+        FROM `family` 
+        WHERE receiver_id = :receiver_id
+        AND sender_id = :sender_id";
+
+        $result = $this->DB->prepare($sql);
+        $result->bindParam(':receiver_id',  $receiver_id, PDO::PARAM_INT);
+        $result->bindParam(':sender_id',  $sender_id, PDO::PARAM_INT);
+        $result->execute();
+        $relationship = $result->fetchAll(PDO::FETCH_CLASS);
+
+        // Проверка существования отправителя
+        if($relationship)
+        {
+            return true;
+        } else {
+            $this->error_validation = array(
+                'error' => true,
+                'text' => 'Нет такого запроса',
+            );
+            return false;
+        }
+    }
+
     /**
      * Создание запроса на соединение данных
      * @param $sender_id
@@ -149,15 +265,35 @@ echo $sql;
      */
     public function create($sender_id, $receiver_email)
     {
-        if(! $this->setSenderById($sender_id) || ! $this->setReceiverByEmail($receiver_email))
+        $this->sender_id = $sender_id;
+
+        // Проверка существования пользователя с данным Email
+        if(! $this->setReceiverByEmail($receiver_email))
+        {
+            return false;
+        }
+
+        // отказ от создание запроса на самого себя
+        if($this->sender_id == $this->receiver_id)
         {
             $this->error_validation = array(
                 'error' => true,
-                'text' => 'Не определени отправитель или получатель',
+                'text' => 'Нет смысла добавлять себя к себе',
             );
             return false;
         }
 
+        // проверка существования подобного запроса
+        if($this->checkRelationshipByIds($this->sender_id, $this->receiver_id))
+        {
+            $this->error_validation = array(
+                'error' => true,
+                'text' => 'Не стоит добавлять более одного запроса на человека',
+            );
+            return false;
+        }
+
+        // Создание
         $sql = "INSERT INTO `" . self::TABLE_NAME . "`
                     (sender_id,
                     receiver_id,

@@ -111,6 +111,7 @@ $userInfo2 = array (
     'gender' => 'female ',
     'locale' => 'ru' );
 
+// todo перевести email в нижний регистр
 var_dump($userInfo);
 
         if(! empty($userInfo['email']))

@@ -15,8 +15,6 @@ class Family
     {
         parent::__construct();
         $this->M_Family = new M_Family();
-        //$this->M_Setting = new M_Setting($this->user->id);
-        //$this->setting();
     }
 
     function isPost($action)
@@ -36,6 +34,7 @@ class Family
     {
         if(!empty($_POST))
         {
+            // Создание запроса.
             if($this->M_Family->create($this->user->id, $_POST['email']))
             {
                 header("Location: /" . self::getMainTeamplate());
@@ -45,16 +44,12 @@ class Family
             // ошибки добавления новой записи расходов
             $data['error'] = $this->M_Family->error_validation;
         }
-        $request = $this->M_Family->getAllSendedRequestBySenderIdWithReseiverEmail($this->user->id);
 
-        if($request == false)
-        {
-            $data['error'] = $this->M_Family->error_validation;
-        } else {
-            $data['waiting_request'] = $request;
-        }
+        $request = $this->M_Family->getRequestByStatus($this->user->id, M_Family::WAITING);
+        $confirmed = $this->M_Family->getRequestByStatus($this->user->id, M_Family::CONFIRMED);
 
-        print_r($request);
+        $data['waiting_request'] = $request;
+        $data['confirmed_request'] = $confirmed;
 
         $this->render($data);
     }
@@ -65,18 +60,31 @@ class Family
      */
     function confirm($id)
     {
-        if(!empty($_POST) && $_POST['category_id'] != ''){
-            if($this->isPost('update')){
-                header("Location: /" . $this->main_teamplate);
+        if(!empty($_POST) && $_POST['relationship_id'] != '')
+        {
+            if($this->M_Family->confirmeRelationshiop($_POST['relationship_id']))
+            {
+                header("Location: /" . self::getMainTeamplate());
                 exit();
             }
+
+            // ошибки добавления новой записи расходов
+            $data['error'] = $this->M_Family->error_validation;
         }
 
-        $data = array(
-            1 => 1
-        );
+        // Проверка существования записи
+        $relationship = $this->M_Family->getRelationshipById($id);
 
-        $this->render($data, 'Edit');
+        if($relationship == false)
+        {
+            $data['error'] = $this->M_Family->error_validation;
+        } else {
+            // получение данных о получателе
+            $data['receiver'] = $this->M_Family->getReceiverEmailById($relationship->receiver_id);
+            $data['relationship'] = $relationship;
+        }
+
+        $this->render($data, 'Confirme');
     }
 
     /**
