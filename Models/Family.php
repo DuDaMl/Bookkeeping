@@ -35,21 +35,123 @@ class Family
         $this->M_User = new User();
     }
 
-    /**
-     * Получение запросов на связи по id Отправителя и статусу операции
-     * @param $sender_id
-     * @param $status
-     * @return array
-     */
-    public function getRequestByStatus($sender_id, $status)
+
+    public function getSendedRequest($sender_id)
     {
         $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
         FROM `family` 
         LEFT JOIN `user`
         ON user.id = family.receiver_id
-        WHERE family.sender_id = " . $sender_id . "
-        AND family.status = " . $status;
+        WHERE family.sender_id = " . $sender_id . " 
+        AND family.status = " . Family::WAITING ;
 
+        $result = $this->DB->prepare($sql);
+        $result->execute();
+        return $result->fetchAll(PDO::FETCH_CLASS);
+    }
+
+    public function getIncomeRequest($receiver_id)
+    {
+        $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
+        FROM `family` 
+        LEFT JOIN `user`
+        ON user.id = family.sender_id
+        WHERE family.receiver_id = " . $receiver_id . " 
+        AND family.status = " . Family::WAITING ;
+        $result = $this->DB->prepare($sql);
+        $result->execute();
+        return $result->fetchAll(PDO::FETCH_CLASS);
+    }
+
+    public function getIncomeRequestById($id, $receiver_id)
+    {
+        $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
+        FROM `family` 
+        LEFT JOIN `user`
+        ON user.id = family.sender_id
+        WHERE family.receiver_id = " . $receiver_id . " 
+        AND family.status = " . Family::WAITING . "
+        AND family.id = " . $id . " 
+        LIMIT 1";
+        $result = $this->DB->prepare($sql);
+        $result->execute();
+        $request = $result->fetchAll(PDO::FETCH_CLASS);
+
+        if($request)
+        {
+            return $request[0];
+        } else {
+            $this->error_validation = array(
+                'error' => true,
+                'text' => 'Нет такого пользователя',
+            );
+            return false;
+        }
+    }
+
+    public function getWaitingRequestById($id, $receiver_id)
+    {
+        $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
+        FROM `family` 
+        LEFT JOIN `user`
+        ON user.id = family.sender_id
+        WHERE family.receiver_id = " . $receiver_id . " 
+        AND family.status = " . Family::WAITING . "
+        AND family.id = " . $id . " 
+        LIMIT 1";
+        $result = $this->DB->prepare($sql);
+        $result->execute();
+        $request = $result->fetchAll(PDO::FETCH_CLASS);
+
+        if($request)
+        {
+            return $request[0];
+        } else {
+            $this->error_validation = array(
+                'error' => true,
+                'text' => 'Нет такого пользователя',
+            );
+            return false;
+        }
+    }
+
+    public function getDeleteableRequestById($id, $sender_id)
+    {
+        $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
+        FROM `family` 
+        LEFT JOIN `user`
+        ON user.id = family.receiver_id
+        WHERE family.sender_id = " . $sender_id . " 
+        AND family.id = " . $id . " 
+        LIMIT 1";
+        $result = $this->DB->prepare($sql);
+        $result->execute();
+        $request = $result->fetchAll(PDO::FETCH_CLASS);
+
+        if($request)
+        {
+            return $request[0];
+        } else {
+            $this->error_validation = array(
+                'error' => true,
+                'text' => 'Нет такого пользователя',
+            );
+            return false;
+        }
+
+    }
+
+    public function getConfirmedRequest($user_id)
+    {
+        $sql = "SELECT family.id, family.date, user.id as user_id, user.family_name, user.given_name, user.picture 
+        FROM `family` 
+        LEFT JOIN `user`
+        ON user.id = family.receiver_id OR user.id = family.sender_id
+        WHERE family.sender_id = " . $user_id . " 
+        AND family.status = " . Family::CONFIRMED . "
+        OR family.receiver_id = " . $user_id . " 
+        AND family.status = " . Family::CONFIRMED . " 
+        ORDER BY family.id";
         $result = $this->DB->prepare($sql);
         $result->execute();
         return $result->fetchAll(PDO::FETCH_CLASS);
@@ -60,13 +162,21 @@ class Family
      * @param $id
      * @return bool
      */
-    function confirmeRelationshiop($id)
+    function confirmeRelationshiop($receiver_id, $id)
     {
         $relationship = $this->getRelationshipById($id);
 
-
         if($relationship)
         {
+            if($relationship->receiver_id != $receiver_id)
+            {
+                $this->error_validation = array(
+                    'error' => true,
+                    'text' => 'Попытка несанкционированного подтверждения запроса',
+                );
+                return false;
+                // todo Попытка махинаций, сообщить администратору
+            }
             $result = $this->updateStatus($relationship->id, Family::CONFIRMED);
         } else {
             $this->error_validation = array(
@@ -82,6 +192,28 @@ class Family
         } else {
             return false;
         }
+    }
+
+    /**
+     * Удаление связи с получателем
+     * @param $id
+     * @return bool
+     */
+    function deleteRelationshiop($id)
+    {
+        $sql = "DELETE 
+        FROM `family` 
+        WHERE
+        id = :id";
+
+        $result = $this->DB->prepare($sql);
+        $result->bindParam(':id', $id, PDO::PARAM_INT);
+        return $result->execute();
+    }
+
+    public function cancelRelationshiop($id)
+    {
+        return $this->updateStatus($id, Family::REFUSED);
     }
 
     /**

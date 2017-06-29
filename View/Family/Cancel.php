@@ -5,13 +5,13 @@
 ?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
-    <h1>Удаление запроса</h1>
+    <h1>Отмена запроса</h1>
 
     <p><?= $relationship->family_name; ?> <?= $relationship->given_name; ?></p>
     <p><img src="<?= $relationship->picture; ?>" ></p>
-    <form action="/<?= $controller_name ?>/delete/<?=$relationship->id?>" method="post">
+    <form action="/<?= $controller_name ?>/cancel/<?=$relationship->id?>" method="post">
         <input type="hidden" min="0" step="1" name="relationship_id" value="<?=$relationship->id?>">
-        <button type="submit" class="btn btn-default">Удалить</button>
+        <button type="submit" class="btn btn-default">Отменить</button>
         <br/>
         <br/>
     </form>

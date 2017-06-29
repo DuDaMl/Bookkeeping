@@ -21,9 +21,9 @@ if(isset($data['error']))
 <div class="jumbotron">
     <h2>Подтверждение запроса для:</h2>
 
-    <p><?=$receiver->given_name; ?></p>
-    <p><?=$receiver->family_name; ?></p>
-    <img src="<?= $receiver->picture; ?>">
+    <p><?=$relationship->given_name; ?></p>
+    <p><?=$relationship->family_name; ?></p>
+    <img src="<?= $relationship->picture; ?>">
 
     <form action="/<?= $controller_name ?>/confirm/<?=$relationship->id?>" method="post">
         <input type="hidden" min="0" step="1" name="relationship_id" value="<?=$relationship->id?>">

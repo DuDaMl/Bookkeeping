@@ -29,7 +29,34 @@
     }
     ?>
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-4">
+            <h3>Входящие запросы</h3>
+            <ul class="list-group">
+                <?php
+                $output = '';
+                $date_current = 0;
+                foreach ($incomig_request as $request){
+                    $output .= '<li class="list-group-item">
+                        <a href="/' . $controller_name . '/confirm/' . $request->id . '" style="margin-right:10px;"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
+                        <a href="/' . $controller_name . '/cancel/' . $request->id . '" style="margin-right:10px;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                       '
+                        . '<span style="margin-left: 10px; float: right">' . $request->date . '</span>
+                         <span>' . $request->family_name . " " .  $request->given_name . '</span> <img src="' . $request->picture . '" style="max-width: 20px; float: right">
+                        ';
+
+                    if(! empty($request->description))
+                    {
+                        $output .= ' ' . $request->description;
+                    }
+
+                    $output .= '</li>';
+                    $date_current = $request->date;
+                }
+                echo $output;
+                ?>
+            </ul>
+        </div>
+        <div class="col-lg-4">
             <h3>Отправленные запросы</h3>
             <ul class="list-group">
                 <?php
@@ -37,7 +64,6 @@
                 $date_current = 0;
                 foreach ($waiting_request as $request){
                     $output .= '<li class="list-group-item">
-                        <a href="/' . $controller_name . '/confirm/' . $request->id . '" style="margin-right:10px;"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
                         <a href="/' . $controller_name . '/delete/' . $request->id . '" style="margin-right:10px;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                        '
                         . '<span style="margin-left: 10px; float: right">' . $request->date . '</span>
@@ -56,27 +82,35 @@
                 ?>
             </ul>
         </div>
-        <div class="col-lg-6">
-            <h3>Подтвержденные</h3>
+        <div class="col-lg-4">
+            <h3>Подключены:</h3>
             <ul class="list-group">
                 <?php
                 $output = '';
+                $arr_id = array();
                 $date_current = 0;
                 foreach ($confirmed_request as $request){
-                    $output .= '<li class="list-group-item">
-                        <a href="/' . $controller_name . '/delete/' . $request->id . '" style="margin-right:10px;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                       '
-                        . '<span style="margin-left: 10px; float: right">' . $request->date . '</span>
-                         <span>' . $request->family_name . " " .  $request->given_name . '</span> <img src="' . $request->picture . '" style="max-width: 20px; float: right">
-                        ';
 
-                    if(! empty($request->description))
+                    if($request->user_id != $user->id)
                     {
-                        $output .= ' ' . $request->description;
-                    }
 
-                    $output .= '</li>';
-                    $date_current = $request->date;
+                        $output .= '<li class="list-group-item">
+                            <a href="/' . $controller_name . '/delete/' . $request->id . '" style="margin-right:10px;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                           '
+                            . '<span style="margin-left: 10px; float: right">' . $request->date . '</span>
+                             <span>' . $request->family_name . " " .  $request->given_name . '</span> <img src="' . $request->picture . '" style="max-width: 20px; float: right">
+                            ';
+
+                        if(! empty($request->description))
+                        {
+                            $output .= ' ' . $request->description;
+                        }
+
+                        $output .= '</li>';
+                        $date_current = $request->date;
+
+                        array_push($arr_id, $request->id);
+                    }
                 }
                 echo $output;
                 ?>

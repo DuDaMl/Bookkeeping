@@ -45,9 +45,12 @@ class Family
             $data['error'] = $this->M_Family->error_validation;
         }
 
-        $request = $this->M_Family->getRequestByStatus($this->user->id, M_Family::WAITING);
-        $confirmed = $this->M_Family->getRequestByStatus($this->user->id, M_Family::CONFIRMED);
+        $incoming = $this->M_Family->getIncomeRequest($this->user->id);
+        $request = $this->M_Family->getSendedRequest($this->user->id);
+        $confirmed = $this->M_Family->getConfirmedRequest($this->user->id);
 
+        $data['user'] = $this->user;
+        $data['incomig_request'] = $incoming;
         $data['waiting_request'] = $request;
         $data['confirmed_request'] = $confirmed;
 
@@ -55,14 +58,17 @@ class Family
     }
 
     /**
-     * Подтверждение доступа к данных
+     * Подтверждение доступа к данных Получателем (receiver)
      * @param $id
      */
     function confirm($id)
     {
+
+        // Проверка существования запроса с другой стороны
+
         if(!empty($_POST) && $_POST['relationship_id'] != '')
         {
-            if($this->M_Family->confirmeRelationshiop($_POST['relationship_id']))
+            if($this->M_Family->confirmeRelationshiop($this->user->id, $_POST['relationship_id']))
             {
                 header("Location: /" . self::getMainTeamplate());
                 exit();
@@ -73,14 +79,12 @@ class Family
         }
 
         // Проверка существования записи
-        $relationship = $this->M_Family->getRelationshipById($id);
-
+        $relationship = $this->M_Family->getWaitingRequestById($id, $this->user->id);
         if($relationship == false)
         {
             $data['error'] = $this->M_Family->error_validation;
         } else {
             // получение данных о получателе
-            $data['receiver'] = $this->M_Family->getReceiverEmailById($relationship->receiver_id);
             $data['relationship'] = $relationship;
         }
 
@@ -88,22 +92,36 @@ class Family
     }
 
     /**
-     * Удаление своих запросов
+     * Удаление своих запросов, где sender = user->id
      * @param $id
      */
     function delete($id)
     {
-        if(!empty($_POST) && $_POST['id'] != '')
+        // Проверка существования записи
+        $relationship = $this->M_Family->getDeleteableRequestById($id, $this->user->id);
+
+        if( !empty($_POST)
+            && $_POST['relationship_id'] != ''
+            && $relationship != false
+            && $relationship->id != '')
         {
-            if($this->isPost('delete')){
-                header("Location: /" . $this->main_teamplate);
+            if($this->M_Family->deleteRelationshiop($_POST['relationship_id']))
+            {
+                header("Location: /" . self::getMainTeamplate());
                 exit();
             }
+
+            // ошибки добавления новой записи расходов
+            $data['error'] = $this->M_Family->error_validation;
         }
 
-        $data = array(
-            1 => 1
-        );
+        if($relationship == false)
+        {
+            $data['error'] = $this->M_Family->error_validation;
+        } else {
+            // получение данных о получателе
+            $data['relationship'] = $relationship;
+        }
 
         $this->render($data, 'Delete');
     }
@@ -114,18 +132,32 @@ class Family
      */
     function cancel($id)
     {
-        if(!empty($_POST) && $_POST['id'] != '')
+        // Проверка существования записи
+        $relationship = $this->M_Family->getIncomeRequestById($id, $this->user->id);
+
+        if( !empty($_POST)
+            && $_POST['relationship_id'] != ''
+            && $relationship != false
+            && $relationship->id != '')
         {
-            if($this->isPost('delete')){
-                header("Location: /" . $this->main_teamplate);
+            if($this->M_Family->cancelRelationshiop($_POST['relationship_id']))
+            {
+                header("Location: /" . self::getMainTeamplate());
                 exit();
             }
+
+            // ошибки добавления новой записи расходов
+            $data['error'] = $this->M_Family->error_validation;
         }
 
-        $data = array(
-            1 => 1
-        );
+        if($relationship == false)
+        {
+            $data['error'] = $this->M_Family->error_validation;
+        } else {
+            // получение данных о получателе
+            $data['relationship'] = $relationship;
+        }
 
-        $this->render($data, 'Delete');
+        $this->render($data, 'Cancel');
     }
 }
