@@ -20,7 +20,7 @@ class User
 
     function __construct()
     {
-        $this->DB = DB::getInstance()->getConnection();
+        $this->DB = DB::getInstance();
     }
     /**
      * @return array|bool
@@ -29,6 +29,19 @@ class User
     protected function get($sql)
     {
         try
+        {
+            $result = $this->DB->query($sql);
+            return $result;
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+            return false;
+        }
+
+        //$result = $this->DB->query($sql);
+        //return $result;
+        /*try
         {
             $result = $this->DB->prepare($sql);
 
@@ -40,7 +53,7 @@ class User
         {
             echo $e->getMessage();
             return false;
-        }
+        }*/
 
     }
 
@@ -84,7 +97,6 @@ class User
     {
         // user from db by user id as Obj
         $user = $this->getById($user_id);
-
         if($user->token != $_SESSION['token'])
         {
             //session_destroy();
@@ -98,11 +110,21 @@ class User
                 WHERE id = :id
                 ";
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
-        $stmt->bindParam(':id',  $user_id, PDO::PARAM_INT);
+        $params = [
+          ':token' => $token,
+          ':id' => $user_id
+        ];
 
-        if($stmt->execute())
+
+        $result = $this->DB->execute($sql, $params);
+
+        //return $result;
+
+        //$stmt = $this->DB->prepare($sql);
+        //$stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        //$stmt->bindParam(':id',  $user_id, PDO::PARAM_INT);
+
+        if($result)
         {
             $_SESSION['token'] =  $token;
             return true;
@@ -122,11 +144,15 @@ class User
                 WHERE id = :id
                 ";
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
-        $stmt->bindParam(':id',  $user_id, PDO::PARAM_INT);
+        $params = [
+            ':token' => $token,
+            ':id' => $user_id
+        ];
 
-        if($stmt->execute())
+
+        $result = $this->DB->execute($sql, $params);
+
+        if($result)
         {
             return true;
         } else {

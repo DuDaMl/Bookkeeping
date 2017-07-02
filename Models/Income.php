@@ -19,7 +19,7 @@ class Income
     function __construct($user_id)
     {
         $this->user_id = $user_id;
-        $this->DB = DB::getInstance()->getConnection();
+        $this->DB = DB::getInstance();
     }
 
     /**
@@ -30,9 +30,10 @@ class Income
    {
        try
        {
-           $result = $this->DB->prepare($sql);
-           $result->execute();
-           return $result->fetchAll(PDO::FETCH_CLASS);
+           $result = $this->DB->query($sql);
+           //$result->execute();
+           //return $result->fetchAll(PDO::FETCH_CLASS);
+           return $result;
        }
        catch(PDOException $e)
        {
@@ -43,8 +44,8 @@ class Income
 
    function getAll()
    {
-       $month_start = date('Y-m-01');
-       $month_end = date('Y-m-30');
+       $month_start = date('Y-01-01');
+       $month_end = date('Y-12-30');
 
        $sql = "SELECT income.id, income.amount, income.user_id, income.category_id, income.description, income.date, category.name, category.type
                FROM `" . self::TABLE_NAME . "`     

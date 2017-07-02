@@ -19,7 +19,7 @@ class Pay
     function __construct($user_id)
     {
         $this->user_id = $user_id;
-        $this->DB = DB::getInstance()->getConnection();
+        $this->DB = DB::getInstance();
     }
 
     /**
@@ -30,9 +30,9 @@ class Pay
    {
        try
        {
-           $result = $this->DB->prepare($sql);
-           $result->execute();
-           return $result->fetchAll(PDO::FETCH_CLASS);
+           $result = $this->DB->query($sql);
+           //$result->execute();
+           return $result; //->fetchAll(PDO::FETCH_CLASS);
        }
        catch(PDOException $e)
        {

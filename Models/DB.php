@@ -1,29 +1,20 @@
 <?php
 namespace bookkeeping\Models;
 use PDO;
+use bookkeeping\Models\Core\Singleton;
 
 class DB
+    extends Singleton
 {
     protected $connection;
     public $error;
-    private static $_instance;
+    protected static $_instance;
 
-    private function __construct(){
-        $DB_host = "localhost";
-        $DB_user = "root";
-        $DB_pass = "";
-        $DB_name = "bookkeeping";
+    protected function __construct(){
 
-        try
-        {
-            $this->connection = new PDO("mysql:host={$DB_host};dbname={$DB_name}",$DB_user,$DB_pass);
-            $this->connection->exec("set names utf8");
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        }
-        catch(PDOException $e)
-        {
-            echo $e->getMessage();
-        }
+        $this->connection = new PDO('mysql:host=127.0.0.1;dbname=bookkeeping', 'root', '');
+        $this->connection->exec("set names utf8");
+        $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     public static function getInstance() {
@@ -33,9 +24,21 @@ class DB
         return self::$_instance;
     }
 
-    public function getConnection()
+    public function execute($sql, $params = [])
     {
-        return $this->connection;
+        $sth = $this->connection->prepare($sql);
+        $res = $sth->execute($params);
+        return $res;
+    }
+
+    public function query($sql)
+    {
+        $sth = $this->connection->prepare($sql);
+        $res = $sth->execute();
+        if (false !== $res) {
+            return $sth->fetchAll(\PDO::FETCH_CLASS);
+        }
+        return [];
     }
 
     public function getError() {

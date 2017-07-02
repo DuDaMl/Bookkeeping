@@ -17,7 +17,7 @@ class Setting
     function __construct($user_id)
     {
         $this->user_id = $user_id;
-        $this->DB = DB::getInstance()->getConnection();
+        $this->DB = DB::getInstance();
     }
     /**
      * @return array|bool
@@ -27,9 +27,10 @@ class Setting
     {
         try
         {
-            $result = $this->DB->prepare($sql);
-            $result->execute();
-            return $result->fetchAll(PDO::FETCH_CLASS);
+            $result = $this->DB->query($sql);
+            //$result->execute();
+            //return $result->fetchAll(PDO::FETCH_CLASS);
+            return $result;//->fetchAll(PDO::FETCH_CLASS);
         }
         catch(PDOException $e)
         {
