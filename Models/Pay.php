@@ -23,24 +23,11 @@ class Pay
     }
 
     /**
-     * @return array|bool
+     * return all pays from pointed data limit
+     * @param $start
+     * @param $end
+     * @return array|object
      */
-
-   protected function get($sql)
-   {
-       try
-       {
-           $result = $this->DB->query($sql);
-           //$result->execute();
-           return $result; //->fetchAll(PDO::FETCH_CLASS);
-       }
-       catch(PDOException $e)
-       {
-           echo $e->getMessage();
-           return false;
-       }
-   }
-
    function getAll($start, $end)
    {
        $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.user_id, pay.date, category.name, category.type
@@ -53,7 +40,8 @@ class Pay
                AND category.type = 'Pay'
                ORDER BY date DESC, id DESC
                ";
-       return $this->get($sql);
+
+       return $this->DB->query($sql);
    }
 
     /**
@@ -76,16 +64,17 @@ class Pay
         WHERE  id = " . $id . "
         AND pay.user_id = " . $this->user_id;
 
-        $answer = $this->get($sql);
-        return $answer[0];
+        $answer = $this->DB->query($sql, 'fetch');
+        return $answer;
     }
 
     /**
+     * create pay
      * @return bool
      */
-    public function save($sql)
+    public function create()
     {
-        if($this->user_id == false)
+        if(! self::validate())
         {
             return false;
         }
@@ -93,34 +82,6 @@ class Pay
         if(empty($this->amount)
             || empty($this->category_id)
             || empty($this->date))
-        {
-            return false;
-        }
-
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':amount',  $this->amount, PDO::PARAM_INT);
-        $stmt->bindParam(':description', $this->description , PDO::PARAM_STR);
-        $stmt->bindParam(':category_id', $this->category_id , PDO::PARAM_INT);
-        $stmt->bindParam(':user_id', $this->user_id , PDO::PARAM_INT);
-        $stmt->bindParam(':date', $this->date , PDO::PARAM_STR);
-
-        if(isset($this->id) && $this->id != '')
-        {
-            $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
-        }
-
-        if($stmt->execute())
-        {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    public function create()
-    {
-        if(! self::validate())
         {
             return false;
         }
@@ -139,17 +100,37 @@ class Pay
                     :date
                     )";
 
-        return $this->save($sql);
+        $params = [
+            ':amount' => $this->amount,
+            ':description' => $this->description,
+            ':category_id' => $this->category_id,
+            ':user_id' => $this->user_id,
+            ':date' => $this->date
+        ];
+
+        return $this->DB->execute($sql, $params);
+
     }
 
+    /**
+     * update pay
+     * @return bool
+     */
     public function update()
     {
-        if(! self::validate())
+        if(! $this->validate())
         {
             return false;
         }
 
         if(! isset($this->id) || $this->id == '')
+        {
+            return false;
+        }
+
+        if(empty($this->amount)
+            || empty($this->category_id)
+            || empty($this->date))
         {
             return false;
         }
@@ -162,14 +143,26 @@ class Pay
                     date = :date
                     WHERE id = :id";
 
-        return $this->save($sql);
+        $params = [
+            ':id' => $this->id,
+            ':amount' => $this->amount,
+            ':description' => $this->description,
+            ':category_id' => $this->category_id,
+            ':user_id' => $this->user_id,
+            ':date' => $this->date
+        ];
+
+        return $this->DB->execute($sql, $params);
+
     }
+
     /**
+     * delete pay
      * @return bool
      */
     function delete()
     {
-        if(! self::validate()){
+        if(! $this->validate()){
 
             return false;
         }
@@ -185,17 +178,20 @@ class Pay
             return false;
         }
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
+        $params = [
+            ':id' => $this->id
+        ];
 
-        if($stmt->execute())
+        $result = $this->DB->execute($sql, $params);
+
+
+        if($result)
         {
             return true;
         } else {
             return false;
         }
     }
-
 
     /**
      * Валидация данных формы. Инициализация переменных класса

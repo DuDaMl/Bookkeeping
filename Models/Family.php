@@ -31,7 +31,7 @@ class Family
 
     function __construct()
     {
-        $this->DB = DB::getInstance()->getConnection();
+        $this->DB = DB::getInstance();
         $this->M_User = new User();
     }
 
@@ -44,10 +44,8 @@ class Family
         ON user.id = family.receiver_id
         WHERE family.sender_id = " . $sender_id . " 
         AND family.status = " . Family::WAITING ;
-
-        $result = $this->DB->prepare($sql);
-        $result->execute();
-        return $result->fetchAll(PDO::FETCH_CLASS);
+        $result = $this->DB->query($sql);
+        return $result;
     }
 
     public function getIncomeRequest($receiver_id)
@@ -58,9 +56,8 @@ class Family
         ON user.id = family.sender_id
         WHERE family.receiver_id = " . $receiver_id . " 
         AND family.status = " . Family::WAITING ;
-        $result = $this->DB->prepare($sql);
-        $result->execute();
-        return $result->fetchAll(PDO::FETCH_CLASS);
+        $result = $this->DB->query($sql);
+        return $result;
     }
 
     public function getIncomeRequestById($id, $receiver_id)
@@ -73,9 +70,7 @@ class Family
         AND family.status = " . Family::WAITING . "
         AND family.id = " . $id . " 
         LIMIT 1";
-        $result = $this->DB->prepare($sql);
-        $result->execute();
-        $request = $result->fetchAll(PDO::FETCH_CLASS);
+        $request = $this->DB->query($sql);
 
         if($request)
         {
@@ -99,9 +94,7 @@ class Family
         AND family.status = " . Family::WAITING . "
         AND family.id = " . $id . " 
         LIMIT 1";
-        $result = $this->DB->prepare($sql);
-        $result->execute();
-        $request = $result->fetchAll(PDO::FETCH_CLASS);
+        $request = $this->DB->query($sql);
 
         if($request)
         {
@@ -124,10 +117,7 @@ class Family
         WHERE family.sender_id = " . $sender_id . " 
         AND family.id = " . $id . " 
         LIMIT 1";
-        $result = $this->DB->prepare($sql);
-        $result->execute();
-        $request = $result->fetchAll(PDO::FETCH_CLASS);
-
+        $request = $this->DB->query($sql);
         if($request)
         {
             return $request[0];
@@ -152,9 +142,8 @@ class Family
         OR family.receiver_id = " . $user_id . " 
         AND family.status = " . Family::CONFIRMED . " 
         ORDER BY family.id";
-        $result = $this->DB->prepare($sql);
-        $result->execute();
-        return $result->fetchAll(PDO::FETCH_CLASS);
+        $result = $this->DB->query($sql);
+        return $result;
     }
 
     /**
@@ -206,9 +195,12 @@ class Family
         WHERE
         id = :id";
 
-        $result = $this->DB->prepare($sql);
-        $result->bindParam(':id', $id, PDO::PARAM_INT);
-        return $result->execute();
+        $values = [
+            'id' => $id
+        ];
+
+        $request = $this->DB->execute($sql, $values);
+        return $request;
     }
 
     public function cancelRelationshiop($id)
@@ -259,15 +251,22 @@ class Family
                     status = " . $status . "
                     WHERE id = :id";
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':id',  $id, PDO::PARAM_INT);
+        $values = [
+            'id' => $id
+        ];
+
+        $request = $this->DB->execute($sql, $values);
+
 
         if(isset($this->id) && $this->id != '')
         {
-            $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
+
+            $values = [
+                'id' => $this->id
+            ];
         }
 
-        if($stmt->execute())
+        if($request = $this->DB->execute($sql, $values))
         {
             return true;
         } else {
@@ -288,9 +287,7 @@ class Family
         WHERE id = " . $id . "
         LIMIT 1";
 
-        $result = $this->DB->prepare($sql);
-        $result->execute();
-        $relationship = $result->fetchAll(PDO::FETCH_CLASS);
+        $relationship = $this->DB->query($sql);
 
         // Проверка существования отправителя
         if($relationship)
@@ -440,13 +437,17 @@ class Family
 
         $date = date('Y-m-d');
         $this->status = Family::WAITING;
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':sender_id', $this->sender_id , PDO::PARAM_STR);
-        $stmt->bindParam(':receiver_id', $this->receiver_id , PDO::PARAM_INT);
-        $stmt->bindParam(':status', $this->status , PDO::PARAM_INT);
-        $stmt->bindParam(':date', $date , PDO::PARAM_STR);
 
-        if($stmt->execute())
+        $values = [
+            'sender_id' => $this->sender_id,
+            'receiver_id' => $this->receiver_id,
+            'status' => $this->status,
+            'date' => $date
+        ];
+
+        $request = $this->DB->execute($sql, $values);
+
+        if($request)
         {
             return true;
         } else {

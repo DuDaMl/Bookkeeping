@@ -13,28 +13,24 @@ class Controller
 {
     protected static $main_teamplate;
 
-    // Сохраненный пользователь из БД найденный по id и авторизированный
-    protected $user;
+    // Auth User
+    protected  static $current_user_id;
 
     function __construct()
     {
-        $this->M_User = new M_User();
+        //$this->M_User = new M_User();
 
         // auth
-        if(isset($_SESSION['user_id']))
+        if(! M_User::checkAuth())
         {
-            if(! $this->M_User->checkToken($_SESSION['user_id'], $_SESSION['token']))
-            {
-                echo "<h1>no auth</h1>";
-                //header('Location: /');
-            } else {
-                $this->user = $this->M_User->getById($_SESSION['user_id']);
-            }
-
-        } else {
             echo "<h1>no auth</h1>";
             //header('Location: /');
+        } else {
+            static::$current_user_id = M_User::getUserId();
         }
+
+
+
     }
 
     public static function getMainTeamplate()
@@ -55,7 +51,7 @@ class Controller
         $current_page = self::getMainTeamplate();
         $controller_name = self::getMainTeamplate();
 
-        $user = $this->user;
+        $user = M_User::getById(static::$current_user_id);
 
         //return include (__DIR__ . '\..\View\\' . $this->main_teamplate . '\\' . $view . '.php');
         return include (__DIR__ . '/../View/' . self::getMainTeamplate() . '/' . $view . '.php');

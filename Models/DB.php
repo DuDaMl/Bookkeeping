@@ -31,12 +31,24 @@ class DB
         return $res;
     }
 
-    public function query($sql)
+    public function query($sql, $method = 'fetchAll')
     {
         $sth = $this->connection->prepare($sql);
         $res = $sth->execute();
         if (false !== $res) {
-            return $sth->fetchAll(\PDO::FETCH_CLASS);
+            switch($method)
+            {
+                case 'fetch':
+                    //return  $sth->fetch(8);
+                    return (object) $sth->fetch();
+                    break;
+                default:
+                    //echo PDO::FETCH_CLASS; exit();
+                    //print_r($sth->fetchAll(PDO::FETCH_CLASS)); exit();
+                    return $sth->fetchAll(PDO::FETCH_CLASS);
+                    break;
+            }
+
         }
         return [];
     }

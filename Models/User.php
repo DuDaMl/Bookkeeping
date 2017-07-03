@@ -22,87 +22,93 @@ class User
     {
         $this->DB = DB::getInstance();
     }
-    /**
-     * @return array|bool
-     */
-
-    protected function get($sql)
-    {
-        try
-        {
-            $result = $this->DB->query($sql);
-            return $result;
-        }
-        catch(PDOException $e)
-        {
-            echo $e->getMessage();
-            return false;
-        }
-
-        //$result = $this->DB->query($sql);
-        //return $result;
-        /*try
-        {
-            $result = $this->DB->prepare($sql);
-
-            $result->execute();
-
-            return $result->fetchAll(PDO::FETCH_CLASS);
-        }
-        catch(PDOException $e)
-        {
-            echo $e->getMessage();
-            return false;
-        }*/
-
-    }
 
     /**
      * @param $id
      * @return Obj
      */
-    function getById($id)
+    static function getById($id)
     {
+        $DB = DB::getInstance();
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-        $answer = $this->get($sql);
-        return $answer[0];
+        $answer = $DB->query($sql, 'fetch');
+        return $answer;
     }
-    /**
-     * @return array|bool
-     */
-    /*function getTokenById($id)
-    {
-        $sql = "SELECT `token` FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-        $answer = $this->get($sql);
-        return $answer[0];
-    }*/
+
     /**
      * @return array|bool
      */
     function getByEmail($email)
     {
+
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  email = '" . $email ."'";
-        $answer = $this->get($sql);
+        $answer = $this->DB->query($sql, 'fetch');
 
         if(! empty($answer))
         {
-            return $answer[0];
+            return $answer;
         } else {
             return false;
         }
-
     }
 
-    function checkToken($user_id)
+    static function getUserId()
     {
-        // user from db by user id as Obj
-        $user = $this->getById($user_id);
+        if(self::checkAuth())
+        {
+            return $_SESSION['user_id'];
+        }
+    }
+
+
+    /**
+     * Check Auth user
+     * @return bool
+     */
+    public static function checkAuth( )
+    {
+        if(isset($_SESSION['user_id']) && isset($_SESSION['token']))
+        {
+            return self::checkToken($_SESSION['user_id'], $_SESSION['token']);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check $_Session token with saved token in DB
+     * @param $user_id
+     * @param $token
+     * @return bool
+     */
+    public static function checkToken($user_id, $token)
+    {
+        $DB = DB::getInstance();
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $user_id . " LIMIT 1";
+        $user = $DB->query($sql, 'fetch');
+
         if($user->token != $_SESSION['token'])
         {
             //session_destroy();
             return false;
         }
 
+        if(self::updateToken($user_id))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Update token in DB and $_Session
+     * @param $user_id
+     * @return bool
+     */
+    public static function updateToken($user_id)
+    {
+        $DB = DB::getInstance();
         $token = bin2hex(random_bytes('64'));
 
         $sql = "UPDATE `" . self::TABLE_NAME . "` SET
@@ -111,18 +117,11 @@ class User
                 ";
 
         $params = [
-          ':token' => $token,
-          ':id' => $user_id
+            ':token' => $token,
+            ':id' => $user_id
         ];
 
-
-        $result = $this->DB->execute($sql, $params);
-
-        //return $result;
-
-        //$stmt = $this->DB->prepare($sql);
-        //$stmt->bindParam(':token', $token, PDO::PARAM_STR);
-        //$stmt->bindParam(':id',  $user_id, PDO::PARAM_INT);
+        $result = $DB->execute($sql, $params);
 
         if($result)
         {
@@ -148,7 +147,6 @@ class User
             ':token' => $token,
             ':id' => $user_id
         ];
-
 
         $result = $this->DB->execute($sql, $params);
 
@@ -182,15 +180,17 @@ class User
                     :gender
                     )";
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
-        $stmt->bindParam(':given_name', $this->given_name, PDO::PARAM_STR);
-        $stmt->bindParam(':family_name', $this->family_name, PDO::PARAM_STR);
-        $stmt->bindParam(':picture', $this->picture, PDO::PARAM_STR);
-        $stmt->bindParam(':link', $this->link, PDO::PARAM_STR);
-        $stmt->bindParam(':gender', $this->gender, PDO::PARAM_STR);
+        $params = [
+            ':email' => $this->email,
+            ':given_name' => $this->given_name,
+            ':family_name' => $this->family_name,
+            ':picture' => $this->picture,
+            ':link' => $this->link,
+            ':gender' => $this->gender
+        ];
 
-        if($stmt->execute())
+        $result = $this->DB->execute($sql, $params);
+        if($result)
         {
             return $this->DB->lastInsertId();
         } else {

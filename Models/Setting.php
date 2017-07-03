@@ -19,25 +19,7 @@ class Setting
         $this->user_id = $user_id;
         $this->DB = DB::getInstance();
     }
-    /**
-     * @return array|bool
-     */
 
-    protected function get($sql)
-    {
-        try
-        {
-            $result = $this->DB->query($sql);
-            //$result->execute();
-            //return $result->fetchAll(PDO::FETCH_CLASS);
-            return $result;//->fetchAll(PDO::FETCH_CLASS);
-        }
-        catch(PDOException $e)
-        {
-            echo $e->getMessage();
-            return false;
-        }
-    }
     /**
      * @return array|bool
      */
@@ -55,8 +37,8 @@ class Setting
         }
 
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-        $answer = $this->get($sql);
-        return $answer[0];
+        $answer =  $this->DB->query($sql, 'fetch');
+        return $answer;
     }
 
     /**
@@ -69,11 +51,11 @@ class Setting
                AND user_id = " . $this->user_id . "
               ";
 
-        $answer = $this->get($sql);
+        $answer = $this->DB->query($sql, 'fetch');
 
         if(! empty($answer))
         {
-            return $answer[0];
+            return $answer;
         } else {
             return false;
         }
@@ -85,19 +67,21 @@ class Setting
      */
     function edit($id, $value)
     {
-        // Update
         $sql = "UPDATE `" . self::TABLE_NAME . "` SET
                 user_id = :user_id,
                 value = :value
                 WHERE id = :id
                 ";
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':user_id', $this->user_id, PDO::PARAM_INT);
-        $stmt->bindParam(':value', $value, PDO::PARAM_STR);
-        $stmt->bindParam(':id',  $id, PDO::PARAM_INT);
+        $params = [
+            'user_id' => $this->user_id,
+            'value' => $value,
+            'id' => $id
+        ];
 
-        if($stmt->execute())
+        $result = $this->DB->execute($sql, $params);
+
+        if($result)
         {
             return true;
         } else {

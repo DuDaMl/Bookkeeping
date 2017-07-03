@@ -1,6 +1,7 @@
 <?php
 namespace bookkeeping\Controllers;
 use bookkeeping\Controllers\Controller as Controller;
+use bookkeeping\Models\User as M_User;
 use bookkeeping\Models\Setting as M_Setting;
 use bookkeeping\Models\Pay as M_Pay;
 use bookkeeping\Models\Category as M_Category;
@@ -14,8 +15,8 @@ class Pay
     function __construct()
     {
         parent::__construct();
-        $this->M_Pay = new M_Pay($this->user->id);
-        $this->M_Setting = new M_Setting($this->user->id);
+
+        $this->M_Pay = new M_Pay(static::$current_user_id);
         $this->setting();
     }
 
@@ -24,6 +25,8 @@ class Pay
      */
     public function setting()
     {
+        $M_Setting = new M_Setting(static::$current_user_id);
+
         if(isset($_POST['format']))
         {
             $format_value = $_POST['format'];
@@ -59,12 +62,12 @@ class Pay
             );
 
             // изменения параметров представления контроллера
-           $result =  $this->M_Setting->setFormat(self::getMainTeamplate(), $params);
+           $result =  $M_Setting->setFormat(self::getMainTeamplate(), $params);
 
             if(! $result)
             {
                 // todo записать в лог.
-                $this->M_Setting->error_validation;
+                $M_Setting->error_validation;
             }
 
             header("Location: /" . self::getMainTeamplate());
@@ -79,8 +82,11 @@ class Pay
      */
     function getSettings()
     {
+        $M_Setting = new M_Setting(static::$current_user_id);
+
         // загрузка параметров контроллера
-        $params = $this->M_Setting->getByController(self::getMainTeamplate());
+        $params = $M_Setting->getByController(self::getMainTeamplate());
+
 
         // если данных нет, то загрузка данных по умолчанию
         if(empty($params))
@@ -128,7 +134,7 @@ class Pay
         $data['pays'] = $this->M_Pay->getAll($data['settings']->date_start, $data['settings']->date_end);
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category($this->user->id))->getAll();
+        $data['categories'] =  (new M_Category(static::$current_user_id))->getAll();
         $this->render($data);
     }
 
@@ -157,7 +163,7 @@ class Pay
             }
         }
 
-        $M_Category = new M_Category($this->user->id);
+        $M_Category = new M_Category(static::$current_user_id);
         $data['categories'] = $M_Category->getAll();
         $this->render($data, 'Edit');
     }
