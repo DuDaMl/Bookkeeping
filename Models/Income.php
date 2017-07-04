@@ -25,23 +25,6 @@ class Income
     /**
      * @return array|bool
      */
-
-   protected function get($sql)
-   {
-       try
-       {
-           $result = $this->DB->query($sql);
-           //$result->execute();
-           //return $result->fetchAll(PDO::FETCH_CLASS);
-           return $result;
-       }
-       catch(PDOException $e)
-       {
-           echo $e->getMessage();
-           return false;
-       }
-   }
-
    function getAll()
    {
        $month_start = date('Y-01-01');
@@ -58,7 +41,7 @@ class Income
                ORDER BY date DESC, id DESC
                ";
 
-       return $this->get($sql);
+       return $this->DB->query($sql);
    }
 
     /**
@@ -78,47 +61,19 @@ class Income
         }
 
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-        $answer = $this->get($sql);
-        return $answer[0];
-    }
-
-    /**
-     * @return bool
-     */
-    function save($sql)
-    {
-
-
-        if(empty($this->amount)
-            || empty($this->category_id)
-            || empty($this->date))
-        {
-            return false;
-        }
-
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':amount',  $this->amount, PDO::PARAM_INT);
-        $stmt->bindParam(':description', $this->description , PDO::PARAM_STR);
-        $stmt->bindParam(':user_id', $this->user_id , PDO::PARAM_INT);
-        $stmt->bindParam(':category_id', $this->category_id , PDO::PARAM_INT);
-        $stmt->bindParam(':date', $this->date , PDO::PARAM_STR);
-
-        if(isset($this->id) && $this->id != '')
-        {
-            $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
-        }
-
-        if($stmt->execute())
-        {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->DB->query($sql,'fetch');
     }
 
     public function create()
     {
         if(! self::validate())
+        {
+            return false;
+        }
+
+        if(empty($this->amount)
+            || empty($this->category_id)
+            || empty($this->date))
         {
             return false;
         }
@@ -137,7 +92,15 @@ class Income
                     :date
                     )";
 
-        return $this->save($sql);
+        $params = [
+            ':amount' => $this->amount,
+            ':description' => $this->description,
+            ':user_id' => $this->user_id,
+            ':category_id' => $this->category_id,
+            ':date' => $this->date,
+        ];
+
+        return $this->DB->execute($sql, $params);
     }
 
     public function update()
@@ -152,6 +115,13 @@ class Income
            return false;
         }
 
+        if(empty($this->amount)
+            || empty($this->category_id)
+            || empty($this->date))
+        {
+            return false;
+        }
+
         $sql = "UPDATE `" . self::TABLE_NAME . "` SET
                     amount = :amount,
                     description = :description,
@@ -161,7 +131,16 @@ class Income
                     WHERE id = :id
                     ";
 
-        return $this->save($sql);
+        $params = [
+            ':amount' => $this->amount,
+            ':description' => $this->description,
+            ':user_id' => $this->user_id,
+            ':category_id' => $this->category_id,
+            ':date' => $this->date,
+            ':id' => $this->id,
+        ];
+
+        return $this->DB->execute($sql, $params);
     }
 
     /**
@@ -185,15 +164,11 @@ class Income
             return false;
         }
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
+        $params = [
+            ':id' => $this->id
+        ];
 
-        if($stmt->execute())
-        {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->DB->execute($sql, $params);
     }
 
     /**

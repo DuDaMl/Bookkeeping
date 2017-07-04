@@ -87,7 +87,7 @@ class Index
         }
 */
 
-$userInfo = array (
+$userInfo2 = array (
 'id' => 110665724950086710524,
 'email' => 'duda.ml1986@gmail.com',
 'verified_email' => 1 ,
@@ -99,7 +99,7 @@ $userInfo = array (
 'gender' => 'male ',
 'locale' => 'ru' );
 
-$userInfo2 = array (
+$userInfo = array (
     'id' => 110665724950086710524,
     'email' => 'chubaka_lenochka@gmail.com',
     'verified_email' => 1 ,

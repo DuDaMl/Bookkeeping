@@ -16,24 +16,7 @@ class Category
     function __construct($user_id)
     {
         $this->user_id = $user_id;
-        $this->DB = DB::getInstance();//->getConnection();
-    }
-
-    protected function get($sql)
-    {
-        try
-        {
-            $result = $this->DB->query($sql);
-            //$result = $this->DB->prepare($sql);
-            //$result->execute();
-            //return $result->fetchAll(PDO::FETCH_CLASS);
-            return $result;
-        }
-        catch(PDOException $e)
-        {
-            echo $e->getMessage();
-            return false;
-        }
+        $this->DB = DB::getInstance();
     }
 
     function getAll($type = 'Pay')
@@ -42,7 +25,7 @@ class Category
         WHERE type = '" . $type . "' 
         AND user_id = " . $this->user_id . "
         ORDER BY name ASC";
-        return $this->get($sql);
+        return $this->DB->query($sql);
     }
 
     function getAllPays()
@@ -51,7 +34,7 @@ class Category
         WHERE type = 'Pay' 
         AND user_id = " . $this->user_id . "
         ORDER BY name ASC";
-        return $this->get($sql);
+        return $this->DB->query($sql);
     }
 
     function getAllIncomes()
@@ -60,7 +43,7 @@ class Category
         WHERE type = 'Income'  
         AND user_id = " . $this->user_id . "
         ORDER BY name ASC";
-        return $this->get($sql);
+        return $this->DB->query($sql);
     }
 
     /**
@@ -80,18 +63,17 @@ class Category
         }
 
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-        $answer = $this->get($sql);
-        return $answer[0];
+        return $this->DB->query($sql, 'fetch');
     }
 
-    /**
-     * @return bool
-     */
-    protected function save($sql)
+    public function update()
     {
-
-        if($this->user_id == false || ! self::validate())
+        if(! self::validate() )
         {
+            $this->error_validation = array(
+                'error' => true,
+                'amount' => 'Ошибка в переданном id',
+            );
             return false;
         }
 
@@ -101,45 +83,42 @@ class Category
                 'error' => true,
                 'amount' => 'Имя категории не может быть пустым',
             );
-           return false;
-        }
-
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':name', $this->name , PDO::PARAM_STR);
-        $stmt->bindParam(':type', $this->type , PDO::PARAM_STR);
-        $stmt->bindParam(':user_id', $this->user_id , PDO::PARAM_STR);
-
-        if(isset($this->id) && $this->id != ''){
-            $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
-        }
-
-
-        if($stmt->execute()){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function update()
-    {
-        if(! isset($this->id) && $this->id == '')
-        {
             return false;
         }
 
         $sql = "UPDATE `" . self::TABLE_NAME . "` SET
                     name = :name,
-                    type = :type
+                    type = :type,
                     user_id = :user_id
                     WHERE id = :id
                     ";
+        echo $sql;
+        /*echo $this->name . "<br/>";
+        echo $this->type . "<br/>";
+        echo $this->user_id . "<br/>";
+        echo $this->id . "<br/>";*/
 
-        return $this->save($sql);
+        $params = [
+            ':name' => $this->name,
+            ':type' => $this->type,
+            ':user_id' => $this->user_id,
+            ':id' => $this->id,
+        ];
+
+        return $this->DB->execute($sql, $params);
     }
 
     public function create()
     {
+        if(!self::validate() || empty($this->name) )
+        {
+            $this->error_validation = array(
+                'error' => true,
+                'amount' => 'Имя категории не может быть пустым',
+            );
+            return false;
+        }
+
         $sql = "INSERT INTO `" . self::TABLE_NAME . "`
                     (name,
                     user_id,
@@ -150,7 +129,14 @@ class Category
                     :type
                     )";
 
-        return $this->save($sql);
+        $params = [
+            ':name' => $this->name,
+            ':user_id' => $this->user_id,
+            ':type' => $this->type
+        ];
+
+            return $this->DB->execute($sql, $params);
+
     }
     /**
      * @return bool
@@ -173,14 +159,11 @@ class Category
             return false;
         }
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':id',  $this->id, PDO::PARAM_INT);
+        $params = [
+            ':id' => $this->id
+        ];
 
-        if($stmt->execute()){
-            return true;
-        } else {
-            return false;
-        }
+        return $this->DB->execute($sql, $params);
     }
 
     function validate()

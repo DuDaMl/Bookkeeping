@@ -70,11 +70,11 @@ class Family
         AND family.status = " . Family::WAITING . "
         AND family.id = " . $id . " 
         LIMIT 1";
-        $request = $this->DB->query($sql);
+        $request = $this->DB->query($sql, 'fetch');
 
         if($request)
         {
-            return $request[0];
+            return $request;
         } else {
             $this->error_validation = array(
                 'error' => true,
@@ -110,17 +110,15 @@ class Family
 
     public function getDeleteableRequestById($id, $sender_id)
     {
-        $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
+        $sql = "SELECT  *
         FROM `family` 
-        LEFT JOIN `user`
-        ON user.id = family.receiver_id
-        WHERE family.sender_id = " . $sender_id . " 
-        AND family.id = " . $id . " 
+        WHERE family.id = " . $id . " 
         LIMIT 1";
-        $request = $this->DB->query($sql);
+
+        $request = $this->DB->query($sql, 'fetch');
         if($request)
         {
-            return $request[0];
+            return $request;
         } else {
             $this->error_validation = array(
                 'error' => true,
@@ -192,11 +190,10 @@ class Family
     {
         $sql = "DELETE 
         FROM `family` 
-        WHERE
-        id = :id";
+        WHERE id = :id";
 
         $values = [
-            'id' => $id
+            ':id' => $id
         ];
 
         $request = $this->DB->execute($sql, $values);
@@ -228,15 +225,6 @@ class Family
         } else {
             return false;
         }
-    }
-
-    /**
-     * Удаление запроса связи
-     * @param $id
-     * @return bool
-     */
-    function deletedRelationshiop($id)
-    {
     }
 
     /**
@@ -362,20 +350,26 @@ class Family
 
     public function checkRelationshipByIds($sender_id, $receiver_id)
     {
-        $sql = "SELECT id
+        $sql = "SELECT *
         FROM `family` 
-        WHERE receiver_id = :receiver_id
-        AND sender_id = :sender_id";
+        WHERE receiver_id = " . $receiver_id ."
+        AND sender_id = " . $sender_id ."
+        OR receiver_id = " . $sender_id ."
+        AND sender_id = " . $receiver_id ;
 
-        $result = $this->DB->prepare($sql);
-        $result->bindParam(':receiver_id',  $receiver_id, PDO::PARAM_INT);
-        $result->bindParam(':sender_id',  $sender_id, PDO::PARAM_INT);
-        $result->execute();
-        $relationship = $result->fetchAll(PDO::FETCH_CLASS);
 
-        // Проверка существования отправителя
-        if($relationship)
+        $values = [
+            'sender_id' => $this->sender_id,
+            'receiver_id' => $this->receiver_id
+        ];
+
+        $result = $this->DB->query($sql);
+
+        //print_r($result);
+
+        if($result)
         {
+
             return true;
         } else {
             $this->error_validation = array(
@@ -434,7 +428,6 @@ class Family
                     :status,
                     :date
                     )";
-
         $date = date('Y-m-d');
         $this->status = Family::WAITING;
 
@@ -445,14 +438,8 @@ class Family
             'date' => $date
         ];
 
-        $request = $this->DB->execute($sql, $values);
+        return $this->DB->execute($sql, $values);
 
-        if($request)
-        {
-            return true;
-        } else {
-            return false;
-        }
     }
 
 }

@@ -29,6 +29,11 @@ class User
      */
     static function getById($id)
     {
+        if(!$id)
+        {
+            return false;
+        }
+
         $DB = DB::getInstance();
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
         $answer = $DB->query($sql, 'fetch');
@@ -40,7 +45,6 @@ class User
      */
     function getByEmail($email)
     {
-
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  email = '" . $email ."'";
         $answer = $this->DB->query($sql, 'fetch');
 

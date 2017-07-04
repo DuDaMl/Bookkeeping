@@ -28,9 +28,6 @@ class Controller
         } else {
             static::$current_user_id = M_User::getUserId();
         }
-
-
-
     }
 
     public static function getMainTeamplate()

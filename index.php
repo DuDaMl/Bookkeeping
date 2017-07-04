@@ -13,6 +13,20 @@ ini_set('display_errors', 'on');
 
 $Route = new  Route($_SERVER['REQUEST_URI']);
 $Route::start();
+
+/*
+try {
+    // код который может выбросить исключение
+    if (true) {
+        throw new Exception("One");
+    } else {
+        echo "Zero";
+    }
+} catch (Exception $e) {
+    // код который может обработать исключение
+    echo $e->getMessage();
+}
+*/
 /*
 abstract class Model {
     public static $table='some table';

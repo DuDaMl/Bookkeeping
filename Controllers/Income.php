@@ -13,7 +13,7 @@ class Income
     function __construct()
     {
         parent::__construct();
-        $this->M_Income = new M_Income($this->user->id);
+        $this->M_Income = new M_Income(static::$current_user_id);
     }
 
     function isPost($action)
@@ -44,7 +44,7 @@ class Income
         $data['incomes'] = $this->M_Income->getAll();
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category($this->user->id))->getAll('Income');
+        $data['categories'] =  (new M_Category(static::$current_user_id))->getAll('Income');
 
         $this->render($data);
     }
@@ -75,7 +75,7 @@ class Income
             }
         }
 
-        $M_Category = new M_Category($this->user->id);
+        $M_Category = new M_Category(static::$current_user_id);
         $data['categories'] = $M_Category->getAll('Income');
         $this->render($data, 'Edit');
     }

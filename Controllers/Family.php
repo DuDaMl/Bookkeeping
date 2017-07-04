@@ -2,6 +2,7 @@
 namespace bookkeeping\Controllers;
 use bookkeeping\Controllers\Controller as Controller;
 use bookkeeping\Models\Setting as M_Setting;
+use bookkeeping\Models\User as M_User;
 use bookkeeping\Models\Family as M_Family;
 use bookkeeping\Models\Category as M_Category;
 
@@ -35,7 +36,7 @@ class Family
         if(!empty($_POST))
         {
             // Создание запроса.
-            if($this->M_Family->create($this->user->id, $_POST['email']))
+            if($this->M_Family->create(static::$current_user_id, $_POST['email']))
             {
                 header("Location: /" . self::getMainTeamplate());
                 exit();
@@ -45,11 +46,11 @@ class Family
             $data['error'] = $this->M_Family->error_validation;
         }
 
-        $incoming = $this->M_Family->getIncomeRequest($this->user->id);
-        $request = $this->M_Family->getSendedRequest($this->user->id);
-        $confirmed = $this->M_Family->getConfirmedRequest($this->user->id);
+        $incoming = $this->M_Family->getIncomeRequest(static::$current_user_id);
+        $request = $this->M_Family->getSendedRequest(static::$current_user_id);
+        $confirmed = $this->M_Family->getConfirmedRequest(static::$current_user_id);
 
-        $data['user'] = $this->user;
+        $data['user'] = static::$current_user_id;
         $data['incomig_request'] = $incoming;
         $data['waiting_request'] = $request;
         $data['confirmed_request'] = $confirmed;
@@ -68,7 +69,7 @@ class Family
 
         if(!empty($_POST) && $_POST['relationship_id'] != '')
         {
-            if($this->M_Family->confirmeRelationshiop($this->user->id, $_POST['relationship_id']))
+            if($this->M_Family->confirmeRelationshiop(static::$current_user_id, $_POST['relationship_id']))
             {
                 header("Location: /" . self::getMainTeamplate());
                 exit();
@@ -79,7 +80,7 @@ class Family
         }
 
         // Проверка существования записи
-        $relationship = $this->M_Family->getWaitingRequestById($id, $this->user->id);
+        $relationship = $this->M_Family->getWaitingRequestById($id, static::$current_user_id);
         if($relationship == false)
         {
             $data['error'] = $this->M_Family->error_validation;
@@ -98,29 +99,51 @@ class Family
     function delete($id)
     {
         // Проверка существования записи
-        $relationship = $this->M_Family->getDeleteableRequestById($id, $this->user->id);
+        $relationship = $this->M_Family->getDeleteableRequestById($id, static::$current_user_id);
 
         if( !empty($_POST)
             && $_POST['relationship_id'] != ''
             && $relationship != false
             && $relationship->id != '')
         {
-            if($this->M_Family->deleteRelationshiop($_POST['relationship_id']))
+            // Check allow for delete
+            if($relationship->receiver_id != self::$current_user_id
+                && $relationship->sender_id != self::$current_user_id
+            )
             {
-                header("Location: /" . self::getMainTeamplate());
-                exit();
+                $data['error'] = array(
+                    'error' => true,
+                    'text' => 'Нет прав на удаление запроса',
+                );
+            } else {
+                if($this->M_Family->deleteRelationshiop($_POST['relationship_id']))
+                {
+                    header("Location: /" . self::getMainTeamplate());
+                    exit();
+                } else {
+                    // ошибки добавления новой записи расходов
+                    $data['error'] = $this->M_Family->error_validation;
+                }
             }
-
-            // ошибки добавления новой записи расходов
-            $data['error'] = $this->M_Family->error_validation;
         }
+
+        $data['relationship'] = $relationship;
+
+        // get receiver_id as deleting user
+        if($relationship->sender_id == self::$current_user_id)
+        {
+            $user = M_User::getById($relationship->receiver_id);
+        } else {
+            $user = M_User::getById($relationship->sender_id);
+        }
+
 
         if($relationship == false)
         {
             $data['error'] = $this->M_Family->error_validation;
         } else {
             // получение данных о получателе
-            $data['relationship'] = $relationship;
+            $data['deleting_user'] = $user;
         }
 
         $this->render($data, 'Delete');
@@ -133,7 +156,7 @@ class Family
     function cancel($id)
     {
         // Проверка существования записи
-        $relationship = $this->M_Family->getIncomeRequestById($id, $this->user->id);
+        $relationship = $this->M_Family->getIncomeRequestById($id, static::$current_user_id);
 
         if( !empty($_POST)
             && $_POST['relationship_id'] != ''
