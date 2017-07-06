@@ -39,8 +39,14 @@ class DB
             switch($method)
             {
                 case 'fetch':
-                    //return  $sth->fetch(8);
-                    return (object) $sth->fetch();
+                    if($sth->rowCount() == 0)
+                    {
+                        return false;
+                    } else {
+                        return (object) $sth->fetch();
+                    }
+
+
                     break;
                 default:
                     //echo PDO::FETCH_CLASS; exit();
@@ -52,6 +58,7 @@ class DB
         }
         return [];
     }
+
 
     public function getError() {
         return $this->error;

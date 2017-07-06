@@ -6,7 +6,7 @@ use bookkeeping\Models\Route;
 use bookkeeping\Core\ErrorHandler;
 
 
-
+//phpinfo();
 
 ini_set('display_errors', 'on');
 //(new ErrorHandler())->register();

@@ -16,7 +16,7 @@ class Pay
     {
         parent::__construct();
 
-        $this->M_Pay = new M_Pay(static::$current_user_id);
+        $this->M_Pay = new M_Pay(self::getCurrentUserId());
         $this->setting();
     }
 
@@ -25,9 +25,10 @@ class Pay
      */
     public function setting()
     {
-        $M_Setting = new M_Setting(static::$current_user_id);
+        $M_Setting = new M_Setting(self::getMainTeamplate(), self::getCurrentUserId());
+        //$M_Setting = new M_Setting(self::getMainTeamplate(), self::getCurrentUserId());
 
-        if(isset($_POST['format']))
+        if(isset($_POST['settings']))
         {
             $format_value = $_POST['format'];
 
@@ -62,8 +63,8 @@ class Pay
             );
 
             // изменения параметров представления контроллера
-           $result =  $M_Setting->setFormat(self::getMainTeamplate(), $params);
-
+            $result =  $M_Setting->setFormat($params);
+            //echo $result; exit();
             if(! $result)
             {
                 // todo записать в лог.
@@ -82,11 +83,10 @@ class Pay
      */
     function getSettings()
     {
-        $M_Setting = new M_Setting(static::$current_user_id);
+        $M_Setting = new M_Setting(self::getMainTeamplate(), self::getCurrentUserId());
 
         // загрузка параметров контроллера
-        $params = $M_Setting->getByController(self::getMainTeamplate());
-
+        $params = $M_Setting::getByController();
 
         // если данных нет, то загрузка данных по умолчанию
         if(empty($params))
@@ -103,21 +103,12 @@ class Pay
        return (object) $data_params;
     }
 
-    function isPost($action)
-    {
-        if($this->M_Pay->$action())
-        {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     function index()
     {
+
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
-            if($this->isPost('create'))
+            if($this->M_Pay->create())
             {
                 header("Location: /" . self::getMainTeamplate());
                 exit();
@@ -129,19 +120,20 @@ class Pay
 
         // параметры контроллера
         $data['settings'] =  $this->getSettings();
+        //print_r($data['settings']);
 
         // загрузка всех платежей текущего месяца
         $data['pays'] = $this->M_Pay->getAll($data['settings']->date_start, $data['settings']->date_end);
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category(static::$current_user_id))->getAll();
+        $data['categories'] =  (new M_Category(self::getCurrentUserId()))->getAll();
         $this->render($data);
     }
 
     function edit($id)
     {
         if(!empty($_POST) && $_POST['category_id'] != ''){
-            if($this->isPost('update')){
+            if($this->M_Pay->update()){
                 header("Location: /" . self::getMainTeamplate());
                 exit();
             }
@@ -163,7 +155,7 @@ class Pay
             }
         }
 
-        $M_Category = new M_Category(static::$current_user_id);
+        $M_Category = new M_Category(self::getCurrentUserId());
         $data['categories'] = $M_Category->getAll();
         $this->render($data, 'Edit');
     }
@@ -175,7 +167,7 @@ class Pay
     {
         if(!empty($_POST) && $_POST['id'] != '')
         {
-            if($this->isPost('delete')){
+            if($this->M_Pay->delete()){
                 header("Location: /" . self::getMainTeamplate());
                 exit();
             }

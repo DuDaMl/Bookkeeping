@@ -12,6 +12,7 @@
             <div class="well">
 
                 <form action="/<?= $controller_name ?>/setting/" method="post">
+                <input type="hidden" name="settings" value="1">
                 <h2>Отображать расходы за:</h2>
                     <hr/>
                 <ul>

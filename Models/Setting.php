@@ -1,41 +1,43 @@
 <?php
 namespace bookkeeping\Models;
-use \DateTime;
+use bookkeeping\Models\Settings\PaySetting;
+
 use \PDO;
+
 
 class Setting
 {
+    use \bookkeeping\Models\Traits\ValidateDate;
+
     const TABLE_NAME = 'setting';
     protected $DB;
     public $id;
-    public $user_id;
-    public $controller;
+    static $user_id;
+    static $controller;
     public $value;
 
     public $error_validation;
 
-    function __construct($user_id)
+    function __construct(string $controller, int $user_id)
     {
-        $this->user_id = $user_id;
+        static::$user_id = $user_id;
+        static::$controller = $controller;
         $this->DB = DB::getInstance();
     }
 
+    static function getController()
+    {
+        return static::$controller;
+    }
+    static function getUserId()
+    {
+        return static::$user_id;
+    }
     /**
      * @return array|bool
      */
-    function getById($id)
+    function getById(int $id)
     {
-        if(filter_var($id, FILTER_VALIDATE_INT)){
-            $id = str_replace('+', '', $id);
-            $id = str_replace('-', '', $id);
-        } else {
-            $this->error_validation = array(
-                'error' => true,
-                'text' => 'Ошибка в передаваемом id',
-            );
-            return false;
-        }
-
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
         $answer =  $this->DB->query($sql, 'fetch');
         return $answer;
@@ -44,21 +46,16 @@ class Setting
     /**
      * @return int|id
      */
-    function getByController($controller)
+    public static function getByController()
     {
+        $DB = DB::getInstance();
+
        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" .
-              " WHERE  controller = '" . $controller . "'
-               AND user_id = " . $this->user_id . "
-              ";
+              " WHERE  controller = '" . self::getController() . "'
+               AND user_id = " . self::getUserId() . "
+               LIMIT 1";
 
-        $answer = $this->DB->query($sql, 'fetch');
-
-        if(! empty($answer))
-        {
-            return $answer;
-        } else {
-            return false;
-        }
+       return  $DB->query($sql, 'fetch');
 
     }
 
@@ -73,26 +70,24 @@ class Setting
                 WHERE id = :id
                 ";
 
+
         $params = [
-            'user_id' => $this->user_id,
-            'value' => $value,
-            'id' => $id
+            ':user_id' => self::getUserId(),
+            ':value' => $value,
+            ':id' => $id
         ];
 
-        $result = $this->DB->execute($sql, $params);
+        $DB = DB::getInstance();
 
-        if($result)
-        {
-            return true;
-        } else {
-            return false;
-        }
+        return $DB->execute($sql, $params);
+
+
     }
 
     /**
      * @return bool
      */
-    function create($controller, $value)
+    function create($value)
     {
         $sql = "INSERT INTO  `" . self::TABLE_NAME . "` (
                 `user_id`,
@@ -104,28 +99,27 @@ class Setting
                 :value )
                 ";
 
-        $stmt = $this->DB->prepare($sql);
-        $stmt->bindParam(':user_id', $this->user_id, PDO::PARAM_STR);
-        $stmt->bindParam(':controller', $controller, PDO::PARAM_STR);
-        $stmt->bindParam(':value',  $value, PDO::PARAM_STR);
+        $params = [
+            ':user_id' => self::getUserId(),
+            ':value' => $value,
+            ':controller' => self::getController()
+        ];
 
-        if($stmt->execute())
-        {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->DB->execute($sql, $params);
     }
 
-    public function setFormat($controller, array $params)
+    public function setFormat(array $params)
     {
-        // проверка на существование значений
-        if(empty($controller))
+        /*switch(self::getController())
         {
-            // todo отобразить данную ошибку в логах
-            $this->error_validation .= "нельзя сохранить парметры без имени контроллера";
-            return false;
-        }
+            case 'Pay':
+                return (new PaySetting())->setFormat($params);
+                break;
+            default:
+                // todo create Error Exception;
+                return false;
+                break;
+        }*/
 
         // валидация введенных дат по переданной маске из контроллера
         if(! $this->validateDate($params['date_start'], 'Y-m-d'))
@@ -136,7 +130,7 @@ class Setting
         }
 
         // проверка существования записи для выбора действия INSERT/DELETE
-        $controller_db = $this->getByController($controller);
+        $controller_db = $this->getByController();
 
 
         if(! empty ($controller_db))
@@ -146,7 +140,7 @@ class Setting
             $this->error_validation .= " no update";
         } else {
             // insert
-            $result = $this->create($controller, serialize($params));
+            $result = $this->create(self::getController(), serialize($params));
             $this->error_validation .= " no insert";
         }
 
@@ -157,17 +151,5 @@ class Setting
         }
         return true;
 
-    }
-
-
-    /**
-     * @param $date
-     * @param string $format
-     * @return bool false если формат не верен, дату в формате если верно
-     */
-    function validateDate($date, $format = 'Y-m-d')
-    {
-        $d = DateTime::createFromFormat($format, $date);
-        return $d && $d->format($format) == $date;
     }
 }

@@ -35,7 +35,10 @@ class Controller
         return static::$main_teamplate;
     }
 
-
+    public static function getCurrentUserId()
+    {
+        return static::$current_user_id;
+    }
 
     function render(array $data, $view = 'Index')
     {
@@ -48,7 +51,7 @@ class Controller
         $current_page = self::getMainTeamplate();
         $controller_name = self::getMainTeamplate();
 
-        $user = M_User::getById(static::$current_user_id);
+        $user = M_User::getById(self::getCurrentUserId());
 
         //return include (__DIR__ . '\..\View\\' . $this->main_teamplate . '\\' . $view . '.php');
         return include (__DIR__ . '/../View/' . self::getMainTeamplate() . '/' . $view . '.php');
