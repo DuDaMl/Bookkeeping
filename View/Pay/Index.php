@@ -134,31 +134,37 @@
     ?>
     <ul class="list-group">
         <?php
-        $output = '';
-        $date_current = 0;
-        foreach ($pays as $pay){
+        // проверка существования $pays
+        if(! empty($pays)) {
 
-            $date = $pay->date;
-            if($date != $date_current){
-                $output .= ' <span href="#" class="list-group-item active">
-                           ' . $pay->date . '
-                        </span>';
+
+            $output = '';
+            $date_current = 0;
+            foreach ($pays as $pay) {
+
+                $date = $pay->date;
+                if ($date != $date_current) {
+                    $output .= ' <span href="#" class="list-group-item active">
+                               ' . $pay->date . '
+                            </span>';
+                }
+
+                $output .= '<li class="list-group-item">
+                    <a href="/' . $controller_name . '/edit/' . $pay->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                    <a href="/' . $controller_name . '/delete/' . $pay->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                    <span class="badge">' . $pay->amount . '</span> <strong>' . $pay->name . '</strong>';
+
+                if (!empty($pay->description)) {
+                    $output .= ' ' . $pay->description;
+                }
+
+                $output .= '</li>';
+                $date_current = $pay->date;
             }
-
-            $output .= '<li class="list-group-item">
-                <a href="/' . $controller_name . '/edit/' . $pay->id . '"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
-                <a href="/' . $controller_name . '/delete/' . $pay->id . '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                <span class="badge">' . $pay->amount . '</span> <strong>' . $pay->name . '</strong>';
-
-            if(! empty($pay->description))
-            {
-                $output .= ' ' . $pay->description;
-            }
-
-            $output .= '</li>';
-            $date_current = $pay->date;
+            echo $output;
+        } else {
+            echo '<div class="alert alert-info" role="alert"><p>За данный период нет данных</p></div>';
         }
-        echo $output;
         ?>
     </ul>
 

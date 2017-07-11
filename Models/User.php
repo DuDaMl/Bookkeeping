@@ -60,7 +60,7 @@ class User
     {
         if(self::checkAuth())
         {
-            return $_SESSION['user_id'];
+            return $_SESSION["user_id"];
         }
     }
 

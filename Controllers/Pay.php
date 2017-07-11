@@ -2,7 +2,7 @@
 namespace bookkeeping\Controllers;
 use bookkeeping\Controllers\Controller as Controller;
 use bookkeeping\Models\User as M_User;
-use bookkeeping\Models\Setting as M_Setting;
+use bookkeeping\Models\Settings\PaySetting as M_PaySetting;
 use bookkeeping\Models\Pay as M_Pay;
 use bookkeeping\Models\Category as M_Category;
 
@@ -15,66 +15,33 @@ class Pay
     function __construct()
     {
         parent::__construct();
-
         $this->M_Pay = new M_Pay(self::getCurrentUserId());
-        $this->setting();
+
+        // Проверка существования запроса на изменение настроек представления
+        if(isset($_POST['settings']))
+        {
+            $this->setSetting();
+        }
     }
 
     /**
      * установка времени отчета контроллера
      */
-    public function setting()
+    public function setSetting()
     {
-        $M_Setting = new M_Setting(self::getMainTeamplate(), self::getCurrentUserId());
-        //$M_Setting = new M_Setting(self::getMainTeamplate(), self::getCurrentUserId());
+        $M_PaySetting = new M_PaySetting(self::getCurrentUserId());
 
-        if(isset($_POST['settings']))
+        // изменения параметров представления контроллера
+        $result =  $M_PaySetting->setFormat();
+
+        if(! $result)
         {
-            $format_value = $_POST['format'];
-
-            switch($_POST['format'])
-            {
-                case 'day':
-                    $date = $_POST['day'];
-                    $data_report_start = $date;
-                    $data_report_end = $date;
-                    break;
-                case 'month':
-                    $date = $_POST['month'];
-                    $data_report_start = $date . "-01";
-                    $data_report_end = $date . "-31";
-                    break;
-                case 'year':
-                    $date = $_POST['year'];
-                    $data_report_start = $date . "-01-01";
-                    $data_report_end = $date . "-12-31";
-                    break;
-                default:
-                    $format_value = 'month';
-                    $data_report_start = date('Y-m-01');
-                    $data_report_end = date('Y-m-31');
-                    break;
-            }
-
-            $params = array(
-                'date_start' => $data_report_start,
-                'date_end' => $data_report_end,
-                'format' => $format_value
-            );
-
-            // изменения параметров представления контроллера
-            $result =  $M_Setting->setFormat($params);
-            //echo $result; exit();
-            if(! $result)
-            {
-                // todo записать в лог.
-                $M_Setting->error_validation;
-            }
-
-            header("Location: /" . self::getMainTeamplate());
-            exit();
-
+            // todo записать в лог.
+            $M_PaySetting->error_validation;
         }
+
+        header("Location: /" . self::getMainTeamplate());
+        exit();
     }
 
     /**
@@ -83,29 +50,15 @@ class Pay
      */
     function getSettings()
     {
-        $M_Setting = new M_Setting(self::getMainTeamplate(), self::getCurrentUserId());
+        $M_PaySetting = new M_PaySetting(self::getCurrentUserId());
 
         // загрузка параметров контроллера
-        $params = $M_Setting::getByController();
-
-        // если данных нет, то загрузка данных по умолчанию
-        if(empty($params))
-        {
-            $data_params = array(
-                'date_start' => date('Y-m-01'),
-                'date_end' => date('Y-m-31'),
-                'format' => 'month'
-            );
-        } else {
-            $data_params = unserialize($params->value);
-        }
-
-       return (object) $data_params;
+        $params = $M_PaySetting->getSettings();
+        return $params;
     }
 
     function index()
     {
-
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
             if($this->M_Pay->create())
@@ -120,7 +73,6 @@ class Pay
 
         // параметры контроллера
         $data['settings'] =  $this->getSettings();
-        //print_r($data['settings']);
 
         // загрузка всех платежей текущего месяца
         $data['pays'] = $this->M_Pay->getAll($data['settings']->date_start, $data['settings']->date_end);

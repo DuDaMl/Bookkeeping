@@ -37,6 +37,7 @@ class Controller
 
     public static function getCurrentUserId()
     {
+        //echo static::$current_user_id;
         return static::$current_user_id;
     }
 
