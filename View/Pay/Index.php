@@ -10,7 +10,7 @@
         <br/>
         <div class="collapse" id="collapseExample">
             <div class="well">
-
+                <!-- Форма установки настроек -->
                 <form action="/<?= $controller_name ?>/setting/" method="post">
                 <input type="hidden" name="settings" value="1">
                 <h2>Отображать расходы за:</h2>
@@ -70,7 +70,6 @@
                 </ul>
                     <button type="submit" class="btn btn-default">Показать</button>
                 </form>
-
             </div>
         </div>
     </div>

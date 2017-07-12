@@ -3,11 +3,14 @@ namespace bookkeeping\Models\Settings;
 use \bookkeeping\Models\DB;
 use \PDO;
 
+/**
+ * Класс предназначен для создания/обновления/возвращения параметров настроек для контроллера Pay
+ * @package bookkeeping\Models\Settings
+ */
 class PaySetting extends Setting
 {
     use \bookkeeping\Models\Traits\ValidateDate;
 
-    const TABLE_NAME = 'setting';
     private $id;
     protected static $user_id;
     protected static $controller = 'pay';
@@ -15,13 +18,20 @@ class PaySetting extends Setting
 
     public $error_validation;
 
+    /**
+     * PaySetting constructor.
+     * Инициализация статической переменной user_id
+     * @param int $user_id - id авторихзированного пользователя
+     */
     function __construct(int $user_id)
     {
         static::$user_id = $user_id;
     }
 
     /**
-     * @return int|id
+     * Возвращает запись из БД для указанного контроллера и id пользователя
+     * Или значение по умолчанию
+     * @return object | Обьект с полями значений настроек
      */
     public function getSettings()
     {
@@ -44,14 +54,17 @@ class PaySetting extends Setting
            );
 
            $this->create(serialize($data_params));
-           return (object) $data_params;
+           return $data_params;
        } else {
            // возвращение сохраненных ранее параметров контроллера
-           return (object) unserialize($result->value);
+           return unserialize($result->value);
        }
     }
 
     /**
+     * Обновление настроек в БД
+     * @param int | $id - id записи настроек в таблице БД
+     * @param string | $value - изменяемые значения
      * @return bool
      */
     protected function edit($id, $value)
@@ -79,6 +92,8 @@ class PaySetting extends Setting
     }
 
     /**
+     * Создание новой записи параметров для определенного контроллера и авторизированного пользователя
+     * @param  string | $value - сохранямые параметры
      * @return bool
      */
     protected function create($value)
@@ -103,6 +118,10 @@ class PaySetting extends Setting
         return $DB->execute($sql, $params);
     }
 
+    /**
+     * Возвращает id записи для текущего пользователя и контроллера
+     * @return array|bool|object
+     */
     private static function getSettingId()
     {
         $DB = DB::getInstance();
@@ -114,6 +133,10 @@ class PaySetting extends Setting
         return $DB->query($sql, 'fetch');
     }
 
+    /**
+     * Функция подготовки параметров настроек для контроллера перед сохранением в БД
+     * @return array - массив сохраняемых значений
+     */
     protected function prepareFormat()
     {
         if(isset($_POST['settings']))
@@ -154,6 +177,11 @@ class PaySetting extends Setting
         }
     }
 
+    /**
+     * Запись настроек контроллера в БД.
+     * @param array  - $_POST ['setting']
+     * @return bool
+     */
     public function setFormat()
     {
         $params = $this->prepareFormat();
@@ -187,6 +215,6 @@ class PaySetting extends Setting
             return false;
         }
         return true;
-
     }
+
 }

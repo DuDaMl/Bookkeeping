@@ -44,19 +44,6 @@ class Pay
         exit();
     }
 
-    /**
-     * получение данных даты отчета контроллера
-     * @return object
-     */
-    function getSettings()
-    {
-        $M_PaySetting = new M_PaySetting(self::getCurrentUserId());
-
-        // загрузка параметров контроллера
-        $params = $M_PaySetting->getSettings();
-        return $params;
-    }
-
     function index()
     {
         if(!empty($_POST) && $_POST['category_id'] != '')
@@ -71,8 +58,10 @@ class Pay
             $data['error'] = $this->M_Pay->error_validation;
         }
 
+        $M_PaySetting = new M_PaySetting(self::getCurrentUserId());
+
         // параметры контроллера
-        $data['settings'] =  $this->getSettings();
+        $data['settings'] =  (object) $M_PaySetting->getSettings();
 
         // загрузка всех платежей текущего месяца
         $data['pays'] = $this->M_Pay->getAll($data['settings']->date_start, $data['settings']->date_end);

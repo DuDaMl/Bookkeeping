@@ -37,7 +37,6 @@ class Controller
 
     public static function getCurrentUserId()
     {
-        //echo static::$current_user_id;
         return static::$current_user_id;
     }
 
@@ -47,14 +46,23 @@ class Controller
             $$k = $v;
         }
 
-
         // переменная для указания активного пункта главного меню
         $current_page = self::getMainTeamplate();
         $controller_name = self::getMainTeamplate();
-
         $user = M_User::getById(self::getCurrentUserId());
 
-        //return include (__DIR__ . '\..\View\\' . $this->main_teamplate . '\\' . $view . '.php');
         return include (__DIR__ . '/../View/' . self::getMainTeamplate() . '/' . $view . '.php');
+    }
+
+    function getView(string $path, array $params)
+    {
+        ob_start();
+
+        foreach ($params as $k => $v) {
+            $$k = $v;
+        }
+
+        include ($path);
+        return ob_get_clean();
     }
 }
