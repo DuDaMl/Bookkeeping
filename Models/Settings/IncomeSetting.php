@@ -205,7 +205,7 @@ class IncomeSetting extends Setting
             $this->error_validation .= " no update";
         } else {
             // insert
-            $result = $this->create(serialize($params));
+            $result = self::create(self::getUserId(), serialize($params));
             $this->error_validation .= " no insert";
         }
 
