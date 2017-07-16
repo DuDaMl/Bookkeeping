@@ -7,11 +7,13 @@ use \PDO;
  * Класс предназначен для создания/обновления/возвращения параметров настроек для контроллера Pay
  * @package bookkeeping\Models\Settings
  */
-class PaySetting extends Setting
+class IncomeSetting extends Setting
 {
+
+
     private $id;
     protected static $user_id;
-    protected static $controller = 'pay';
+    protected static $controller = 'income';
     public $value;
 
     public $error_validation;

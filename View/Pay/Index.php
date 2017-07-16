@@ -66,7 +66,6 @@
                     </li>
                     <hr/>
                     <?php //todo сделать возможность выбора диапазона выборки данных  ?>
-
                 </ul>
                     <button type="submit" class="btn btn-default">Показать</button>
                 </form>

@@ -19,13 +19,20 @@ class Category
         $this->DB = DB::getInstance();
     }
 
-    function getAll($type = 'Pay')
+    /**
+     * @param int | $user_id
+     * @param string | $type
+     * @return array|bool|object
+     */
+    static function getAll($user_id, $type)
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" . " 
         WHERE type = '" . $type . "' 
-        AND user_id = " . $this->user_id . "
+        AND user_id = " . $user_id . "
         ORDER BY name ASC";
-        return $this->DB->query($sql);
+
+        $DB = DB::getInstance();
+        return $DB->query($sql);
     }
 
     function getAllPays()

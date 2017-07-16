@@ -1,19 +1,44 @@
 <?php
 namespace bookkeeping\Controllers;
 use bookkeeping\Controllers\Controller as Controller;
+use bookkeeping\Models\Settings\IncomeSetting as M_IncomeSetting;
 use bookkeeping\Models\Income as M_Income;
 use bookkeeping\Models\Category as M_Category;
 
 class Income
     extends Controller
 {
+    const CONTROLLER_NAME = 'Income';
     protected static $main_teamplate = 'Income';
     private $M_Income;
 
     function __construct()
     {
         parent::__construct();
-        $this->M_Income = new M_Income(static::$current_user_id);
+        $this->M_Income = new M_Income(self::getCurrentUserId());
+
+        // Проверка существования запроса на изменение настроек представления
+        if(isset($_POST['settings']))
+        {
+            $this->setSetting();
+        }
+    }
+
+    public function setSetting()
+    {
+        $M_IncomeSetting = new M_IncomeSetting(self::getCurrentUserId());
+
+        // изменения параметров представления контроллера
+        $result =  $M_IncomeSetting->setFormat();
+
+        if(! $result)
+        {
+            // todo записать в лог.
+            $M_IncomeSetting->error_validation;
+        }
+
+        header("Location: /" . self::getMainTeamplate());
+        exit();
     }
 
     function isPost($action)
@@ -40,11 +65,19 @@ class Income
             $data['error'] = $this->M_Income->error_validation;
         }
 
+        // id текущего авторизированного пользователя
+        $user_id = self::getCurrentUserId();
+
+        // параметры контроллера
+        $data['settings'] =  (object) M_IncomeSetting::getSettings($user_id);
+
         // загрузка всех платежей текущего месяца
-        $data['incomes'] = $this->M_Income->getAll();
+        $data['incomes'] = M_Income::getAll($user_id,
+                                            $data['settings']->date_start,
+                                            $data['settings']->date_end);
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category(static::$current_user_id))->getAll('Income');
+        $data['categories'] =  (new M_Category(static::$current_user_id))->getAll(self::getCurrentUserId(), self::CONTROLLER_NAME);
 
         $this->render($data);
     }
@@ -59,24 +92,37 @@ class Income
             }
         }
 
-        $data['income'] = $this->M_Income->getById($id);
-        $data['error'] = $this->M_Income->error_validation;
+        $income = M_Income::getById($id);
 
-        if(empty($data['income']))
+        if(empty($income))
         {
-            if(! empty($data['error']))
-            {
-                $data['error']['text'] = $data['error']['text'] . ' <br/> нет такой записи';
-            } else {
-                $data['error'] =  array(
+            $data['error'] =  array(
+                'error' => true,
+                'text' => 'Данный платеж не существует'
+            );
+        } else {
+            $income = (object) $income;
+
+            if ($income->user_id != self::getCurrentUserId()) {
+                $data['error'] = array(
                     'error' => true,
-                    'text' => 'нет такой записи',
+                    'text' => 'Доступ к данной записи закрыт для вас'
                 );
+            } else {
+
+                $data['income'] = $income;
+
+                // id текущего авторизированного пользователя
+                $user_id = self::getCurrentUserId();
+
+                // Категории заданного типа (Расходы | Доходы | другое)
+                $type_of_category = self::CONTROLLER_NAME;
+
+                // загрузка всех категорий расходов
+                $data['categories'] = M_Category::getAll($user_id, $type_of_category);
             }
         }
 
-        $M_Category = new M_Category(static::$current_user_id);
-        $data['categories'] = $M_Category->getAll('Income');
         $this->render($data, 'Edit');
     }
 
@@ -94,19 +140,34 @@ class Income
             }
         }
 
-        $data['income'] = $this->M_Income->getById($id);
-        $data['error'] = $this->M_Income->error_validation;
+        $income = M_Income::getById($id);
 
-        if(empty($data['income']))
+        if(empty($income))
         {
-            if(! empty($data['error']))
-            {
-                $data['error']['text'] = $data['error']['text'] . ' <br/> нет такой записи';
-            } else {
-                $data['error'] =  array(
+            $data['error'] =  array(
+                'error' => true,
+                'text' => 'Данный платеж не существует'
+            );
+        } else {
+            $income = (object) $income;
+
+            if ($income->user_id != self::getCurrentUserId()) {
+                $data['error'] = array(
                     'error' => true,
-                    'text' => 'нет такой записи',
+                    'text' => 'Доступ к данной записи закрыт для вас'
                 );
+            } else {
+
+                $data['income'] = $income;
+
+                // id текущего авторизированного пользователя
+                $user_id = self::getCurrentUserId();
+
+                // Категории заданного типа (Расходы | Доходы | другое)
+                $type_of_category = self::CONTROLLER_NAME;
+
+                // загрузка всех категорий расходов
+                $data['categories'] = M_Category::getAll($user_id, $type_of_category);
             }
         }
 

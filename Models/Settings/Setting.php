@@ -13,8 +13,6 @@ abstract class Setting
 
     function __construct(int $user_id)
     {
-        static::$user_id = $user_id;
-        static::$controller = $controller;
     }
 
     /**
@@ -38,7 +36,7 @@ abstract class Setting
     /**
      * @return int|id
      */
-    abstract public function getSettings();
+    static public function getSettings($user_id){}
 
     /**
      * @return bool
@@ -48,7 +46,7 @@ abstract class Setting
     /**
      * @return bool
      */
-    abstract protected function create($value);
+    abstract protected static function create($user_id, $value);
 
     abstract public function setFormat();
 

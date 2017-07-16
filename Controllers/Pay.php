@@ -9,6 +9,7 @@ use bookkeeping\Models\Category as M_Category;
 class Pay
     extends Controller
 {
+    const CONTROLLER_NAME = 'Pay';
     protected static $main_teamplate = 'Pay';
     private $M_Pay;
 
@@ -58,16 +59,23 @@ class Pay
             $data['error'] = $this->M_Pay->error_validation;
         }
 
-        $M_PaySetting = new M_PaySetting(self::getCurrentUserId());
+        // id текущего авторизированного пользователя
+        $user_id = self::getCurrentUserId();
+
+        // Категории заданного типа (Расходы | Доходы | другое)
+        $type_of_category = self::CONTROLLER_NAME;
 
         // параметры контроллера
-        $data['settings'] =  (object) $M_PaySetting->getSettings();
+        $data['settings'] =  (object) M_PaySetting::getSettings($user_id);
 
         // загрузка всех платежей текущего месяца
-        $data['pays'] = $this->M_Pay->getAll($data['settings']->date_start, $data['settings']->date_end);
+        $data['pays'] = M_Pay::getAll($user_id,
+                                      $data['settings']->date_start,
+                                      $data['settings']->date_end);
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category(self::getCurrentUserId()))->getAll();
+        $data['categories'] = M_Category::getAll($user_id, $type_of_category);
+
         $this->render($data);
     }
 
@@ -80,24 +88,37 @@ class Pay
             }
         }
 
-        $data['pay'] = $this->M_Pay->getById($id);
-        $data['error'] = $this->M_Pay->error_validation;
+        $pay =  M_Pay::getById($id);
 
-        if(empty($data['pay']))
+        if(empty($pay))
         {
-            if(! empty($data['error']))
-            {
-                $data['error']['text'] = $data['error']['text'] . ' <br/> нет такой записи';
-            } else {
-                $data['error'] =  array(
+            $data['error'] =  array(
+                'error' => true,
+                'text' => 'Данный платеж не существует'
+            );
+        } else {
+            $pay = (object)$pay;
+
+            if ($pay->user_id != self::getCurrentUserId()) {
+                $data['error'] = array(
                     'error' => true,
-                    'text' => 'нет такой записи',
+                    'text' => 'Доступ к данной записи закрыт для вас'
                 );
+            } else {
+
+                $data['pay'] = $pay;
+
+                // id текущего авторизированного пользователя
+                $user_id = self::getCurrentUserId();
+
+                // Категории заданного типа (Расходы | Доходы | другое)
+                $type_of_category = self::CONTROLLER_NAME;
+
+                // загрузка всех категорий расходов
+                $data['categories'] = M_Category::getAll($user_id, $type_of_category);
             }
         }
 
-        $M_Category = new M_Category(self::getCurrentUserId());
-        $data['categories'] = $M_Category->getAll();
         $this->render($data, 'Edit');
     }
 
@@ -114,19 +135,34 @@ class Pay
             }
         }
 
-        $data['pay'] = $this->M_Pay->getById($id);
-        $data['error'] = $this->M_Pay->error_validation;
+        $pay =  M_Pay::getById($id);
 
-        if(empty($data['pay']))
+        if(empty($pay))
         {
-            if(! empty($data['error']))
-            {
-                $data['error']['text'] = $data['error']['text'] . ' <br/> нет такой записи';
-            } else {
-                $data['error'] =  array(
+            $data['error'] =  array(
+                'error' => true,
+                'text' => 'Данный платеж не существует'
+            );
+        } else {
+            $pay = (object)$pay;
+
+            if ($pay->user_id != self::getCurrentUserId()) {
+                $data['error'] = array(
                     'error' => true,
-                    'text' => 'нет такой записи',
+                    'text' => 'Доступ к данной записи закрыт для вас'
                 );
+            } else {
+
+                $data['pay'] = $pay;
+
+                // id текущего авторизированного пользователя
+                $user_id = self::getCurrentUserId();
+
+                // Категории заданного типа (Расходы | Доходы | другое)
+                $type_of_category = self::CONTROLLER_NAME;
+
+                // загрузка всех категорий расходов
+                $data['categories'] = M_Category::getAll($user_id, $type_of_category);
             }
         }
 

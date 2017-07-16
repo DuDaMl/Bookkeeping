@@ -1,10 +1,10 @@
 <?php
 namespace bookkeeping\Models;
-use \DateTime;
-use \PDO;
 
 class Pay
 {
+    use \bookkeeping\Models\Traits\ValidateDate;
+
     const TABLE_NAME = 'pay';
     protected $DB;
     public $id;
@@ -28,7 +28,7 @@ class Pay
      * @param $end
      * @return array|object
      */
-   function getAll($start, $end)
+   static function getAll($user_id, $start, $end)
    {
        $sql = "SELECT pay.id, pay.amount, pay.category_id, pay.description, pay.user_id, pay.date, category.name, category.type
                FROM `" . self::TABLE_NAME . "`     
@@ -36,35 +36,24 @@ class Pay
                ON pay.category_id = category.id 
                WHERE pay.date BETWEEN  '" . $start ."' 
                AND '" . $end ."'
-               AND pay.user_id = " . $this->user_id . "
+               AND pay.user_id = " . $user_id . "
                AND category.type = 'Pay'
                ORDER BY date DESC, id DESC
                ";
 
-       return $this->DB->query($sql);
+       $DB = DB::getInstance();
+       return $DB->query($sql);
    }
 
     /**
+     * @param int | $id
      * @return array|bool
      */
-    function getById($id)
+    public static function getById(int $id)
     {
-        if(filter_var($id, FILTER_VALIDATE_INT)){
-            $id = str_replace('+', '', $id);
-            $id = str_replace('-', '', $id);
-        } else {
-            $this->error_validation = array(
-                'error' => true,
-                'text' => 'Ошибка в передаваемом id',
-            );
-            return false;
-        }
-
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` 
-        WHERE  id = " . $id . "
-        AND pay.user_id = " . $this->user_id;
-
-        $answer = $this->DB->query($sql, 'fetch');
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id ;
+        $DB = DB::getInstance();
+        $answer = $DB->query($sql, 'fetch');
         return $answer;
     }
 
@@ -276,16 +265,5 @@ class Pay
 
         $this->description = strip_tags($_POST['description']);
         return true;
-    }
-
-    /**
-     * @param $date
-     * @param string $format
-     * @return bool
-     */
-    function validateDate($date, $format = 'Y-m-d')
-    {
-        $d = DateTime::createFromFormat($format, $date);
-        return $d && $d->format($format) == $date;
     }
 }

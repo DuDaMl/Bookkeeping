@@ -6,17 +6,22 @@
 <div class="jumbotron">
     <h1>Расходы</h1>
     <h2>Удаление расходов</h2>
-
+    <?php
+    // Отображение ошибок добавления новой записи
+    if(! isset($data['error']))
+    {
+    ?>
     <p><?= $pay->description; ?> </p>
     <p><?= $pay->amount; ?> грн </p>
     <p><?= $pay->date; ?> </p>
-    <form action="/<?= $controller_name ?>/delete/<?=$pay->id?>" method="post">
-        <input type="hidden" min="0" step="1" name="id" value="<?=$pay->id?>">
+    <form action="/<?= $controller_name ?>/delete/<?= $pay->id ?>" method="post">
+        <input type="hidden" min="0" step="1" name="id" value="<?= $pay->id ?>">
         <button type="submit" class="btn btn-default">Удалить</button>
         <br/>
         <br/>
     </form>
     <?php
+    }
     // Отображение ошибок добавления новой записи
     if(isset($data['error']))
     {

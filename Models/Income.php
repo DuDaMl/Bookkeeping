@@ -1,10 +1,10 @@
 <?php
 namespace bookkeeping\Models;
-use \DateTime;
-use \PDO;
 
 class Income
 {
+    use \bookkeeping\Models\Traits\ValidateDate;
+
     const TABLE_NAME = 'income';
     protected $DB;
     public $id;
@@ -25,43 +25,32 @@ class Income
     /**
      * @return array|bool
      */
-   function getAll()
+   static function getAll($user_id, $start, $end)
    {
-       $month_start = date('Y-01-01');
-       $month_end = date('Y-12-30');
-
        $sql = "SELECT income.id, income.amount, income.user_id, income.category_id, income.description, income.date, category.name, category.type
                FROM `" . self::TABLE_NAME . "`     
                LEFT JOIN category
                ON income.category_id = category.id 
-               WHERE income.date BETWEEN  '" . $month_start ."' 
-               AND '" . $month_end ."'  
+               WHERE income.date BETWEEN  '" . $start ."' 
+               AND '" . $end ."'  
                AND category.type = 'Income'
-               AND income.user_id = " . $this->user_id . "
+               AND income.user_id = " . $user_id . "
                ORDER BY date DESC, id DESC
                ";
 
-       return $this->DB->query($sql);
+       $DB = DB::getInstance();
+       return $DB->query($sql);
    }
 
     /**
      * @return array|bool
      */
-    function getById($id)
+    static function getById(int $id)
     {
-        if(filter_var($id, FILTER_VALIDATE_INT)){
-            $id = str_replace('+', '', $id);
-            $id = str_replace('-', '', $id);
-        } else {
-            $this->error_validation = array(
-                'error' => true,
-                'text' => 'Ошибка в передаваемом id',
-            );
-            return false;
-        }
-
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-        return $this->DB->query($sql,'fetch');
+        $DB = DB::getInstance();
+        $answer = $DB->query($sql, 'fetch');
+        return $answer;
     }
 
     public function create()
@@ -169,17 +158,6 @@ class Income
         ];
 
         return $this->DB->execute($sql, $params);
-    }
-
-    /**
-     * @param $date
-     * @param string $format
-     * @return bool
-     */
-    function validateDate($date, $format = 'Y-m-d')
-    {
-        $d = DateTime::createFromFormat($format, $date);
-        return $d && $d->format($format) == $date;
     }
 
     /**
