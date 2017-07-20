@@ -31,11 +31,23 @@ class DB
         return $res;
     }
 
-    public function query($sql, $method = 'fetchAll')
+    public function query($sql, $className = '')
     {
         $sth = $this->connection->prepare($sql);
         $res = $sth->execute();
-        if (false !== $res) {
+
+        if ($res !== false)
+        {
+
+            if($className != '')
+            {
+                return $sth->fetchAll(PDO::FETCH_CLASS, $className);
+            } else {
+                return $sth->fetchAll(PDO::FETCH_OBJ);
+            }
+
+
+/*
             switch($method)
             {
                 case 'fetch':
@@ -43,7 +55,7 @@ class DB
                     {
                         return false;
                     } else {
-                        return (object) $sth->fetch();
+                        return (object) $sth->fetch(PDO::FETCH_OBJ);
                     }
 
 
@@ -54,7 +66,7 @@ class DB
                     return $sth->fetchAll(PDO::FETCH_CLASS);
                     break;
             }
-
+*/
         }
         return [];
     }

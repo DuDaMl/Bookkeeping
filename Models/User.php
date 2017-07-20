@@ -7,7 +7,7 @@ class User
 {
     const TABLE_NAME = 'user';
     protected $DB;
-    public $id;
+    private $id;
     public $token;
     public $email;
     public $given_name;
@@ -20,7 +20,7 @@ class User
 
     function __construct()
     {
-        $this->DB = DB::getInstance();
+        //$this->DB = DB::getInstance();
     }
 
     /**
@@ -36,7 +36,7 @@ class User
 
         $DB = DB::getInstance();
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-        $answer = $DB->query($sql, 'fetch');
+        $answer = $DB->query($sql);
         return $answer;
     }
 
@@ -46,7 +46,7 @@ class User
     function getByEmail($email)
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  email = '" . $email ."'";
-        $answer = $this->DB->query($sql, 'fetch');
+        $answer = $this->DB->query($sql);
 
         if(! empty($answer))
         {
@@ -56,12 +56,9 @@ class User
         }
     }
 
-    static function getUserId()
+    function getId()
     {
-        if(self::checkAuth())
-        {
-            return $_SESSION["user_id"];
-        }
+        return $this->id;
     }
 
 
@@ -85,24 +82,22 @@ class User
      * @param $token
      * @return bool
      */
-    public static function checkToken($user_id, $token)
+    public function checkToken($user_id, $token)
     {
         $DB = DB::getInstance();
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $user_id . " LIMIT 1";
-        $user = $DB->query($sql, 'fetch');
+        $user = $DB->query($sql)[0];
 
-        if($user->token != $_SESSION['token'])
+        // Проверка существования записи совпадения token
+        if(! isset($user) || $user->token != $token)
         {
             //session_destroy();
             return false;
         }
 
-        if(self::updateToken($user_id))
-        {
-            return true;
-        } else {
-            return false;
-        }
+        $this->id = $user_id;
+        return true;
+
     }
 
     /**
@@ -110,8 +105,13 @@ class User
      * @param $user_id
      * @return bool
      */
-    public static function updateToken($user_id)
+    public function updateToken()
     {
+        if(! $this->id)
+        {
+            return false;
+        }
+
         $DB = DB::getInstance();
         $token = bin2hex(random_bytes('64'));
 
@@ -122,15 +122,14 @@ class User
 
         $params = [
             ':token' => $token,
-            ':id' => $user_id
+            ':id' => $this->id
         ];
 
         $result = $DB->execute($sql, $params);
 
         if($result)
         {
-            $_SESSION['token'] =  $token;
-            return true;
+            return $token;
         } else {
             return false;
         }

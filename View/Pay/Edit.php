@@ -1,6 +1,8 @@
 <?php include_once(__DIR__ . '/../Header.php'); ?>
 
-<?php
+<?
+
+print_r($pay);
 ?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
@@ -12,7 +14,7 @@
     if(! isset($data['error']))
     {
     ?>
-        <form action="/<?= $controller_name ?>/edit/" method="post">
+        <form action="/<?= $controller_name ?>/edit/<?= $pay->id ?>" method="post">
             <div class="row">
                 <div class="col-lg-3">
                     <div class="form-group">

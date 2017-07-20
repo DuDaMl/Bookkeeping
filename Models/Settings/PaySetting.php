@@ -40,7 +40,7 @@ class PaySetting extends Setting
                LIMIT 1";
 
        $DB = DB::getInstance();
-       $result = $DB->query($sql, 'fetch');
+       $result = $DB->query($sql)[0];
 
        if(! $result)
        {
@@ -128,7 +128,7 @@ class PaySetting extends Setting
                AND user_id = " . self::getUserId() . "
                LIMIT 1";
 
-        return $DB->query($sql, 'fetch');
+        return $DB->query($sql);
     }
 
     /**

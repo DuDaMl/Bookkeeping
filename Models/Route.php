@@ -64,9 +64,7 @@ final class Route {
             {
                 self::$var = $uri[2];
             }
-
         }
-
     }
 
     public static function start()

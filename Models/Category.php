@@ -70,7 +70,7 @@ class Category
         }
 
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
-        return $this->DB->query($sql, 'fetch');
+        return $this->DB->query($sql);
     }
 
     public function update()

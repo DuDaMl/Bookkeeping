@@ -76,6 +76,8 @@
 
                     <li><a href="../navbar-fixed-top/">
                             <?php
+
+
                             if(isset($user) && ! empty($user))
                             {
                                 echo "<img src='" . $user->picture . "' height=18px> ";

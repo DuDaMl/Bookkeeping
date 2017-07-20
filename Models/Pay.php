@@ -16,9 +16,9 @@ class Pay
 
     public $error_validation;
 
-    function __construct($user_id)
+    function __construct()
     {
-        $this->user_id = $user_id;
+
         $this->DB = DB::getInstance();
     }
 
@@ -53,7 +53,7 @@ class Pay
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id ;
         $DB = DB::getInstance();
-        $answer = $DB->query($sql, 'fetch');
+        $answer = $DB->query($sql, static::class);
         return $answer;
     }
 
@@ -89,6 +89,7 @@ class Pay
                     :date
                     )";
 
+
         $params = [
             ':amount' => $this->amount,
             ':description' => $this->description,
@@ -96,6 +97,8 @@ class Pay
             ':user_id' => $this->user_id,
             ':date' => $this->date
         ];
+
+        echo $sql;
 
         return $this->DB->execute($sql, $params);
 
@@ -116,6 +119,7 @@ class Pay
         {
             return false;
         }
+
 
         if(empty($this->amount)
             || empty($this->category_id)
@@ -189,81 +193,71 @@ class Pay
      */
     function validate()
     {
-        if(! filter_var($this->user_id, FILTER_VALIDATE_INT))
-        {
-            $this->error_validation = array(
-                'error' => true,
-                'amount' => 'Ошибка в указанном user_id',
-            );
-        } else {
-            $id = str_replace('+','',$this->user_id);
-            $this->user_id = str_replace('-','',$id);
-        }
 
-        // валидация переданного id
-        if(isset($_POST['id']))
+        if(isset($this->user_id))
         {
-            if(! filter_var($_POST['id'], FILTER_VALIDATE_INT))
-            {
-                $this->error_validation = array(
-                    'error' => true,
-                    'amount' => 'Ошибка в указанном id',
-                );
-            } else {
-                $id = str_replace('+','',$_POST['id']);
-                $this->id = str_replace('-','',$id);
-            }
-        }
 
-        // валидация введенной суммы
-        if(isset($_POST['amount']))
-        {
-            if(! filter_var($_POST['amount'], FILTER_VALIDATE_INT)
-                || $_POST['amount'] == 0)
-            {
-                $this->error_validation = array(
-                    'error' => true,
-                    'amount' => 'Ошибка в указанной сумме',
-                );
-            } else {
-                $amount = str_replace('+','',$_POST['amount']);
-                $this->amount = str_replace('-','',$amount);
-            }
-        }
-
-        if(isset($_POST['category_id']))
-        {
-            if(! filter_var($_POST['category_id'], FILTER_VALIDATE_INT))
-            {
-                $this->error_validation = array(
-                    'error' => true,
-                    'category_id' => 'Ошибка в выбранной категории',
-                );
-            } else {
-                $category_id = str_replace('+','',$_POST['category_id']);
-                $this->category_id = str_replace('-','',$category_id);
-            }
-        }
-
-        if(isset($_POST['date']))
-        {
-            if(! self::validateDate($_POST['date']))
-            {
-                $this->error_validation = array(
-                    'error' => true,
-                    'date' =>  'Ошибка в выбранной дате'
-                );
-            } else {
-                $this->date = $_POST['date'];
-            }
-
-            if($this->error_validation['error'] == true)
+            if(! $this->validateInt('user_id'))
             {
                 return false;
             }
         }
 
-        $this->description = strip_tags($_POST['description']);
+        if(isset($this->id))
+        {
+            if(! $this->validateInt('id'))
+            {
+                return false;
+            }
+        }
+
+        if(isset($this->category_id))
+        {
+            if(! $this->validateInt('category_id'))
+            {
+                return false;
+            }
+        }
+
+        if(isset($this->amount))
+        {
+            if(! $this->validateInt('amount'))
+            {
+                return false;
+            }
+        }
+
+        if(isset($this->date))
+        {
+            if(! self::validateDate($this->date))
+            {
+                $this->error_validation = array(
+                    'error' => true,
+                    'date' =>  'Ошибка в выбранной дате'
+                );
+                return false;
+            }
+
+        }
+
+        if($this->description)
+        {
+            $this->description = strip_tags($this->description);
+        }
+
+        return true;
+    }
+
+    function validateInt($var)
+    {
+        if(! filter_var($this->$var, FILTER_VALIDATE_INT)) {
+
+            $this->error_validation = array(
+                'error' => true,
+                'amount' => 'Ошибка в указанном ' . $var,
+            );
+            return false;
+        }
         return true;
     }
 }

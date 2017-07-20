@@ -1,43 +1,53 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: user
- * Date: 08.06.2017
- * Time: 20:02
- */
-
 namespace bookkeeping\Controllers;
-use bookkeeping\Models\User as M_User;
+use bookkeeping\Models\User as User;
 
 class Controller
 {
     protected static $main_teamplate;
 
-    // Auth User
-    protected  static $current_user_id;
+    protected $user;
 
     function __construct()
     {
-        //$this->M_User = new M_User();
+        $this->user = new User();
+        $this->checkAuth();
+    }
+
+    /**
+     * @return bool
+     */
+    function checkAuth()
+    {
+        if(! isset($_SESSION['user_id']) || ! isset($_SESSION['token']))
+        {
+            echo "<h1>no auth</h1>";
+            //header('Location: /');
+        }
 
         // auth
-        if(! M_User::checkAuth())
+        if(! $this->user->checkToken($_SESSION['user_id'], $_SESSION['token']))
         {
             echo "<h1>no auth</h1>";
             //header('Location: /');
         } else {
-            static::$current_user_id = M_User::getUserId();
+
+            $token = $this->user->updateToken();
+
+            // Создание нового токена
+            if($token)
+            {
+                $_SESSION['token'] =  $token;
+            } else {
+                //todo some error exception
+            }
         }
+
     }
 
     public static function getMainTeamplate()
     {
         return static::$main_teamplate;
-    }
-
-    public static function getCurrentUserId()
-    {
-        return static::$current_user_id;
     }
 
     function render(array $data, $view = 'Index')
@@ -49,7 +59,7 @@ class Controller
         // переменная для указания активного пункта главного меню
         $current_page = self::getMainTeamplate();
         $controller_name = self::getMainTeamplate();
-        $user = M_User::getById(self::getCurrentUserId());
+        $user = $this->user;
 
         return include (__DIR__ . '/../View/' . self::getMainTeamplate() . '/' . $view . '.php');
     }
