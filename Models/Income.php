@@ -4,9 +4,9 @@ namespace bookkeeping\Models;
 class Income
 {
     use \bookkeeping\Models\Traits\ValidateDate;
+    use \bookkeeping\Models\Traits\ValidateInt;
 
     const TABLE_NAME = 'income';
-    protected $DB;
     public $id;
     public $user_id;
     public $amount;
@@ -16,9 +16,8 @@ class Income
 
     public $error_validation;
 
-    function __construct($user_id)
+    function __construct()
     {
-        $this->user_id = $user_id;
         $this->DB = DB::getInstance();
     }
 
@@ -39,7 +38,7 @@ class Income
                ";
 
        $DB = DB::getInstance();
-       return $DB->query($sql);
+       return $DB->query($sql, static::class);
    }
 
     /**
@@ -49,7 +48,7 @@ class Income
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
         $DB = DB::getInstance();
-        $answer = $DB->query($sql, 'fetch');
+        $answer = $DB->query($sql);
         return $answer;
     }
 

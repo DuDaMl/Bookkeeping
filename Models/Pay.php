@@ -4,9 +4,10 @@ namespace bookkeeping\Models;
 class Pay
 {
     use \bookkeeping\Models\Traits\ValidateDate;
+    use \bookkeeping\Models\Traits\ValidateInt;
 
     const TABLE_NAME = 'pay';
-    protected $DB;
+    //protected $DB;
     public $id;
     public $amount;
     public $description;
@@ -18,8 +19,7 @@ class Pay
 
     function __construct()
     {
-
-        $this->DB = DB::getInstance();
+        //$DB = DB::getInstance();
     }
 
     /**
@@ -42,7 +42,7 @@ class Pay
                ";
 
        $DB = DB::getInstance();
-       return $DB->query($sql);
+       return $DB->query($sql, static::class);
    }
 
     /**
@@ -98,9 +98,8 @@ class Pay
             ':date' => $this->date
         ];
 
-        echo $sql;
-
-        return $this->DB->execute($sql, $params);
+        $DB = DB::getInstance();
+        return $DB->execute($sql, $params);
 
     }
 
@@ -119,7 +118,6 @@ class Pay
         {
             return false;
         }
-
 
         if(empty($this->amount)
             || empty($this->category_id)
@@ -144,9 +142,8 @@ class Pay
             ':user_id' => $this->user_id,
             ':date' => $this->date
         ];
-
-        return $this->DB->execute($sql, $params);
-
+        $DB = DB::getInstance();
+        return $DB->execute($sql, $params);
     }
 
     /**
@@ -174,9 +171,9 @@ class Pay
         $params = [
             ':id' => $this->id
         ];
-
-        $result = $this->DB->execute($sql, $params);
-
+        
+        $DB = DB::getInstance();
+        $result = $DB->execute($sql, $params);
 
         if($result)
         {
@@ -248,16 +245,5 @@ class Pay
         return true;
     }
 
-    function validateInt($var)
-    {
-        if(! filter_var($this->$var, FILTER_VALIDATE_INT)) {
 
-            $this->error_validation = array(
-                'error' => true,
-                'amount' => 'Ошибка в указанном ' . $var,
-            );
-            return false;
-        }
-        return true;
-    }
 }

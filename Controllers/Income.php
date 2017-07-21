@@ -10,23 +10,26 @@ class Income
 {
     const CONTROLLER_NAME = 'Income';
     protected static $main_teamplate = 'Income';
-    private $M_Income;
 
     function __construct()
     {
         parent::__construct();
-        $this->M_Income = new M_Income(self::getCurrentUserId());
-
+        
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
         {
             $this->setSetting();
         }
+        
     }
 
     public function setSetting()
     {
-        $M_IncomeSetting = new M_IncomeSetting(self::getCurrentUserId());
+
+
+
+        $M_IncomeSetting = new M_IncomeSetting();
+        $M_IncomeSetting->user_id = $this->user->getId();
 
         // изменения параметров представления контроллера
         $result =  $M_IncomeSetting->setFormat();
@@ -43,7 +46,9 @@ class Income
 
     function isPost($action)
     {
-        if($this->M_Income->$action())
+        $M_Income = new M_Income();
+
+        if($M_Income->$action())
         {
             return true;
         } else {
@@ -53,31 +58,41 @@ class Income
 
     function index()
     {
+        $M_Income = new M_Income();
+        $M_IncomeSetting = new M_IncomeSetting();
+
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
-            if($this->isPost('create'))
+
+            $M_Income->amount = $_POST['amount'];
+            $M_Income->description = $_POST['description'];
+            $M_Income->category_id = $_POST['category_id'];
+            $M_Income->user_id = $this->user->getId();
+            $M_Income->date = $_POST['date'];
+
+            if($M_Income->create())
             {
                 header("Location: /" . self::getMainTeamplate());
                 exit();
             }
 
             // ошибки добавления новой записи расходов
-            $data['error'] = $this->M_Income->error_validation;
+            $data['error'] = $M_Income->error_validation;
         }
 
-        // id текущего авторизированного пользователя
-        $user_id = self::getCurrentUserId();
-
         // параметры контроллера
-        $data['settings'] =  (object) M_IncomeSetting::getSettings($user_id);
+        $M_IncomeSetting->user_id = $this->user->getId();
+        $data['settings'] = $M_IncomeSetting->getSettings();
+
+        print_r($data['settings']);
 
         // загрузка всех платежей текущего месяца
-        $data['incomes'] = M_Income::getAll($user_id,
+        $data['incomes'] = M_Income::getAll($this->user->getId(),
                                             $data['settings']->date_start,
                                             $data['settings']->date_end);
 
         // загрузка всех категорий расходов
-        $data['categories'] =  (new M_Category(static::$current_user_id))->getAll(self::getCurrentUserId(), self::CONTROLLER_NAME);
+        $data['categories'] =  (new M_Category($this->user->getId()))->getAll($this->user->getId(), self::CONTROLLER_NAME);
 
         $this->render($data);
     }
@@ -103,7 +118,7 @@ class Income
         } else {
             $income = (object) $income;
 
-            if ($income->user_id != self::getCurrentUserId()) {
+            if ($income->user_id != $this->user->getId()) {
                 $data['error'] = array(
                     'error' => true,
                     'text' => 'Доступ к данной записи закрыт для вас'
@@ -113,7 +128,7 @@ class Income
                 $data['income'] = $income;
 
                 // id текущего авторизированного пользователя
-                $user_id = self::getCurrentUserId();
+                $user_id = $this->user->getId();
 
                 // Категории заданного типа (Расходы | Доходы | другое)
                 $type_of_category = self::CONTROLLER_NAME;
@@ -151,7 +166,7 @@ class Income
         } else {
             $income = (object) $income;
 
-            if ($income->user_id != self::getCurrentUserId()) {
+            if ($income->user_id != $this->user->getId()) {
                 $data['error'] = array(
                     'error' => true,
                     'text' => 'Доступ к данной записи закрыт для вас'
@@ -161,7 +176,7 @@ class Income
                 $data['income'] = $income;
 
                 // id текущего авторизированного пользователя
-                $user_id = self::getCurrentUserId();
+                $user_id = $this->user->getId();
 
                 // Категории заданного типа (Расходы | Доходы | другое)
                 $type_of_category = self::CONTROLLER_NAME;

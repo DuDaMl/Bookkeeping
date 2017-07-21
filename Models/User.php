@@ -6,7 +6,6 @@ use \PDO;
 class User
 {
     const TABLE_NAME = 'user';
-    protected $DB;
     private $id;
     public $token;
     public $email;
@@ -20,7 +19,6 @@ class User
 
     function __construct()
     {
-        //$this->DB = DB::getInstance();
     }
 
     /**
@@ -45,8 +43,9 @@ class User
      */
     function getByEmail($email)
     {
+        $DB = DB::getInstance();
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  email = '" . $email ."'";
-        $answer = $this->DB->query($sql);
+        $answer = $DB->query($sql);
 
         if(! empty($answer))
         {
@@ -151,7 +150,8 @@ class User
             ':id' => $user_id
         ];
 
-        $result = $this->DB->execute($sql, $params);
+        $DB = DB::getInstance();
+        $result = $DB->execute($sql, $params);
 
         if($result)
         {
@@ -192,10 +192,12 @@ class User
             ':gender' => $this->gender
         ];
 
-        $result = $this->DB->execute($sql, $params);
+        $DB = DB::getInstance();
+        $result = $DB->execute($sql, $params);
+
         if($result)
         {
-            return $this->DB->lastInsertId();
+            return $DB->lastInsertId();
         } else {
             return false;
         }

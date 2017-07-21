@@ -30,13 +30,12 @@ abstract class Setting
      */
     static function getUserId()
     {
-        return static::$user_id;
     }
 
     /**
      * @return int|id
      */
-    static public function getSettings($user_id){}
+    public function getSettings(){}
 
     /**
      * @return bool
@@ -50,6 +49,6 @@ abstract class Setting
 
     abstract public function setFormat();
 
-    abstract protected function prepareFormat();
+    abstract protected function prepareFormat($date);
 
 }

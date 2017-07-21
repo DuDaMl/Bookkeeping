@@ -12,8 +12,11 @@ class IncomeSetting extends Setting
 
 
     private $id;
-    protected static $user_id;
+    public $user_id;
     protected static $controller = 'income';
+    public $date_start;
+    public $date_end;
+    public $format;
     public $value;
 
     public $error_validation;
@@ -23,9 +26,8 @@ class IncomeSetting extends Setting
      * Инициализация статической переменной user_id
      * @param int $user_id - id авторихзированного пользователя
      */
-    function __construct(int $user_id)
+    function __construct()
     {
-        static::$user_id = $user_id;
     }
 
     /**
@@ -34,15 +36,16 @@ class IncomeSetting extends Setting
      * @param int | $user_id
      * @return object | Обьект с полями значений настроек
      */
-    public static function getSettings($user_id)
+    public function getSettings()
     {
        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" .
               " WHERE  controller = '" . self::getController() . "'
-               AND user_id = " . $user_id . "
+               AND user_id = " . $this->user_id . "
                LIMIT 1";
 
        $DB = DB::getInstance();
-       $result = $DB->query($sql, 'fetch');
+       $result = $DB->query($sql)[0];
+
 
        if(! $result)
        {
@@ -54,10 +57,20 @@ class IncomeSetting extends Setting
            );
 
            self::create($user_id, serialize($data_params));
-           return $data_params;
+
+           $this->date_start = $data_params['date_start'];
+           $this->date_end = $data_params['date_end'];
+           $this->format = $data_params['format'];
+
+           return $this;
        } else {
+
            // возвращение сохраненных ранее параметров контроллера
-           return unserialize($result->value);
+           $params = unserialize($result->value);
+           $result->date_start = $params['date_start'];
+           $result->date_end = $params['date_end'];
+           $result->format = $params['format'];
+           return $result;
        }
     }
 
@@ -115,6 +128,9 @@ class IncomeSetting extends Setting
         ];
 
         $DB = DB::getInstance();
+        echo $sql;
+        print_r($params);
+        exit();
         return $DB->execute($sql, $params);
     }
 
@@ -130,7 +146,7 @@ class IncomeSetting extends Setting
                AND user_id = " . self::getUserId() . "
                LIMIT 1";
 
-        return $DB->query($sql, 'fetch');
+        return $DB->query($sql);
     }
 
     /**

@@ -116,7 +116,7 @@ var_dump($userInfo);
 
         if(! empty($userInfo['email']))
         {
-            $user = $this->M_User->getByEmail($userInfo['email']);
+            $user = $this->M_User->getByEmail($userInfo['email'])[0];
 
             if(empty($user))
             {
@@ -140,7 +140,6 @@ var_dump($userInfo);
                 //header('Location: /');
 
             } else {
-
                 // Если данный пользователь уже существует то создаём сессию
                 $this->M_User->setSession($user->id);
                 header('Location: /Pay/');

@@ -11,12 +11,10 @@ class Pay
 {
     const CONTROLLER_NAME = 'Pay';
     protected static $main_teamplate = 'Pay';
-    private $M_Pay;
 
     function __construct()
     {
         parent::__construct();
-        $this->M_Pay = new M_Pay();
 
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
@@ -30,68 +28,73 @@ class Pay
      */
     public function setSetting()
     {
-        $M_PaySetting = new M_PaySetting($this->user->getId());
+        //Array ( [settings] => 1 [day] => 2017-07-21 [format] => month [month] => 2017-07 [year] => 2017 )
+        $M_PaySetting = new M_PaySetting();
+        $M_PaySetting->user_id = $this->user->getId();
+        $M_PaySetting->format = $_POST['format'];
+        $date = $_POST[$M_PaySetting->format];
 
-        // изменения параметров представления контроллера
-        $result =  $M_PaySetting->setFormat();
-
-        if(! $result)
+        if($M_PaySetting->prepareFormat($date))
         {
-            // todo записать в лог.
-            $M_PaySetting->error_validation;
+            // изменения параметров представления контроллера
+            if(! $M_PaySetting->setFormat())
+            {
+                // todo записать в лог.
+                $M_PaySetting->error_validation;
+            } else {
+                header("Location: /" . self::getMainTeamplate());
+                exit();
+            }
         }
 
-        header("Location: /" . self::getMainTeamplate());
-        exit();
     }
 
     function index()
     {
+        $M_PaySetting = new M_PaySetting();
+
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
+            $M_Pay =  new M_Pay();
+            $M_Pay->amount = $_POST['amount'];
+            $M_Pay->description = $_POST['description'];
+            $M_Pay->category_id = $_POST['category_id'];
+            $M_Pay->user_id = $this->user->getId();
+            $M_Pay->date = $_POST['date'];
 
-            $pay =  new M_Pay();
-
-            $pay->amount = $_POST['amount'];
-            $pay->description = $_POST['description'];
-            $pay->category_id = $_POST['category_id'];
-            $pay->user_id = $this->user->getId();
-            $pay->date = $_POST['date'];
-
-            if($pay->create())
+            if($M_Pay->create())
             {
                 header("Location: /" . self::getMainTeamplate());
                 exit();
             }
 
             // ошибки добавления новой записи расходов
-            $data['error'] = $pay->error_validation;
-
+            $data['error'] = $M_Pay->error_validation;
         }
 
-        // Категории заданного типа (Расходы | Доходы | другое)
-        $type_of_category = self::CONTROLLER_NAME;
-
         // параметры контроллера
-        $data['settings'] =  (object) M_PaySetting::getSettings($this->user->getId());
+        $M_PaySetting->user_id = $this->user->getId();
+        $M_PaySetting->getSettings();
+
+        // настройки представления
+        $data['settings'] = $M_PaySetting;
 
         // загрузка всех платежей текущего месяца
-        $data['pays'] = M_Pay::getAll($this->user->getId(),
-                                      $data['settings']->date_start,
-                                      $data['settings']->date_end);
+        $data['pays'] = M_Pay::getAll(  $M_PaySetting->user_id,
+                                        $M_PaySetting->date_start,
+                                        $M_PaySetting->date_end);
 
         // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll($this->user->getId(), $type_of_category);
-
+        $data['categories'] = M_Category::getAll($this->user->getId(), self::CONTROLLER_NAME);
         $this->render($data);
     }
 
     function edit($id)
     {
 
-        $pay =  M_Pay::getById($id)[0];
+        $M_Pay =  M_Pay::getById($id)[0];
 
-        if(empty($pay))
+        if(empty($M_Pay))
         {
             $data['error'] =  array(
                 'error' => true,
@@ -99,27 +102,29 @@ class Pay
             );
         } else {
 
-            if(!empty($_POST) && $_POST['category_id'] != ''){
-
-                $pay->amount = $_POST['amount'];
-                $pay->description = $_POST['description'];
-                $pay->category_id = $_POST['category_id'];
-                $pay->date = $_POST['date'];
-
-                if($pay->update()){
-                    header("Location: /" . self::getMainTeamplate());
-                    exit();
-                }
-            }
-
-            if ($pay->user_id != $this->user->getId()) {
+            if ($M_Pay->user_id != $this->user->getId())
+            {
                 $data['error'] = array(
                     'error' => true,
                     'text' => 'Доступ к данной записи закрыт для вас'
                 );
             } else {
+                if(!empty($_POST) && $_POST['category_id'] != '')
+                {
+                    $M_Pay->amount = $_POST['amount'];
+                    $M_Pay->description = $_POST['description'];
+                    $M_Pay->category_id = $_POST['category_id'];
+                    $M_Pay->user_id = $this->user->getId();
+                    $M_Pay->date = $_POST['date'];
 
-                $data['pay'] = $pay;
+                    if($M_Pay->update())
+                    {
+                        header("Location: /" . self::getMainTeamplate());
+                        exit();
+                    }
+                }
+
+                $data['pay'] = $M_Pay;
 
                 // id текущего авторизированного пользователя
                 $user_id = $this->user->getId();
@@ -140,33 +145,33 @@ class Pay
      */
     function delete($id)
     {
+        $M_Pay =  M_Pay::getById($id)[0];
+
         if(!empty($_POST) && $_POST['id'] != '')
         {
-            if($this->M_Pay->delete()){
+            if($M_Pay->delete()){
                 header("Location: /" . self::getMainTeamplate());
                 exit();
             }
         }
 
-        $pay =  M_Pay::getById($id);
+        //$M_Pay =  M_Pay::getById($id);
 
-        if(empty($pay))
+        if(empty($M_Pay))
         {
             $data['error'] =  array(
                 'error' => true,
                 'text' => 'Данный платеж не существует'
             );
         } else {
-            $pay = (object)$pay;
-
-            if ($pay->user_id != $this->user->getId()) {
+            if ($M_Pay->user_id != $this->user->getId())
+            {
                 $data['error'] = array(
                     'error' => true,
                     'text' => 'Доступ к данной записи закрыт для вас'
                 );
             } else {
-
-                $data['pay'] = $pay;
+                $data['pay'] = $M_Pay;
 
                 // id текущего авторизированного пользователя
                 $user_id = $this->user->getId();

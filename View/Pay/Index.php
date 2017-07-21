@@ -19,13 +19,25 @@
                     <!-- Поле выбора дня -->
                     <li>
                         <div class='col-lg-1'>
-                           <input type="radio" aria-label="1" name="format" value="day" <?php if($settings->format == 'day'){ echo 'checked';} ?>>
+                           <input type="radio" aria-label="1" name="format"
+                                  value="day" <?php
+                           if($settings->format == 'day'){
+                               echo 'checked';
+                           }
+                           ?>>
                         </div>
                         <div class='col-lg-2'>
                             <span>За день: </span>
                         </div>
                         <div class='input-group date col-lg-3' id='datetimepicker_day'>
-                            <input type='text' class="form-control" value="<?php if($settings->format == 'day'){ echo $settings->date_start;} else { echo date('Y-m-d');} ?>" name="day"/>
+                            <input type='text' class="form-control"
+                                   value="<?php
+                                   if($settings->format == 'day'){
+                                       echo $settings->date_start;
+                                   } else {
+                                       echo date('Y-m-d');
+                                   }
+                                   ?>" name="day"/>
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -35,13 +47,26 @@
                     <!-- Поле выбора месяца -->
                     <li>
                         <div class='col-lg-1'>
-                            <input type="radio" aria-label="2" name="format" value="month" <?php if($settings->format == 'month'){ echo 'checked';} ?>>
+                            <input type="radio" aria-label="2" name="format"
+                                   value="month"
+                                <?php
+                                if($settings->format == 'month'){
+                                    echo 'checked';
+                                }
+                                ?>>
                         </div>
                         <div class='col-lg-2'>
                             <span>За месяц: </span>
                         </div>
                         <div class='input-group date col-lg-3' id='datetimepicker_months'>
-                            <input type='text' class="form-control"  value=" <?php if($settings->format == 'month'){ echo substr($settings->date_start, 0, 7);} else { echo date('Y-m');} ?>"  name="month"/>
+                            <input type='text' class="form-control"
+                                   value="<?php
+                                   if($settings->format == 'month'){
+                                       echo substr($settings->date_start, 0, 7);
+                                   } else {
+                                       echo date('Y-m');
+                                   }
+                                   ?>"  name="month"/>
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-calendar"></span>
                             </span>

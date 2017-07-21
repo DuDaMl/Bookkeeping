@@ -10,8 +10,11 @@ use \PDO;
 class PaySetting extends Setting
 {
     private $id;
-    protected static $user_id;
+    public $user_id;
     protected static $controller = 'pay';
+    public $date_start;
+    public $date_end;
+    public $format;
     public $value;
 
     public $error_validation;
@@ -21,9 +24,8 @@ class PaySetting extends Setting
      * Инициализация статической переменной user_id
      * @param int $user_id - id авторихзированного пользователя
      */
-    function __construct(int $user_id)
+    function __construct()
     {
-        static::$user_id = $user_id;
     }
 
     /**
@@ -32,11 +34,16 @@ class PaySetting extends Setting
      * @param int | $user_id
      * @return object | Обьект с полями значений настроек
      */
-    public static function getSettings($user_id)
+    public function getSettings()
     {
+        if(! $this->user_id)
+        {
+            return false;
+        }
+
        $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" .
               " WHERE  controller = '" . self::getController() . "'
-               AND user_id = " . $user_id . "
+               AND user_id = " . $this->user_id . "
                LIMIT 1";
 
        $DB = DB::getInstance();
@@ -50,13 +57,17 @@ class PaySetting extends Setting
                'date_end' => date('Y-m-31'),
                'format' => 'month'
            );
-
-           self::create($user_id, serialize($data_params));
-           return $data_params;
+           self::create($this->user_id, serialize($data_params));
        } else {
-           // возвращение сохраненных ранее параметров контроллера
-           return unserialize($result->value);
+
+           $data_params = unserialize($result->value);
        }
+
+        $this->date_start = $data_params['date_start'];
+        $this->date_end = $data_params['date_end'];
+        $this->format = $data_params['format'];
+
+        return true;
     }
 
     /**
@@ -74,16 +85,15 @@ class PaySetting extends Setting
         }
 
         $sql = "UPDATE `" . self::TABLE_NAME . "` SET
-                user_id = :user_id,
                 value = :value
                 WHERE id = :id
                 ";
 
         $params = [
-            ':user_id' => self::getUserId(),
             ':value' => $value,
             ':id' => $id
         ];
+
 
         $DB = DB::getInstance();
         return $DB->execute($sql, $params);
@@ -120,59 +130,62 @@ class PaySetting extends Setting
      * Возвращает id записи для текущего пользователя и контроллера
      * @return array|bool|object
      */
-    private static function getSettingId()
+    private function getSettingId()
     {
         $DB = DB::getInstance();
         $sql = "SELECT id FROM `" . self::TABLE_NAME . "`" .
             " WHERE  controller = '" . self::getController() . "'
-               AND user_id = " . self::getUserId() . "
+               AND user_id = " . $this->user_id . "
                LIMIT 1";
 
-        return $DB->query($sql);
+        return $DB->query($sql)[0];
     }
 
     /**
      * Функция подготовки параметров настроек для контроллера перед сохранением в БД
-     * @return array - массив сохраняемых значений
+     * @return
      */
-    protected function prepareFormat()
+    public function prepareFormat($date)
     {
-        if(isset($_POST['settings']))
+        $date = trim($date);
+
+        switch($this->format)
         {
-            $format_value = $_POST['format'];
-
-            switch($_POST['format'])
-            {
-                case 'day':
-                    $date = $_POST['day'];
-                    $data_report_start = $date;
-                    $data_report_end = $date;
-                    break;
-                case 'month':
-                    $date = $_POST['month'];
-                    $data_report_start = $date . "-01";
-                    $data_report_end = $date . "-31";
-                    break;
-                case 'year':
-                    $date = $_POST['year'];
-                    $data_report_start = $date . "-01-01";
-                    $data_report_end = $date . "-12-31";
-                    break;
-                default:
-                    $format_value = 'month';
-                    $data_report_start = date('Y-m-01');
-                    $data_report_end = date('Y-m-31');
-                    break;
-            }
-
-            $params = array(
-                'date_start' => $data_report_start,
-                'date_end' => $data_report_end,
-                'format' => $format_value
-            );
-
-            return $params;
+            case 'day':
+                $data_report_start = $date;
+                $data_report_end = $date;
+                break;
+            case 'month':
+                $data_report_start = $date . "-01";
+                $data_report_end = $date . "-31";
+                break;
+            case 'year':
+                $data_report_start = $date . "-01-01";
+                $data_report_end = $date . "-12-31";
+                break;
+            default:
+                $data_report_start = date('Y-m-01');
+                $data_report_end = date('Y-m-31');
+                break;
         }
+
+        $params = array(
+            'date_start' => $data_report_start,
+            'date_end' => $data_report_end,
+            'format' => $this->format
+        );
+
+        $this->value = serialize($params);
+        $this->date_start = $data_report_start;
+        $this->date_end = $data_report_end;
+
+        if(! $this->validateDate( $this->date_start, 'Y-m-d')
+            || ! $this->validateDate($this->date_end, 'Y-m-d'))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -182,28 +195,22 @@ class PaySetting extends Setting
      */
     public function setFormat()
     {
-        $params = $this->prepareFormat();
-
-        // валидация введенных дат по переданной маске из контроллера
-        if(! $this->validateDate($params['date_start'], 'Y-m-d')
-            || ! $this->validateDate($params['date_end'], 'Y-m-d'))
-        {
-            // в случае неправльно указанных данных устанавливается значение по умолчанию
-            $params['date_start']= date('Y-m-01');
-            $params['date_end'] = date('Y-m-31');
-        }
-
         // проверка существования записи для выбора действия INSERT/DELETE
         $controller_db = self::getSettingId();
+
+        if(! $this->value)
+        {
+            return false;
+        }
 
         if(! empty ($controller_db))
         {
             // update
-            $result = $this->edit($controller_db->id, serialize($params));
+            $result = $this->edit($controller_db->id, $this->value);
             $this->error_validation .= " no update";
         } else {
             // insert
-            $result = self::create(self::getUserId(), serialize($params));
+            $result = self::create(self::getUserId(), $this->value);
             $this->error_validation .= " no insert";
         }
 
