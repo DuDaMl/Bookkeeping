@@ -7,7 +7,6 @@ class Pay
     use \bookkeeping\Models\Traits\ValidateInt;
 
     const TABLE_NAME = 'pay';
-    //protected $DB;
     public $id;
     public $amount;
     public $description;
@@ -88,7 +87,6 @@ class Pay
                     :category_id,
                     :date
                     )";
-
 
         $params = [
             ':amount' => $this->amount,
@@ -193,7 +191,6 @@ class Pay
 
         if(isset($this->user_id))
         {
-
             if(! $this->validateInt('user_id'))
             {
                 return false;

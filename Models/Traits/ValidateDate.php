@@ -11,6 +11,7 @@ trait ValidateDate
      */
     function validateDate($date, $format = 'Y-m-d')
     {
+        trim($date);
         $d = DateTime::createFromFormat($format, $date);
         return $d && $d->format($format) == $date;
     }

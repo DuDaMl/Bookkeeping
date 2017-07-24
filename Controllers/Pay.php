@@ -15,45 +15,33 @@ class Pay
     function __construct()
     {
         parent::__construct();
-
-        // Проверка существования запроса на изменение настроек представления
-        if(isset($_POST['settings']))
-        {
-            $this->setSetting();
-        }
-    }
-
-    /**
-     * установка времени отчета контроллера
-     */
-    public function setSetting()
-    {
-        //Array ( [settings] => 1 [day] => 2017-07-21 [format] => month [month] => 2017-07 [year] => 2017 )
-        $M_PaySetting = new M_PaySetting();
-        $M_PaySetting->user_id = $this->user->getId();
-        $M_PaySetting->format = $_POST['format'];
-        $date = $_POST[$M_PaySetting->format];
-
-        if($M_PaySetting->prepareFormat($date))
-        {
-            // изменения параметров представления контроллера
-            if(! $M_PaySetting->setFormat())
-            {
-                // todo записать в лог.
-                $M_PaySetting->error_validation;
-            } else {
-                header("Location: /" . self::getMainTeamplate());
-                exit();
-            }
-        }
-
     }
 
     function index()
     {
-        $M_PaySetting = new M_PaySetting();
+        // Сохраненные настройки для контроллера.
+        $M_PaySetting = new M_PaySetting($this->user->getId());
 
-        if(!empty($_POST) && $_POST['category_id'] != '')
+        // Проверка существования запроса на изменение настроек представления
+        if(isset($_POST['settings']))
+        {
+            $datatime_name = $_POST["format"];
+            $M_PaySetting->date_start = $_POST[$datatime_name];
+            $M_PaySetting->format = $_POST['format'];
+
+            if(! $M_PaySetting->updateSettingByUserId())
+            {
+                // ошибки установки настроек контроллера
+                $data['error'] = array(
+                    'error' => true,
+                    'text' => 'Не удалось внести настройки выбора по дате.  Загружены данные по умоляванию'
+                );
+            } else {
+                header('Location: /' . Pay::CONTROLLER_NAME . "/");
+            }
+        }
+
+        if(!empty($_POST) && isset($_POST['category_id']))
         {
             $M_Pay =  new M_Pay();
             $M_Pay->amount = $_POST['amount'];
@@ -74,7 +62,7 @@ class Pay
 
         // параметры контроллера
         $M_PaySetting->user_id = $this->user->getId();
-        $M_PaySetting->getSettings();
+
 
         // настройки представления
         $data['settings'] = $M_PaySetting;
@@ -89,9 +77,13 @@ class Pay
         $this->render($data);
     }
 
+    /**
+     * Редактирование записи (Платёж)
+     * @param $id
+     *
+     */
     function edit($id)
     {
-
         $M_Pay =  M_Pay::getById($id)[0];
 
         if(empty($M_Pay))
@@ -109,6 +101,7 @@ class Pay
                     'text' => 'Доступ к данной записи закрыт для вас'
                 );
             } else {
+
                 if(!empty($_POST) && $_POST['category_id'] != '')
                 {
                     $M_Pay->amount = $_POST['amount'];
@@ -147,16 +140,6 @@ class Pay
     {
         $M_Pay =  M_Pay::getById($id)[0];
 
-        if(!empty($_POST) && $_POST['id'] != '')
-        {
-            if($M_Pay->delete()){
-                header("Location: /" . self::getMainTeamplate());
-                exit();
-            }
-        }
-
-        //$M_Pay =  M_Pay::getById($id);
-
         if(empty($M_Pay))
         {
             $data['error'] =  array(
@@ -173,14 +156,14 @@ class Pay
             } else {
                 $data['pay'] = $M_Pay;
 
-                // id текущего авторизированного пользователя
-                $user_id = $this->user->getId();
+                if(!empty($_POST) && $_POST['id'] != '')
+                {
+                    if($M_Pay->delete()){
+                        header("Location: /" . self::getMainTeamplate());
+                        exit();
+                    }
+                }
 
-                // Категории заданного типа (Расходы | Доходы | другое)
-                $type_of_category = self::CONTROLLER_NAME;
-
-                // загрузка всех категорий расходов
-                $data['categories'] = M_Category::getAll($user_id, $type_of_category);
             }
         }
 

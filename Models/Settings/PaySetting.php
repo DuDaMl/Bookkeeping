@@ -9,41 +9,43 @@ use \PDO;
  */
 class PaySetting extends Setting
 {
+    CONST TABLE_NAME = 'pay_setting';
+
     private $id;
     public $user_id;
-    protected static $controller = 'pay';
     public $date_start;
     public $date_end;
     public $format;
-    public $value;
-
     public $error_validation;
 
     /**
      * PaySetting constructor.
-     * Инициализация статической переменной user_id
+     * Загрузка настроек по указаному user_id
+     * Инициализация user_id
      * @param int $user_id - id авторихзированного пользователя
      */
-    function __construct()
+    function __construct(int $user_id)
     {
+        $this->user_id = $user_id;
+
+        // Загрузка данных по user_id
+        $this->getSettingsByUserId();
     }
 
     /**
-     * Возвращает запись из БД для указанного контроллера и id пользователя
+     * Возвращает запись из БД для указанного user_id
      * Или значение по умолчанию
-     * @param int | $user_id
      * @return object | Обьект с полями значений настроек
      */
-    public function getSettings()
+    public function getSettingsByUserId()
     {
         if(! $this->user_id)
         {
             return false;
         }
 
-       $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" .
-              " WHERE  controller = '" . self::getController() . "'
-               AND user_id = " . $this->user_id . "
+       $sql = "SELECT * FROM `" . PaySetting::TABLE_NAME . "`" .
+              " WHERE  user_id = " . $this->user_id . "
                LIMIT 1";
 
        $DB = DB::getInstance();
@@ -51,49 +53,51 @@ class PaySetting extends Setting
 
        if(! $result)
        {
-           // создание параметров для контроллера по умолчанию
-           $data_params = array(
-               'date_start' => date('Y-m-01'),
-               'date_end' => date('Y-m-31'),
-               'format' => 'month'
-           );
-           self::create($this->user_id, serialize($data_params));
+           // создание параметров по умолчанию
+           $this->date_start = date('Y-m-01');
+           $this->date_end = date('Y-m-31');
+           $this->format = 'month';
+
+           $this->create($this->user_id);
+
        } else {
-
-           $data_params = unserialize($result->value);
+           $this->date_start = $result->date_start;
+           $this->date_end = $result->date_end;
+           $this->format = $result->format;
        }
-
-        $this->date_start = $data_params['date_start'];
-        $this->date_end = $data_params['date_end'];
-        $this->format = $data_params['format'];
-
-        return true;
     }
 
     /**
      * Обновление настроек в БД
-     * @param int | $id - id записи настроек в таблице БД
-     * @param string | $value - изменяемые значения
      * @return bool
      */
-    protected function edit($id, $value)
+    public function updateSettingByUserId()
     {
-        if(empty($id))
+        if(empty($this->user_id) ||
+        empty($this->date_start) ||
+        $this->format == '')
         {
-            // todo pointed this mistake
+            return false;
+        }
+
+        if(! $this->prepareFormat($this->date_start))
+        {
             return false;
         }
 
         $sql = "UPDATE `" . self::TABLE_NAME . "` SET
-                value = :value
-                WHERE id = :id
+                date_start = :date_start,
+                date_end = :date_end,
+                format = :format
+                WHERE user_id = :user_id
                 ";
 
         $params = [
-            ':value' => $value,
-            ':id' => $id
+            ':date_start' => $this->date_start,
+            ':date_end' => $this->date_end,
+            ':format' => $this->format,
+            ':user_id' => $this->user_id
         ];
-
 
         $DB = DB::getInstance();
         return $DB->execute($sql, $params);
@@ -104,41 +108,30 @@ class PaySetting extends Setting
      * @param  string | $value - сохранямые параметры
      * @return bool
      */
-    protected static function create($user_id, $value)
+    protected function create($user_id)
     {
+
         $sql = "INSERT INTO  `" . self::TABLE_NAME . "` (
                 `user_id`,
-                `controller`,
-                `value`)
+                `date_start`,
+                `date_end`,
+                `format`)
                 VALUES (
                 :user_id,
-                :controller,
-                :value )
+                :date_start,
+                :date_end,
+                :format )
                 ";
 
         $params = [
-            ':user_id' => $user_id,
-            ':value' => $value,
-            ':controller' => self::getController()
+            ':user_id' => $this->user_id,
+            ':date_start' => $this->date_start,
+            ':date_end' => $this->date_end,
+            ':format' => $this->format
         ];
 
         $DB = DB::getInstance();
         return $DB->execute($sql, $params);
-    }
-
-    /**
-     * Возвращает id записи для текущего пользователя и контроллера
-     * @return array|bool|object
-     */
-    private function getSettingId()
-    {
-        $DB = DB::getInstance();
-        $sql = "SELECT id FROM `" . self::TABLE_NAME . "`" .
-            " WHERE  controller = '" . self::getController() . "'
-               AND user_id = " . $this->user_id . "
-               LIMIT 1";
-
-        return $DB->query($sql)[0];
     }
 
     /**
@@ -169,13 +162,6 @@ class PaySetting extends Setting
                 break;
         }
 
-        $params = array(
-            'date_start' => $data_report_start,
-            'date_end' => $data_report_end,
-            'format' => $this->format
-        );
-
-        $this->value = serialize($params);
         $this->date_start = $data_report_start;
         $this->date_end = $data_report_end;
 
@@ -187,39 +173,4 @@ class PaySetting extends Setting
 
         return true;
     }
-
-    /**
-     * Запись настроек контроллера в БД.
-     * @param array  - $_POST ['setting']
-     * @return bool
-     */
-    public function setFormat()
-    {
-        // проверка существования записи для выбора действия INSERT/DELETE
-        $controller_db = self::getSettingId();
-
-        if(! $this->value)
-        {
-            return false;
-        }
-
-        if(! empty ($controller_db))
-        {
-            // update
-            $result = $this->edit($controller_db->id, $this->value);
-            $this->error_validation .= " no update";
-        } else {
-            // insert
-            $result = self::create(self::getUserId(), $this->value);
-            $this->error_validation .= " no insert";
-        }
-
-        if(! $result)
-        {
-            // todo записать в лог.
-            return false;
-        }
-        return true;
-    }
-
 }
