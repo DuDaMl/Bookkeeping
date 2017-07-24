@@ -58,7 +58,8 @@ class Category
      */
     function getById($id)
     {
-        if(filter_var($id, FILTER_VALIDATE_INT)){
+        if(filter_var($id, FILTER_VALIDATE_INT))
+        {
             $id = str_replace('+', '', $id);
             $id = str_replace('-', '', $id);
         } else {
@@ -69,8 +70,10 @@ class Category
             return false;
         }
 
-        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
+        $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id . " LIMIT 1";
+
         return $this->DB->query($sql);
+
     }
 
     public function update()
@@ -99,11 +102,6 @@ class Category
                     user_id = :user_id
                     WHERE id = :id
                     ";
-        echo $sql;
-        /*echo $this->name . "<br/>";
-        echo $this->type . "<br/>";
-        echo $this->user_id . "<br/>";
-        echo $this->id . "<br/>";*/
 
         $params = [
             ':name' => $this->name,
@@ -117,24 +115,21 @@ class Category
 
     public function create()
     {
-        if(!self::validate() || empty($this->name) )
+        if(! self::validate() || empty($this->name) &&
+            ! self::validate() || empty($this->type) )
         {
             $this->error_validation = array(
                 'error' => true,
-                'amount' => 'Имя категории не может быть пустым',
+                'amount' => 'Имя категории не может быть пустым или отсутствует тип категории',
             );
+
             return false;
         }
 
         $sql = "INSERT INTO `" . self::TABLE_NAME . "`
-                    (name,
-                    user_id,
-                    type)
-                     VALUES (
-                    :name,
-                    :user_id,
-                    :type
-                    )";
+                    (name, user_id, type)
+                     VALUES 
+                    (:name, :user_id, :type )";
 
         $params = [
             ':name' => $this->name,
@@ -142,7 +137,7 @@ class Category
             ':type' => $this->type
         ];
 
-            return $this->DB->execute($sql, $params);
+        return $this->DB->execute($sql, $params);
 
     }
     /**
@@ -162,6 +157,7 @@ class Category
                     WHERE id = :id
                     ";
         } else {
+
             // ошибка, попытка удаления без id
             return false;
         }
@@ -171,6 +167,11 @@ class Category
         ];
 
         return $this->DB->execute($sql, $params);
+    }
+
+    public function setId(int $id)
+    {
+        $this->id = $id;
     }
 
     function validate()
@@ -185,22 +186,6 @@ class Category
         } else {
             $id = str_replace('+','',$this->user_id);
             $this->user_id = str_replace('-','',$id);
-        }
-
-        // валидация переданного id
-        if(isset($_POST['id']))
-        {
-            if(! filter_var($_POST['id'], FILTER_VALIDATE_INT))
-            {
-                $this->error_validation = array(
-                    'error' => true,
-                    'amount' => 'Ошибка в указанном id',
-                );
-                return false;
-            } else {
-                $id = str_replace('+','',$_POST['id']);
-                $this->id = str_replace('-','',$id);
-            }
         }
 
         $this->name = strip_tags($_POST['name']);

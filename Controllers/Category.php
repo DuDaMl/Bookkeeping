@@ -9,49 +9,52 @@ class Category
     extends Controller
 {
     protected static $main_teamplate = 'Category';
-    private $M_Category;
 
     public function __construct()
     {
         parent::__construct();
-        $this->M_Category = new M_Category(static::$current_user_id);
     }
-
-    function input(){}
-    function output(){}
 
     public function index()
     {
+        $M_Category = new M_Category($this->user->getId());
+
         if(isset($_POST['name']))
         {
-            if($this->M_Category->create())
+            // Array ( [name] => 123 [type] => Pay )
+            $M_Category->name = $_POST['name'];
+            $M_Category->type = $_POST['type'];
+
+            if($M_Category->create())
             {
                 header("Location: /Category/");
                 exit();
             }
         }
 
-        $data['categories_pays'] = $this->M_Category->getAllPays();
-        $data['categories_incomes'] = $this->M_Category->getAllIncomes();
-        $data['error'] = $this->M_Category->error_validation;
+        $data['categories_pays'] = $M_Category->getAllPays();
+        $data['categories_incomes'] = $M_Category->getAllIncomes();
+        $data['error'] = $M_Category->error_validation;
         $this->render($data);
     }
 
     function edit($id)
     {
+        $M_Category = new M_Category($this->user->getId());
+
         if(isset($_POST['name']))
         {
-            if($this->M_Category->update())
+            $M_Category->setId($id);
+
+            if($M_Category->update())
             {
                 header("Location: /Category/");
                 exit();
             }
-            $data['error'] = $this->M_Category->error_validation;
+            $data['error'] = $M_Category->error_validation;
         }
 
-        $data['category'] = $this->M_Category->getById($id);
-
-        //print_r($data['category']);
+        $data['category'] = $M_Category->getById($id)[0];
 
         if(empty($data['category']))
         {
@@ -74,16 +77,20 @@ class Category
      */
     function delete($id)
     {
+        $M_Category = new M_Category($this->user->getId());
+
         if(!empty($_POST) && $_POST['id'] != '')
         {
-            if($this->M_Category->delete()){
+            $M_Category->setId($id);
+
+            if($M_Category->delete()){
                 header("Location: /Category/");
                 exit();
             }
         }
 
-        $data['category'] = $this->M_Category->getById($id);
-        $data['error'] = $this->M_Category->error_validation;
+        $data['category'] = $M_Category->getById($id)[0];
+        $data['error'] = $M_Category->error_validation;
 
         if(empty($data['category']))
         {
@@ -99,23 +106,5 @@ class Category
         }
 
         $this->render($data, 'Delete');
-        $this->start();
     }
-
-    function start()
-    {
-        $this->input();
-        $this->output();
-    }
-
-    function isPost($action)
-    {
-        if($this->M_Category->$action()){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
 }
