@@ -89,9 +89,11 @@
                 $output = '';
                 $arr_id = array();
                 $date_current = 0;
-                foreach ($confirmed_request as $request){
 
-                    if($request->user_id != $user->id)
+                foreach ($confirmed_request as $request)
+                {
+
+                    if($request->user_id != $user->getId())
                     {
 
                         $output .= '<li class="list-group-item">

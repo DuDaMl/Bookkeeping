@@ -70,7 +70,7 @@ class Family
         AND family.status = " . Family::WAITING . "
         AND family.id = " . $id . " 
         LIMIT 1";
-        $request = $this->DB->query($sql, 'fetch');
+        $request = $this->DB->query($sql);
 
         if($request)
         {
@@ -115,7 +115,7 @@ class Family
         WHERE family.id = " . $id . " 
         LIMIT 1";
 
-        $request = $this->DB->query($sql, 'fetch');
+        $request = $this->DB->query($sql);
         if($request)
         {
             return $request;
@@ -297,7 +297,7 @@ class Family
      */
     public function setReceiverByEmail($receiver_email)
     {
-        $receiver = $this->M_User->getByEmail($receiver_email);
+        $receiver = $this->M_User->getByEmail($receiver_email)[0];
 
         // Проверка существования получателя
         if(! empty($receiver))
@@ -348,28 +348,35 @@ class Family
         }
     }
 
-    public function checkRelationshipByIds($sender_id, $receiver_id)
+    protected function checkRelationshipByIds()
     {
+
+        if($this->sender_id == '' || $this->receiver_id == '')
+        {
+            $this->error_validation = array(
+                'error' => true,
+                'text' => 'Несуществующие данные для просмотра',
+            );
+
+            return false;
+        }
+
         $sql = "SELECT *
         FROM `family` 
-        WHERE receiver_id = " . $receiver_id ."
-        AND sender_id = " . $sender_id ."
-        OR receiver_id = " . $sender_id ."
-        AND sender_id = " . $receiver_id ;
-
+        WHERE receiver_id = :receiver_id 
+        AND sender_id = :sender_id
+        OR receiver_id = :receiver_id 
+        AND sender_id = :sender_id" ;
 
         $values = [
             'sender_id' => $this->sender_id,
             'receiver_id' => $this->receiver_id
         ];
 
-        $result = $this->DB->query($sql);
-
-        //print_r($result);
+        $result = $this->DB->execute($sql, $values);
 
         if($result)
         {
-
             return true;
         } else {
             $this->error_validation = array(
@@ -386,10 +393,8 @@ class Family
      * @param $receiver_email
      * @return bool
      */
-    public function create($sender_id, $receiver_email)
+    public function create($receiver_email)
     {
-        $this->sender_id = $sender_id;
-
         // Проверка существования пользователя с данным Email
         if(! $this->setReceiverByEmail($receiver_email))
         {
@@ -407,12 +412,8 @@ class Family
         }
 
         // проверка существования подобного запроса
-        if($this->checkRelationshipByIds($this->sender_id, $this->receiver_id))
+        if(! $this->checkRelationshipByIds())
         {
-            $this->error_validation = array(
-                'error' => true,
-                'text' => 'Не стоит добавлять более одного запроса на человека',
-            );
             return false;
         }
 
@@ -428,6 +429,7 @@ class Family
                     :status,
                     :date
                     )";
+
         $date = date('Y-m-d');
         $this->status = Family::WAITING;
 
@@ -439,7 +441,5 @@ class Family
         ];
 
         return $this->DB->execute($sql, $values);
-
     }
-
 }
