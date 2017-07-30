@@ -1,5 +1,3 @@
-<?php include_once(__DIR__ . '/../Header.php'); ?>
-
 <?php
 ?>
 <!-- Main component for a primary marketing message or call to action -->
@@ -10,7 +8,7 @@
     <p><?= $income->description; ?> </p>
     <p><?= $income->amount; ?> грн </p>
     <p><?= $income->date; ?> </p>
-    <form action="<?= $controller_name?>/delete/" method="post">
+    <form action="/<?= $controller_name?>/delete/<?=$income->id?>" method="post">
         <input type="hidden" min="0" step="1" name="id" value="<?=$income->id?>">
         <button type="submit" class="btn btn-default">Удалить</button>
         <br/>
@@ -34,9 +32,3 @@
 </div>
 
 </div> <!-- /container -->
-
-<?php include_once(__DIR__ . '/../Footer.php'); ?>
-
-
-</body>
-</html>

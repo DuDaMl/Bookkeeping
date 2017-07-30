@@ -4,7 +4,7 @@ use \bookkeeping\Models\DB;
 use \PDO;
 
 /**
- * Класс предназначен для создания/обновления/возвращения параметров настроек для контроллера Pay
+ * Класс предназначен для создания/обновления/возвращения параметров настроек для контроллера Income
  * @package bookkeeping\Models\Settings
  */
 class IncomeSetting extends Setting
@@ -19,7 +19,7 @@ class IncomeSetting extends Setting
     public $error_validation;
 
     /**
-     * PaySetting constructor.
+     * IncomeSetting constructor.
      * Загрузка настроек по указаному user_id
      * Инициализация user_id
      * @param int $user_id - id авторихзированного пользователя
@@ -44,7 +44,7 @@ class IncomeSetting extends Setting
             return false;
         }
 
-        $sql = "SELECT * FROM `" . PaySetting::TABLE_NAME . "`" .
+        $sql = "SELECT * FROM `" . IncomeSetting::TABLE_NAME . "`" .
             " WHERE  user_id = " . $this->user_id . "
                LIMIT 1";
 

@@ -74,7 +74,10 @@ class Pay
 
         // загрузка всех категорий расходов
         $data['categories'] = M_Category::getAll($this->user->getId(), self::CONTROLLER_NAME);
-        $this->render($data);
+        $data['controller_name'] = self::getMainTeamplate();
+
+        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $this->render();
     }
 
     /**
@@ -130,7 +133,9 @@ class Pay
             }
         }
 
-        $this->render($data, 'Edit');
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Edit.php', $data);
+        $this->render();
     }
 
     /**
@@ -167,6 +172,8 @@ class Pay
             }
         }
 
-        $this->render($data, 'Delete');
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Delete.php', $data);
+        $this->render();
     }
 }

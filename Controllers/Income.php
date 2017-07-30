@@ -74,7 +74,9 @@ class Income
 
         // загрузка всех категорий расходов
         $data['categories'] = M_Category::getAll($this->user->getId(), self::CONTROLLER_NAME);
-        $this->render($data);
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $this->render();
     }
 
     /**
@@ -130,7 +132,10 @@ class Income
             }
         }
 
-        $this->render($data, 'Edit');
+
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Edit.php', $data);
+        $this->render();
     }
 
     /**
@@ -138,6 +143,7 @@ class Income
      */
     function delete($id)
     {
+
         $M_Income =  M_Income::getById($id)[0];
 
         if(empty($M_Income))
@@ -167,6 +173,9 @@ class Income
             }
         }
 
-        $this->render($data, 'Delete');
+
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Delete.php', $data);
+        $this->render();
     }
 }

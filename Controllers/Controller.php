@@ -7,6 +7,7 @@ class Controller
     protected static $main_teamplate;
 
     protected $user;
+    protected $content;
 
     function __construct()
     {
@@ -50,18 +51,18 @@ class Controller
         return static::$main_teamplate;
     }
 
-    function render(array $data, $view = 'Index')
+    function render()
     {
-        foreach ($data as $k => $v) {
-            $$k = $v;
-        }
-
-        // переменная для указания активного пункта главного меню
         $current_page = self::getMainTeamplate();
         $controller_name = self::getMainTeamplate();
-        $user = $this->user;
 
-        return include (__DIR__ . '/../View/' . self::getMainTeamplate() . '/' . $view . '.php');
+        $content = $this->content;
+        $user = $this->user;
+        ob_start();
+        include ('View/Main.php');
+        echo ob_get_clean();
+
+
     }
 
     function getView(string $path, array $params)
@@ -72,7 +73,7 @@ class Controller
             $$k = $v;
         }
 
-        include ($path);
+        include ('View/' . $path);
         return ob_get_clean();
     }
 }

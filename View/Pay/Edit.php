@@ -1,9 +1,3 @@
-<?php include_once(__DIR__ . '/../Header.php'); ?>
-
-<?
-
-print_r($pay);
-?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <h1>Расходы</h1>
@@ -88,9 +82,3 @@ print_r($pay);
 </div>
 
 </div> <!-- /container -->
-
-<?php include_once(__DIR__ . '/../Footer.php'); ?>
-
-
-</body>
-</html>

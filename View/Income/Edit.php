@@ -1,4 +1,3 @@
-<?php include_once(__DIR__ . '/../Header.php'); ?>
 
 <?php
 ?>
@@ -7,7 +6,7 @@
     <h1>Расходы</h1>
     <h2>Редактирование расходов</h2>
 
-    <form action="/<?= $controller_name ?>/edit/" method="post">
+    <form action="/<?= $controller_name ?>/edit/<?=$income->id?>" method="post">
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">
@@ -76,8 +75,4 @@
 
 </div> <!-- /container -->
 
-<?php include_once(__DIR__ . '/../Footer.php'); ?>
 
-
-</body>
-</html>

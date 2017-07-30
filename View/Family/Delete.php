@@ -1,4 +1,3 @@
-<?php include_once(__DIR__ . '/../Header.php'); ?>
 
 <?php
 //stdClass Object ( [id] => 10 [date] => 2017-06-29 [family_name] => Dtest [given_name] => test [picture] => http://s1.iconbird.com/ico/2013/12/505/w450h4001385925286User.png )
@@ -34,9 +33,3 @@
 </div>
 
 </div> <!-- /container -->
-
-<?php include_once(__DIR__ . '/../Footer.php'); ?>
-
-
-</body>
-</html>

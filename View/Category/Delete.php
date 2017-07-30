@@ -1,4 +1,3 @@
-<?php include_once(__DIR__ . '/../Header.php'); ?>
 
 <?php
 ?>
@@ -32,9 +31,3 @@
 </div>
 
 </div> <!-- /container -->
-
-<?php include_once(__DIR__ . '/../Footer.php'); ?>
-
-
-</body>
-</html>

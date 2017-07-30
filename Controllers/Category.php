@@ -8,6 +8,7 @@ use bookkeeping\Models\Category as M_Category;
 class Category
     extends Controller
 {
+    const CONTROLLER_NAME = 'Category';
     protected static $main_teamplate = 'Category';
 
     public function __construct()
@@ -35,7 +36,10 @@ class Category
         $data['categories_pays'] = $M_Category->getAllPays();
         $data['categories_incomes'] = $M_Category->getAllIncomes();
         $data['error'] = $M_Category->error_validation;
-        $this->render($data);
+
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $this->render();
     }
 
     function edit($id)
@@ -69,7 +73,9 @@ class Category
             }
         }
 
-        $this->render($data, 'Edit');
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Edit.php', $data);
+        $this->render();
     }
 
     /**
@@ -105,6 +111,8 @@ class Category
             }
         }
 
-        $this->render($data, 'Delete');
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Delete.php', $data);
+        $this->render();
     }
 }

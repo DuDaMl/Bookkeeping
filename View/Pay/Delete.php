@@ -1,7 +1,3 @@
-<?php include_once(__DIR__ . '/../Header.php'); ?>
-
-<?php
-?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <h1>Расходы</h1>
@@ -40,8 +36,4 @@
 
 </div> <!-- /container -->
 
-<?php include_once(__DIR__ . '/../Footer.php'); ?>
 
-
-</body>
-</html>

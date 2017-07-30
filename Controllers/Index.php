@@ -27,7 +27,9 @@ class Index
 
     function index()
     {
-        $this->render(array('1' => 1), 'Index');
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $this->render();
     }
 
     function login()

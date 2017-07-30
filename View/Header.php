@@ -35,7 +35,7 @@
                     <span class="icon-bar">2</span>
                     <span class="icon-bar">3</span>
                 </button>
-                <a class="navbar-brand" href="#">Project name</a>
+                <a class="navbar-brand" href="/">Bookkeeping</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">

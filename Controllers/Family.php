@@ -9,6 +9,7 @@ use bookkeeping\Models\Category as M_Category;
 class Family
     extends Controller
 {
+    const CONTROLLER_NAME = 'Family';
     protected static $main_teamplate = 'Family';
 
     function __construct()
@@ -41,8 +42,12 @@ class Family
         $data['incomig_request'] = $M_Family->getIncomeRequest($this->user->getId());
         $data['waiting_request'] = $M_Family->getSendedRequest($this->user->getId());
         $data['confirmed_request'] = $M_Family->getConfirmedRequest($this->user->getId());
-        $data['user'] = $this->user->getId();
-        $this->render($data);
+        $data['user_id'] = $this->user->getId();
+
+        $data['controller_name'] = self::getMainTeamplate();
+
+        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $this->render();
     }
 
     /**
@@ -76,7 +81,9 @@ class Family
             $data['relationship'] = $relationship;
         }
 
-        $this->render($data, 'Confirme');
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Confirme.php', $data);
+        $this->render();
     }
 
     /**
@@ -135,7 +142,9 @@ class Family
             $data['deleting_user'] = $user;
         }
 
-        $this->render($data, 'Delete');
+        $data['controller_name'] = self::getMainTeamplate();
+        $this->content = $this->getView(self::getMainTeamplate() . '/Delete.php', $data);
+        $this->render();
     }
 
     /**
@@ -171,6 +180,9 @@ class Family
             $data['relationship'] = $relationship;
         }
 
-        $this->render($data, 'Cancel');
+        $data['controller_name'] = self::getMainTeamplate();
+
+        $this->content = $this->getView(self::getMainTeamplate() . '/Cancel.php', $data);
+        $this->render();
     }
 }

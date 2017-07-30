@@ -1,4 +1,3 @@
-<?php include_once(__DIR__ . '/../Header.php'); ?>
 <?php
 ?>
 <!-- Main component for a primary marketing message or call to action -->
@@ -37,8 +36,10 @@
                 $date_current = 0;
                 foreach ($incomig_request as $request){
                     $output .= '<li class="list-group-item">
-                        <a href="/' . $controller_name . '/confirm/' . $request->id . '" style="margin-right:10px;"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
-                        <a href="/' . $controller_name . '/cancel/' . $request->id . '" style="margin-right:10px;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                        <a href="/' . $controller_name . '/confirm/' . $request->id . '" style="margin-right:10px;">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
+                        <a href="/' . $controller_name . '/cancel/' . $request->id . '" style="margin-right:10px;">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                        '
                         . '<span style="margin-left: 10px; float: right">' . $request->date . '</span>
                          <span>' . $request->family_name . " " .  $request->given_name . '</span> <img src="' . $request->picture . '" style="max-width: 20px; float: right">
@@ -93,7 +94,7 @@
                 foreach ($confirmed_request as $request)
                 {
 
-                    if($request->user_id != $user->getId())
+                    if($request->user_id != $user_id)
                     {
 
                         $output .= '<li class="list-group-item">
@@ -122,8 +123,3 @@
 
 </div> <!-- /container -->
 
-<?php include_once(__DIR__ . '/../Footer.php'); ?>
-
-
-</body>
-</html>

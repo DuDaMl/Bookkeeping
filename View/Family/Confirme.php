@@ -1,7 +1,3 @@
-<?php include_once(__DIR__ . '/../Header.php'); ?>
-
-<?php
-?>
 <?php
 // Отображение ошибок добавления новой записи
 if(isset($data['error']))
@@ -35,9 +31,3 @@ if(isset($data['error']))
 </div>
 
 </div> <!-- /container -->
-
-<?php include_once(__DIR__ . '/../Footer.php'); ?>
-
-
-</body>
-</html>

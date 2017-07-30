@@ -48,7 +48,7 @@ class Income
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  id = " . $id;
         $DB = DB::getInstance();
-        $answer = $DB->query($sql);
+        $answer = $DB->query($sql, static::class);
         return $answer;
     }
 
