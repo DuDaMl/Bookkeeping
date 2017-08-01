@@ -139,9 +139,14 @@
     </div>
     <ul class="list-group">
         <?php
+        // проверка существования $income
+        if(! empty($incomes))
+        {
+
         $output = '';
         $date_current = 0;
-        foreach ($incomes as $income){
+        foreach ($incomes as $income)
+        {
 
             $date = $income->date;
             if($date != $date_current){
@@ -164,6 +169,9 @@
             $date_current = $income->date;
         }
         echo $output;
+        } else {
+            echo '<div class="alert alert-info" role="alert"><p>За данный период нет данных</p></div>';
+        }
         ?>
     </ul>
 

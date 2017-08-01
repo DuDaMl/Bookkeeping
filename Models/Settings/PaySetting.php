@@ -68,8 +68,7 @@ class PaySetting extends Setting
      */
     public function update()
     {
-        if( empty( $this->user_id ) ||
-            empty( $this->date_start ) ||
+        if( empty( $this->date_start ) ||
             empty( $this->date_end ) ||
             $this->format == ''
         )
@@ -164,7 +163,6 @@ class PaySetting extends Setting
         {
             return false;
         }
-
         return true;
     }
 }

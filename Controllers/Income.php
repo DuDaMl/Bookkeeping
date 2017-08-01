@@ -25,6 +25,11 @@ class Income
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
         {
+            $M_IncomeSetting->prepareFormat($_POST);
+            $M_IncomeSetting->update();
+            header('Location: /' . Income::CONTROLLER_NAME . "/");
+
+            /*
             $datatime_name = $_POST["format"];
             $M_IncomeSetting->date_start = $_POST[$datatime_name];
             $M_IncomeSetting->format = $_POST['format'];
@@ -38,7 +43,8 @@ class Income
                 );
             } else {
                 header('Location: /' . Income::CONTROLLER_NAME . "/");
-            }
+            }*/
+
         }
 
         if(!empty($_POST) && isset($_POST['category_id']))
@@ -60,15 +66,11 @@ class Income
             $data['error'] = $M_Income->error_validation;
         }
 
-        // параметры контроллера
-        $M_IncomeSetting->user_id = $this->user->getId();
-
-
         // настройки представления
         $data['settings'] = $M_IncomeSetting;
 
         // загрузка всех платежей текущего месяца
-        $data['incomes'] = M_Income::getAll(  $M_IncomeSetting->user_id,
+        $data['incomes'] = M_Income::getAll(  $this->user->getId(),
             $M_IncomeSetting->date_start,
             $M_IncomeSetting->date_end);
 
