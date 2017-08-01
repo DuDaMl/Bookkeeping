@@ -12,7 +12,7 @@ class PaySetting extends Setting
     CONST TABLE_NAME = 'pay_setting';
 
     private $id;
-    public $user_id;
+    private $user_id;
     public $date_start;
     public $date_end;
     public $format;
@@ -29,21 +29,16 @@ class PaySetting extends Setting
         $this->user_id = $user_id;
 
         // Загрузка данных по user_id
-        $this->getSettingsByUserId();
+        $this->get();
     }
 
     /**
-     * Возвращает запись из БД для указанного user_id
+     * Возвращает запись из БД для user_id
      * Или значение по умолчанию
      * @return object | Обьект с полями значений настроек
      */
-    public function getSettingsByUserId()
+    public function get()
     {
-        if(! $this->user_id)
-        {
-            return false;
-        }
-
        $sql = "SELECT * FROM `" . PaySetting::TABLE_NAME . "`" .
               " WHERE  user_id = " . $this->user_id . "
                LIMIT 1";
@@ -71,17 +66,15 @@ class PaySetting extends Setting
      * Обновление настроек в БД
      * @return bool
      */
-    public function updateSettingByUserId()
+    public function update()
     {
-        if(empty($this->user_id) ||
-        empty($this->date_start) ||
-        $this->format == '')
+        if( empty( $this->user_id ) ||
+            empty( $this->date_start ) ||
+            empty( $this->date_end ) ||
+            $this->format == ''
+        )
         {
-            return false;
-        }
-
-        if(! $this->prepareFormat($this->date_start))
-        {
+            // Error epmtyData
             return false;
         }
 
@@ -135,26 +128,27 @@ class PaySetting extends Setting
     }
 
     /**
-     * Функция подготовки параметров настроек для контроллера перед сохранением в БД
+     * Функция подготовки параметров перед сохранением в БД
      * @return
      */
-    public function prepareFormat($date)
+    public function prepareFormat(array $date)
     {
-        $date = trim($date);
+        $this->format = trim($date['format']);
+        $date_mask = $date[$this->format];
 
         switch($this->format)
         {
             case 'day':
-                $data_report_start = $date;
-                $data_report_end = $date;
+                $data_report_start = $date_mask;
+                $data_report_end = $date_mask;
                 break;
             case 'month':
-                $data_report_start = $date . "-01";
-                $data_report_end = $date . "-31";
+                $data_report_start = $date_mask . "-01";
+                $data_report_end = $date_mask . "-31";
                 break;
             case 'year':
-                $data_report_start = $date . "-01-01";
-                $data_report_end = $date . "-12-31";
+                $data_report_start = $date_mask . "-01-01";
+                $data_report_end = $date_mask . "-12-31";
                 break;
             default:
                 $data_report_start = date('Y-m-01');

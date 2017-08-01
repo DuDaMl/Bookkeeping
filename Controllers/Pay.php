@@ -19,26 +19,15 @@ class Pay
 
     function index()
     {
-        // Сохраненные настройки для контроллера.
+        // Настройки для контроллера.
         $M_PaySetting = new M_PaySetting($this->user->getId());
 
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
         {
-            $datatime_name = $_POST["format"];
-            $M_PaySetting->date_start = $_POST[$datatime_name];
-            $M_PaySetting->format = $_POST['format'];
-
-            if(! $M_PaySetting->updateSettingByUserId())
-            {
-                // ошибки установки настроек контроллера
-                $data['error'] = array(
-                    'error' => true,
-                    'text' => 'Не удалось внести настройки выбора по дате.  Загружены данные по умоляванию'
-                );
-            } else {
-                header('Location: /' . Pay::CONTROLLER_NAME . "/");
-            }
+            $M_PaySetting->prepareFormat($_POST);
+            $M_PaySetting->update();
+            header('Location: /' . Pay::CONTROLLER_NAME . "/");
         }
 
         if(!empty($_POST) && isset($_POST['category_id']))
@@ -61,19 +50,18 @@ class Pay
         }
 
         // параметры контроллера
-        $M_PaySetting->user_id = $this->user->getId();
-
+        //$M_PaySetting->user_id = $this->user->getId();
 
         // настройки представления
         $data['settings'] = $M_PaySetting;
 
         // загрузка всех платежей текущего месяца
-        $data['pays'] = M_Pay::getAll(  $M_PaySetting->user_id,
+        $data['pays'] = M_Pay::getAll(  $this->user->getId(),
                                         $M_PaySetting->date_start,
                                         $M_PaySetting->date_end);
 
         // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll($this->user->getId(), self::CONTROLLER_NAME);
+        $data['categories'] = M_Category::getAll($this->user->getId(), static::CONTROLLER_NAME);
         $data['controller_name'] = self::getMainTeamplate();
 
         $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
@@ -85,8 +73,16 @@ class Pay
      * @param $id
      *
      */
-    function edit($id)
+    function edit(int $id)
     {
+        //echo $id; echo "<br/>";
+
+        if(! is_int($id))
+        {
+            $ex = new \TypeError('id должно быть целове число.');
+            throw $ex;
+        }
+
         $M_Pay =  M_Pay::getById($id)[0];
 
         if(empty($M_Pay))
@@ -126,7 +122,7 @@ class Pay
                 $user_id = $this->user->getId();
 
                 // Категории заданного типа (Расходы | Доходы | другое)
-                $type_of_category = self::CONTROLLER_NAME;
+                $type_of_category = static::CONTROLLER_NAME;
 
                 // загрузка всех категорий расходов
                 $data['categories'] = M_Category::getAll($user_id, $type_of_category);
