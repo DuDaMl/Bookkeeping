@@ -32,7 +32,7 @@ class Pay
 
         if(!empty($_POST) && isset($_POST['category_id']))
         {
-            $M_Pay =  new M_Pay();
+            $M_Pay = new M_Pay();
             $M_Pay->amount = $_POST['amount'];
             $M_Pay->description = $_POST['description'];
             $M_Pay->category_id = $_POST['category_id'];
