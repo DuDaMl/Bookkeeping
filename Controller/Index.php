@@ -1,7 +1,7 @@
 <?php
-namespace bookkeeping\Controllers;
-use bookkeeping\Controllers\Controller as Controller;
-use bookkeeping\Models\User as M_User;
+namespace bookkeeping\Controller;
+use bookkeeping\Controller\Controller as Controller;
+use bookkeeping\Model\User as M_User;
 
 class Index
     extends Controller

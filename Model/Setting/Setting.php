@@ -1,11 +1,11 @@
 <?php
-namespace bookkeeping\Models\Settings;
-use \bookkeeping\Models\DB;
+namespace bookkeeping\Model\Setting;
+use \bookkeeping\Model\DB;
 use \PDO;
 
 class Setting
 {
-    use \bookkeeping\Models\Traits\ValidateDate;
+    use \bookkeeping\Model\Traits\ValidateDate;
 
     const TABLE_NAME = 'setting';
 

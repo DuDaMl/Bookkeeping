@@ -2,7 +2,7 @@
 session_start();
 require('vendor/autoload.php');
 header('Content-type: text/html; charset=utf-8');
-use bookkeeping\Models\Route;
+use bookkeeping\Model\Route;
 use bookkeeping\Core\ErrorHandler;
 
 

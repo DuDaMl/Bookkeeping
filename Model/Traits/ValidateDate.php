@@ -1,5 +1,5 @@
 <?php
-namespace bookkeeping\Models\Traits;
+namespace bookkeeping\Model\Traits;
 use \DateTime;
 
 trait ValidateDate

@@ -1,8 +1,8 @@
 <?php
-namespace bookkeeping\Controllers;
-use bookkeeping\Controllers\Controller as Controller;
-use bookkeeping\Models\Pay as M_Pay;
-use bookkeeping\Models\Category as M_Category;
+namespace bookkeeping\Controller;
+use bookkeeping\Controller\Controller as Controller;
+use bookkeeping\Model\Pay as M_Pay;
+use bookkeeping\Model\Category as M_Category;
 
 
 class Category

@@ -1,7 +1,7 @@
 <?php
-namespace bookkeeping\Models;
+namespace bookkeeping\Model;
 use PDO;
-use bookkeeping\Models\Core\Singleton;
+use bookkeeping\Model\Core\Singleton;
 
 class DB
     extends Singleton

@@ -1,6 +1,6 @@
 <?php
 
-namespace bookkeeping\Models\Core;
+namespace bookkeeping\Model\Core;
 
 abstract class Singleton
 {

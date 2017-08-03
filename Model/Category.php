@@ -1,5 +1,5 @@
 <?php
-namespace bookkeeping\Models;
+namespace bookkeeping\Model;
 use \PDO;
 
 class Category

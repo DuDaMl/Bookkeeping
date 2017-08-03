@@ -1,11 +1,9 @@
 <?php
-namespace bookkeeping\Controllers;
-use bookkeeping\Models\User as User;
+namespace bookkeeping\Controller;
+use bookkeeping\Model\User as User;
 
 class Controller
 {
-    protected static $main_teamplate;
-
     protected $user;
     protected $content;
 
@@ -44,11 +42,6 @@ class Controller
             }
         }
 
-    }
-
-    public static function getMainTeamplate()
-    {
-        return static::$main_teamplate;
     }
 
     function render()

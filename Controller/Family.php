@@ -1,10 +1,10 @@
 <?php
-namespace bookkeeping\Controllers;
-use bookkeeping\Controllers\Controller as Controller;
-use bookkeeping\Models\Setting as M_Setting;
-use bookkeeping\Models\User as M_User;
-use bookkeeping\Models\Family as M_Family;
-use bookkeeping\Models\Category as M_Category;
+namespace bookkeeping\Controller;
+use bookkeeping\Controller\Controller as Controller;
+use bookkeeping\Model\Setting as M_Setting;
+use bookkeeping\Model\User as M_User;
+use bookkeeping\Model\Family as M_Family;
+use bookkeeping\Model\Category as M_Category;
 
 class Family
     extends Controller

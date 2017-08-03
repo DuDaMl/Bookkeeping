@@ -1,5 +1,5 @@
 <?php
-namespace bookkeeping\Models\Settings;
+namespace bookkeeping\Model\Setting;
 
 /**
  * Класс предназначен для создания/обновления/возвращения параметров настроек для контроллера Income

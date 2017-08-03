@@ -1,10 +1,10 @@
 <?php
-namespace bookkeeping\Controllers;
-use bookkeeping\Controllers\Controller as Controller;
-use bookkeeping\Models\User as M_User;
-use bookkeeping\Models\Settings\PaySetting as M_PaySetting;
-use bookkeeping\Models\Pay as M_Pay;
-use bookkeeping\Models\Category as M_Category;
+namespace bookkeeping\Controller;
+use bookkeeping\Controller\Controller as Controller;
+use bookkeeping\Model\User as M_User;
+use bookkeeping\Model\Setting\PaySetting as M_PaySetting;
+use bookkeeping\Model\Pay as M_Pay;
+use bookkeeping\Model\Category as M_Category;
 
 class Pay
     extends Controller
@@ -56,14 +56,13 @@ class Pay
         $data['categories'] = M_Category::getAll($this->user->getId(), static::CONTROLLER_NAME);
         $data['controller_name'] = static::CONTROLLER_NAME;
 
-        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
     }
 
     /**
      * Редактирование записи (Платёж)
      * @param $id
-     *
      */
     function edit(int $id)
     {

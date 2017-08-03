@@ -1,10 +1,10 @@
 <?php
-namespace bookkeeping\Models;
+namespace bookkeeping\Model;
 
 class Model
 {
-    use \bookkeeping\Models\Traits\ValidateDate;
-    use \bookkeeping\Models\Traits\ValidateInt;
+    use \bookkeeping\Model\Traits\ValidateDate;
+    use \bookkeeping\Model\Traits\ValidateInt;
 
     public $id;
     public $user_id;

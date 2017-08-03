@@ -1,11 +1,11 @@
 <?php
-namespace bookkeeping\Models;
+namespace bookkeeping\Model;
 
-use bookkeeping\Controllers\Index;// as Pay;
-use bookkeeping\Controllers\Pay;// as Pay;
-use bookkeeping\Controllers\Income;// as Income;
-use bookkeeping\Controllers\Category;// as Category;
-use bookkeeping\Controllers\Family;// as Family;
+use bookkeeping\Controller\Index;// as Pay;
+use bookkeeping\Controller\Pay;// as Pay;
+use bookkeeping\Controller\Income;// as Income;
+use bookkeeping\Controller\Category;// as Category;
+use bookkeeping\Controller\Family;// as Family;
 
 final class Route {
 

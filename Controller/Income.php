@@ -1,10 +1,10 @@
 <?php
-namespace bookkeeping\Controllers;
-use bookkeeping\Controllers\Controller as Controller;
-use bookkeeping\Models\User as M_User;
-use bookkeeping\Models\Settings\IncomeSetting as M_IncomeSetting;
-use bookkeeping\Models\Income as M_Income;
-use bookkeeping\Models\Category as M_Category;
+namespace bookkeeping\Controller;
+use bookkeeping\Controller\Controller as Controller;
+use bookkeeping\Model\User as M_User;
+use bookkeeping\Model\Setting\IncomeSetting as M_IncomeSetting;
+use bookkeeping\Model\Income as M_Income;
+use bookkeeping\Model\Category as M_Category;
 
 class Income
     extends Controller

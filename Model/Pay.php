@@ -1,7 +1,7 @@
 <?php
-namespace bookkeeping\Models;
+namespace bookkeeping\Model;
 
-use bookkeeping\Models\Settings\Setting;
+use bookkeeping\Model\Setting\Setting;
 
 class Pay extends Model
 {
