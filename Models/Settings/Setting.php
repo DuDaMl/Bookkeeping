@@ -28,6 +28,11 @@ class Setting
         $this->get();
     }
 
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
     /**
      * Заполняет поля обхекта по инициализированному параметру user_id
      * Или значение по умолчанию

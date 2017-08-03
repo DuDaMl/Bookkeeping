@@ -53,8 +53,8 @@ class Controller
 
     function render()
     {
-        $current_page = self::getMainTeamplate();
-        $controller_name = self::getMainTeamplate();
+        $current_page = static::CONTROLLER_NAME;
+        $controller_name = static::CONTROLLER_NAME;
 
         $content = $this->content;
         $user = $this->user;

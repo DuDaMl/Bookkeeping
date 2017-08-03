@@ -27,42 +27,34 @@ class Pay
         {
             $M_PaySetting->prepareFormat($_POST);
             $M_PaySetting->update();
-            header('Location: /' . Pay::CONTROLLER_NAME . "/");
+            header('Location: /' . static::CONTROLLER_NAME . "/");
+            exit();
         }
 
         if(!empty($_POST) && isset($_POST['category_id']))
         {
             $M_Pay = new M_Pay();
-            $M_Pay->amount = $_POST['amount'];
-            $M_Pay->description = $_POST['description'];
-            $M_Pay->category_id = $_POST['category_id'];
-            $M_Pay->user_id = $this->user->getId();
-            $M_Pay->date = $_POST['date'];
+            $_POST['user_id'] = $this->user->getId();
+            $M_Pay->prepareFormat($_POST);
 
             if($M_Pay->create())
             {
-                header("Location: /" . self::getMainTeamplate());
+                header("Location: /" . static::CONTROLLER_NAME);
                 exit();
             }
-
-            // ошибки добавления новой записи расходов
-            $data['error'] = $M_Pay->error_validation;
+            // todo обработка ошибок возникшик при создании записи
         }
-
-        // параметры контроллера
-        //$M_PaySetting->user_id = $this->user->getId();
 
         // настройки представления
         $data['settings'] = $M_PaySetting;
 
         // загрузка всех платежей текущего месяца
-        $data['pays'] = M_Pay::getAll(  $this->user->getId(),
-                                        $M_PaySetting->date_start,
-                                        $M_PaySetting->date_end);
+        // todo перенести метод в другую модель
+        $data['pays'] = M_Pay::getAll($M_PaySetting);
 
         // загрузка всех категорий расходов
         $data['categories'] = M_Category::getAll($this->user->getId(), static::CONTROLLER_NAME);
-        $data['controller_name'] = self::getMainTeamplate();
+        $data['controller_name'] = static::CONTROLLER_NAME;
 
         $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
         $this->render();
@@ -75,62 +67,34 @@ class Pay
      */
     function edit(int $id)
     {
-        //echo $id; echo "<br/>";
-
-        if(! is_int($id))
-        {
-            $ex = new \TypeError('id должно быть целове число.');
-            throw $ex;
-        }
-
         $M_Pay =  M_Pay::getById($id)[0];
 
-        if(empty($M_Pay))
+        if(isset($_POST['category_id']) && $_POST['category_id'] != '')
         {
-            $data['error'] =  array(
-                'error' => true,
-                'text' => 'Данный платеж не существует'
-            );
-        } else {
+            $_POST['user_id'] = $this->user->getId();
+            $M_Pay->prepareFormat($_POST);
 
-            if ($M_Pay->user_id != $this->user->getId())
+            if($M_Pay->update())
             {
-                $data['error'] = array(
-                    'error' => true,
-                    'text' => 'Доступ к данной записи закрыт для вас'
-                );
-            } else {
-
-                if(!empty($_POST) && $_POST['category_id'] != '')
-                {
-                    $M_Pay->amount = $_POST['amount'];
-                    $M_Pay->description = $_POST['description'];
-                    $M_Pay->category_id = $_POST['category_id'];
-                    $M_Pay->user_id = $this->user->getId();
-                    $M_Pay->date = $_POST['date'];
-
-                    if($M_Pay->update())
-                    {
-                        header("Location: /" . self::getMainTeamplate());
-                        exit();
-                    }
-                }
-
-                $data['pay'] = $M_Pay;
-
-                // id текущего авторизированного пользователя
-                $user_id = $this->user->getId();
-
-                // Категории заданного типа (Расходы | Доходы | другое)
-                $type_of_category = static::CONTROLLER_NAME;
-
-                // загрузка всех категорий расходов
-                $data['categories'] = M_Category::getAll($user_id, $type_of_category);
+                header("Location: /" . static::CONTROLLER_NAME);
+                exit();
             }
         }
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Edit.php', $data);
+        $data['pay'] = $M_Pay;
+
+        // id текущего авторизированного пользователя
+        $user_id = $this->user->getId();
+
+        // Категории заданного типа (Расходы | Доходы | другое)
+        $type_of_category = static::CONTROLLER_NAME;
+
+        // загрузка всех категорий расходов
+        $data['categories'] = M_Category::getAll($user_id, $type_of_category);
+
+
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Edit.php', $data);
         $this->render();
     }
 
@@ -141,35 +105,18 @@ class Pay
     {
         $M_Pay =  M_Pay::getById($id)[0];
 
-        if(empty($M_Pay))
+        if(!empty($_POST) && $_POST['id'] != '')
         {
-            $data['error'] =  array(
-                'error' => true,
-                'text' => 'Данный платеж не существует'
-            );
-        } else {
-            if ($M_Pay->user_id != $this->user->getId())
-            {
-                $data['error'] = array(
-                    'error' => true,
-                    'text' => 'Доступ к данной записи закрыт для вас'
-                );
-            } else {
-                $data['pay'] = $M_Pay;
-
-                if(!empty($_POST) && $_POST['id'] != '')
-                {
-                    if($M_Pay->delete()){
-                        header("Location: /" . self::getMainTeamplate());
-                        exit();
-                    }
-                }
-
+            if($M_Pay->delete()){
+                header("Location: /" . static::CONTROLLER_NAME);
+                exit();
             }
         }
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Delete.php', $data);
+        $data['pay'] = $M_Pay;
+
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
         $this->render();
     }
 }

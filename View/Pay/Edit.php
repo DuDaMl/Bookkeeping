@@ -7,6 +7,7 @@
     // Скрыть форму для редактирования
     if(! isset($data['error']))
     {
+
     ?>
         <form action="/<?= $controller_name ?>/edit/<?= $pay->id ?>" method="post">
             <div class="row">

@@ -5,7 +5,7 @@ trait ValidateInt
 {
     function validateInt($var)
     {
-        if(! filter_var($this->$var, FILTER_VALIDATE_INT)) {
+        if(! filter_var($var, FILTER_VALIDATE_INT)) {
 
             $this->error_validation = array(
                 'error' => true,
@@ -13,6 +13,6 @@ trait ValidateInt
             );
             return false;
         }
-        return true;
+        return $var;
     }
 }
