@@ -10,7 +10,6 @@ class Income
     extends Controller
 {
     const CONTROLLER_NAME = 'Income';
-    protected static $main_teamplate = 'Income';
 
     function __construct()
     {
@@ -27,57 +26,35 @@ class Income
         {
             $M_IncomeSetting->prepareFormat($_POST);
             $M_IncomeSetting->update();
-            header('Location: /' . Income::CONTROLLER_NAME . "/");
-
-            /*
-            $datatime_name = $_POST["format"];
-            $M_IncomeSetting->date_start = $_POST[$datatime_name];
-            $M_IncomeSetting->format = $_POST['format'];
-
-            if(! $M_IncomeSetting->updateSettingByUserId())
-            {
-                // ошибки установки настроек контроллера
-                $data['error'] = array(
-                    'error' => true,
-                    'text' => 'Не удалось внести настройки выбора по дате.  Загружены данные по умоляванию'
-                );
-            } else {
-                header('Location: /' . Income::CONTROLLER_NAME . "/");
-            }*/
-
+            header('Location: /' . static::CONTROLLER_NAME . "/");
+            exit();
         }
 
         if(!empty($_POST) && isset($_POST['category_id']))
         {
             $M_Income =  new M_Income();
-            $M_Income->amount = $_POST['amount'];
-            $M_Income->description = $_POST['description'];
-            $M_Income->category_id = $_POST['category_id'];
-            $M_Income->user_id = $this->user->getId();
-            $M_Income->date = $_POST['date'];
+            $_POST['user_id'] = $this->user->getId();
+            $M_Income->prepareFormat($_POST);
 
             if($M_Income->create())
             {
-                header("Location: /" . self::getMainTeamplate());
+                header("Location: /" . static::CONTROLLER_NAME);
                 exit();
             }
 
-            // ошибки добавления новой записи расходов
-            $data['error'] = $M_Income->error_validation;
+            // todo обработка ошибок возникшик при создании записи
         }
 
         // настройки представления
         $data['settings'] = $M_IncomeSetting;
 
         // загрузка всех платежей текущего месяца
-        $data['incomes'] = M_Income::getAll(  $this->user->getId(),
-            $M_IncomeSetting->date_start,
-            $M_IncomeSetting->date_end);
+        $data['incomes'] = M_Income::getAll($M_IncomeSetting);
 
         // загрузка всех категорий расходов
         $data['categories'] = M_Category::getAll($this->user->getId(), self::CONTROLLER_NAME);
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
     }
 
@@ -88,55 +65,36 @@ class Income
      */
     function edit($id)
     {
+        // todo права на редактирование данной записи
+        // todo существование данной записи
         $M_Income =  M_Income::getById($id)[0];
 
-        if(empty($M_Income))
+        if(!empty($_POST) && $_POST['category_id'] != '')
         {
-            $data['error'] =  array(
-                'error' => true,
-                'text' => 'Данный платеж не существует'
-            );
-        } else {
+            $_POST['user_id'] = $this->user->getId();
+            $M_Income->prepareFormat($_POST);
 
-            if ($M_Income->user_id != $this->user->getId())
+            if($M_Income->update())
             {
-                $data['error'] = array(
-                    'error' => true,
-                    'text' => 'Доступ к данной записи закрыт для вас'
-                );
-            } else {
-
-                if(!empty($_POST) && $_POST['category_id'] != '')
-                {
-                    $M_Income->amount = $_POST['amount'];
-                    $M_Income->description = $_POST['description'];
-                    $M_Income->category_id = $_POST['category_id'];
-                    $M_Income->user_id = $this->user->getId();
-                    $M_Income->date = $_POST['date'];
-
-                    if($M_Income->update())
-                    {
-                        header("Location: /" . self::getMainTeamplate());
-                        exit();
-                    }
-                }
-
-                $data['income'] = $M_Income;
-
-                // id текущего авторизированного пользователя
-                $user_id = $this->user->getId();
-
-                // Категории заданного типа (Расходы | Доходы | другое)
-                $type_of_category = self::CONTROLLER_NAME;
-
-                // загрузка всех категорий расходов
-                $data['categories'] = M_Category::getAll($user_id, $type_of_category);
+                header("Location: /" . static::CONTROLLER_NAME);
+                exit();
             }
         }
 
+        $data['income'] = $M_Income;
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Edit.php', $data);
+        // id текущего авторизированного пользователя
+        $user_id = $this->user->getId();
+
+        // Категории заданного типа (Расходы | Доходы | другое)
+        $type_of_category = self::CONTROLLER_NAME;
+
+        // загрузка всех категорий расходов
+        $data['categories'] = M_Category::getAll($user_id, $type_of_category);
+
+
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Edit.php', $data);
         $this->render();
     }
 
@@ -146,38 +104,23 @@ class Income
     function delete($id)
     {
 
+        // todo права на редактирование данной записи
+        // todo существование данной записи
         $M_Income =  M_Income::getById($id)[0];
 
-        if(empty($M_Income))
+
+        if(!empty($_POST) && $_POST['id'] != '')
         {
-            $data['error'] =  array(
-                'error' => true,
-                'text' => 'Данный платеж не существует'
-            );
-        } else {
-            if ($M_Income->user_id != $this->user->getId())
-            {
-                $data['error'] = array(
-                    'error' => true,
-                    'text' => 'Доступ к данной записи закрыт для вас'
-                );
-            } else {
-                $data['income'] = $M_Income;
-
-                if(!empty($_POST) && $_POST['id'] != '')
-                {
-                    if($M_Income->delete()){
-                        header("Location: /" . self::getMainTeamplate());
-                        exit();
-                    }
-                }
-
+            if($M_Income->delete()){
+                header("Location: /" . static::CONTROLLER_NAME);
+                exit();
             }
         }
 
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Delete.php', $data);
+        $data['income'] = $M_Income;
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
         $this->render();
     }
 }

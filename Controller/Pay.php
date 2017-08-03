@@ -10,7 +10,6 @@ class Pay
     extends Controller
 {
     const CONTROLLER_NAME = 'Pay';
-    protected static $main_teamplate = 'Pay';
 
     function __construct()
     {
@@ -66,6 +65,8 @@ class Pay
      */
     function edit(int $id)
     {
+        // todo права на редактирование данной записи
+        // todo существование данной записи
         $M_Pay =  M_Pay::getById($id)[0];
 
         if(isset($_POST['category_id']) && $_POST['category_id'] != '')
@@ -102,6 +103,8 @@ class Pay
      */
     function delete($id)
     {
+        // todo права на редактирование данной записи
+        // todo существование данной записи
         $M_Pay =  M_Pay::getById($id)[0];
 
         if(!empty($_POST) && $_POST['id'] != '')

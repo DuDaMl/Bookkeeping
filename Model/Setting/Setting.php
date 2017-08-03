@@ -1,6 +1,7 @@
 <?php
 namespace bookkeeping\Model\Setting;
 use \bookkeeping\Model\DB;
+//
 use \PDO;
 
 class Setting

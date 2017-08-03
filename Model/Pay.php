@@ -5,15 +5,9 @@ use bookkeeping\Model\Setting\Setting;
 
 class Pay extends Model
 {
-
     const TABLE_NAME = 'pay';
 
-    public $error_validation;
-
-    function __construct()
-    {
-        //$DB = DB::getInstance();
-    }
+    function __construct(){}
 
     /**
      * return all pays from pointed data limit
