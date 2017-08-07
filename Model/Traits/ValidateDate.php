@@ -13,6 +13,15 @@ trait ValidateDate
     {
         trim($date);
         $d = DateTime::createFromFormat($format, $date);
-        return $d && $d->format($format) == $date;
+        /*print_r($d);
+        echo "<br/>";
+        echo $date;*/
+        //exit();
+        if($d && $d->format($format) == $date) {
+            return $date;
+        } else {
+            return false;
+        }
+        //return $d && $d->format($format) == $date;
     }
 }

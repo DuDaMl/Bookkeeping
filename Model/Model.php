@@ -130,12 +130,7 @@ class Model
         $this->amount = $this->validateInt($date['amount']);
         $this->category_id = $this->validateInt($date['category_id']);
         $this->user_id = $this->validateInt($date['user_id']);
-
-        if($this->validateDate($date['date']))
-        {
-            $this->date = $date['date'];
-        }
-
-        $this->description = trim(htmlspecialchars($_POST['description']));
+        $this->date = $this->validateDate($date['date']);
+        $this->description = trim(htmlspecialchars($date['description']));
     }
 }

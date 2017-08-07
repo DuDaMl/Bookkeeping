@@ -78,15 +78,6 @@ class Category
 
     public function update()
     {
-        if(! self::validate() )
-        {
-            $this->error_validation = array(
-                'error' => true,
-                'amount' => 'Ошибка в переданном id',
-            );
-            return false;
-        }
-
         if(empty($this->name))
         {
             $this->error_validation = array(
@@ -115,8 +106,8 @@ class Category
 
     public function create()
     {
-        if(! self::validate() || empty($this->name) &&
-            ! self::validate() || empty($this->type) )
+        if( empty($this->name) ||
+            empty($this->type) )
         {
             $this->error_validation = array(
                 'error' => true,
@@ -145,11 +136,6 @@ class Category
      */
     function delete()
     {
-        if(! self::validate()){
-
-            return false;
-        }
-
         if(isset($this->id) && $this->id != '')
         {
             // Delete
@@ -174,22 +160,10 @@ class Category
         $this->id = $id;
     }
 
-    function validate()
+    function prepareData($date)
     {
-        if(! filter_var($this->user_id, FILTER_VALIDATE_INT))
-        {
-            $this->error_validation = array(
-                'error' => true,
-                'amount' => 'Ошибка в указанном user_id',
-            );
-            return false;
-        } else {
-            $id = str_replace('+','',$this->user_id);
-            $this->user_id = str_replace('-','',$id);
-        }
-
-        $this->name = strip_tags($_POST['name']);
-        $this->type = strip_tags($_POST['type']);
-        return true;
+        $this->name = strip_tags(trim(htmlspecialchars($date['name'])));
+        $this->type = strip_tags(trim(htmlspecialchars($date['type'])));
+        $this->description = strip_tags(trim(htmlspecialchars($date['description'])));
     }
 }

@@ -54,7 +54,6 @@ class Pay
         // загрузка всех категорий расходов
         $data['categories'] = M_Category::getAll($this->user->getId(), static::CONTROLLER_NAME);
         $data['controller_name'] = static::CONTROLLER_NAME;
-
         $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
     }
@@ -116,7 +115,6 @@ class Pay
         }
 
         $data['pay'] = $M_Pay;
-
         $data['controller_name'] = static::CONTROLLER_NAME;
         $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
         $this->render();

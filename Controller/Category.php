@@ -21,9 +21,7 @@ class Category
 
         if(isset($_POST['name']))
         {
-            // Array ( [name] => 123 [type] => Pay )
-            $M_Category->name = $_POST['name'];
-            $M_Category->type = $_POST['type'];
+            $M_Category->prepareData($_POST);
 
             if($M_Category->create())
             {
@@ -35,7 +33,6 @@ class Category
         $data['categories_pays'] = $M_Category->getAllPays();
         $data['categories_incomes'] = $M_Category->getAllIncomes();
         $data['error'] = $M_Category->error_validation;
-
         $data['controller_name'] = static::CONTROLLER_NAME;
         $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
@@ -48,6 +45,7 @@ class Category
         if(isset($_POST['name']))
         {
             $M_Category->setId($id);
+            $M_Category->prepareData($_POST);
 
             if($M_Category->update())
             {
