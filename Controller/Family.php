@@ -10,7 +10,6 @@ class Family
     extends Controller
 {
     const CONTROLLER_NAME = 'Family';
-    protected static $main_teamplate = 'Family';
 
     function __construct()
     {
@@ -31,7 +30,7 @@ class Family
             // Создание запроса.
             if($M_Family->create($_POST['email']))
             {
-                header("Location: /" . self::getMainTeamplate());
+                header("Location: /" . static::CONTROLLER_NAME);
                 exit();
             }
 
@@ -44,9 +43,9 @@ class Family
         $data['confirmed_request'] = $M_Family->getConfirmedRequest($this->user->getId());
         $data['user_id'] = $this->user->getId();
 
-        $data['controller_name'] = self::getMainTeamplate();
+        $data['controller_name'] = static::CONTROLLER_NAME;
 
-        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
     }
 
@@ -63,7 +62,7 @@ class Family
         {
             if($M_Family->confirmeRelationshiop($this->user->getId(), $_POST['relationship_id']))
             {
-                header("Location: /" . self::getMainTeamplate());
+                header("Location: /" . static::CONTROLLER_NAME);
                 exit();
             }
 
@@ -81,8 +80,8 @@ class Family
             $data['relationship'] = $relationship;
         }
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Confirme.php', $data);
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Confirme.php', $data);
         $this->render();
     }
 
@@ -114,7 +113,7 @@ class Family
             } else {
                 if($M_Family->deleteRelationshiop($_POST['relationship_id']))
                 {
-                    header("Location: /" . self::getMainTeamplate());
+                    header("Location: /" . static::CONTROLLER_NAME);
                     exit();
                 } else {
                     // ошибки добавления новой записи расходов
@@ -142,8 +141,8 @@ class Family
             $data['deleting_user'] = $user;
         }
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Delete.php', $data);
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
         $this->render();
     }
 
@@ -164,7 +163,7 @@ class Family
         {
             if($M_Family->cancelRelationshiop($_POST['relationship_id']))
             {
-                header("Location: /" . self::getMainTeamplate());
+                header("Location: /" . static::CONTROLLER_NAME);
                 exit();
             }
 
@@ -180,9 +179,9 @@ class Family
             $data['relationship'] = $relationship;
         }
 
-        $data['controller_name'] = self::getMainTeamplate();
+        $data['controller_name'] = static::CONTROLLER_NAME;
 
-        $this->content = $this->getView(self::getMainTeamplate() . '/Cancel.php', $data);
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Cancel.php', $data);
         $this->render();
     }
 }

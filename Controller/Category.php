@@ -9,7 +9,6 @@ class Category
     extends Controller
 {
     const CONTROLLER_NAME = 'Category';
-    protected static $main_teamplate = 'Category';
 
     public function __construct()
     {
@@ -37,8 +36,8 @@ class Category
         $data['categories_incomes'] = $M_Category->getAllIncomes();
         $data['error'] = $M_Category->error_validation;
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
     }
 
@@ -73,8 +72,8 @@ class Category
             }
         }
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Edit.php', $data);
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Edit.php', $data);
         $this->render();
     }
 
@@ -111,8 +110,8 @@ class Category
             }
         }
 
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Delete.php', $data);
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
         $this->render();
     }
 }

@@ -6,7 +6,7 @@ use bookkeeping\Model\User as M_User;
 class Index
     extends Controller
 {
-    protected static $main_teamplate = 'Index';
+    const CONTROLLER_NAME = 'Index';
 
     function __construct()
     {
@@ -27,8 +27,8 @@ class Index
 
     function index()
     {
-        $data['controller_name'] = self::getMainTeamplate();
-        $this->content = $this->getView(self::getMainTeamplate() . '/Index.php', $data);
+        $data['controller_name'] = static::CONTROLLER_NAME;
+        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
     }
 
