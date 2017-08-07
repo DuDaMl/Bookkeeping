@@ -6,7 +6,7 @@ use \PDO;
 class User
 {
     const TABLE_NAME = 'user';
-    private $id;
+    private static $id;
     public $token;
     public $email;
     public $given_name;
@@ -55,9 +55,9 @@ class User
         }
     }
 
-    function getId()
+    public static function getId()
     {
-        return $this->id;
+        return self::$id;
     }
 
 
@@ -94,22 +94,17 @@ class User
             return false;
         }
 
-        $this->id = $user_id;
+        self::$id = $user_id;
         return true;
 
     }
 
     /**
      * Update token in DB and $_Session
-     * @param $user_id
      * @return bool
      */
     public function updateToken()
     {
-        if(! $this->id)
-        {
-            return false;
-        }
 
         $DB = DB::getInstance();
         $token = bin2hex(random_bytes('64'));
@@ -121,7 +116,7 @@ class User
 
         $params = [
             ':token' => $token,
-            ':id' => $this->id
+            ':id' => self::$id
         ];
 
         $result = $DB->execute($sql, $params);

@@ -13,8 +13,6 @@ class Model
     public $category_id;
     public $date;
 
-    public $error_validation;
-
     /**
      * Create record in db
      * @return bool
@@ -47,7 +45,7 @@ class Model
             ':amount' => $this->amount,
             ':description' => $this->description,
             ':category_id' => $this->category_id,
-            ':user_id' => $this->user_id,
+            ':user_id' =>  User::getId(),
             ':date' => $this->date
         ];
 
@@ -88,7 +86,7 @@ class Model
             ':amount' => $this->amount,
             ':description' => $this->description,
             ':category_id' => $this->category_id,
-            ':user_id' => $this->user_id,
+            ':user_id' =>  User::getId(),
             ':date' => $this->date
         ];
 
@@ -125,11 +123,19 @@ class Model
         }
     }
 
-    function prepareFormat($date)
+    /**
+     * @return id авторизированного пользователя
+     */
+    protected static function getUserId()
+    {
+        $M_User = new User();
+        return $M_User->getId();
+    }
+
+    function prepareFormat(array $date)
     {
         $this->amount = $this->validateInt($date['amount']);
         $this->category_id = $this->validateInt($date['category_id']);
-        $this->user_id = $this->validateInt($date['user_id']);
         $this->date = $this->validateDate($date['date']);
         $this->description = trim(htmlspecialchars($date['description']));
     }

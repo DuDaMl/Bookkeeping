@@ -1,6 +1,7 @@
 <?php
 namespace bookkeeping\Model\Setting;
 use \bookkeeping\Model\DB;
+use \bookkeeping\Model\User;
 //
 use \PDO;
 
@@ -10,8 +11,8 @@ class Setting
 
     const TABLE_NAME = 'setting';
 
-    private $id;
-    private $user_id;
+    public $id;
+    public $user_id;
     public $date_start;
     public $date_end;
     public $format;
@@ -21,17 +22,11 @@ class Setting
      * Инициализация user_id
      * @param int $user_id - id авторихзированного пользователя
      */
-    function __construct(int $user_id)
+    function __construct()
     {
-        $this->user_id = $user_id;
 
         // Загрузка данных по user_id
         $this->get();
-    }
-
-    public function getUserId()
-    {
-        return $this->user_id;
     }
 
     /**
@@ -42,7 +37,7 @@ class Setting
     public function get()
     {
         $sql = "SELECT * FROM `" . static::TABLE_NAME . "`" .
-            " WHERE  user_id = " . $this->user_id . "
+            " WHERE  user_id = " . User::getId() . "
                LIMIT 1";
 
         $DB = DB::getInstance();
@@ -55,7 +50,7 @@ class Setting
             $this->date_end = date('Y-m-31');
             $this->format = 'month';
 
-            $this->create($this->user_id);
+            $this->create( User::getId() );
 
         } else {
             $this->date_start = $result->date_start;
@@ -90,7 +85,7 @@ class Setting
             ':date_start' => $this->date_start,
             ':date_end' => $this->date_end,
             ':format' => $this->format,
-            ':user_id' => $this->user_id
+            ':user_id' =>  User::getId()
         ];
 
         $DB = DB::getInstance();
@@ -102,7 +97,7 @@ class Setting
      * @param  string | $value - сохранямые параметры
      * @return bool
      */
-    protected function create($user_id)
+    public function create()
     {
         $sql = "INSERT INTO  `" . static::TABLE_NAME . "` (
                 `user_id`,
@@ -117,7 +112,7 @@ class Setting
                 ";
 
         $params = [
-            ':user_id' => $this->user_id,
+            ':user_id' =>  User::getId(),
             ':date_start' => $this->date_start,
             ':date_end' => $this->date_end,
             ':format' => $this->format
@@ -166,4 +161,6 @@ class Setting
         }
         return true;
     }
+
+    public function delete(){}
 }

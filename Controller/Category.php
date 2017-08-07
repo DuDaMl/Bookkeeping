@@ -17,7 +17,7 @@ class Category
 
     public function index()
     {
-        $M_Category = new M_Category($this->user->getId());
+        $M_Category = new M_Category();
 
         if(isset($_POST['name']))
         {
@@ -40,7 +40,7 @@ class Category
 
     function edit($id)
     {
-        $M_Category = new M_Category($this->user->getId());
+        $M_Category = new M_Category();
 
         if(isset($_POST['name']))
         {
@@ -80,7 +80,7 @@ class Category
      */
     function delete($id)
     {
-        $M_Category = new M_Category($this->user->getId());
+        $M_Category = new M_Category();
 
         if(!empty($_POST) && $_POST['id'] != '')
         {

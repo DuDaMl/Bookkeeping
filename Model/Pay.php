@@ -23,7 +23,7 @@ class Pay extends Model
                ON pay.category_id = category.id 
                WHERE pay.date BETWEEN  '" . $setting->date_start ."' 
                AND '" . $setting->date_end ."'
-               AND pay.user_id = " . $setting->getUserId() . "
+               AND pay.user_id = " .  User::getId() . "
                AND category.type = 'Pay'
                ORDER BY date DESC, id DESC
                ";

@@ -1,5 +1,6 @@
 <?php
 namespace bookkeeping\Model;
+use \bookkeeping\Model\User;
 use \PDO;
 
 class Category
@@ -13,9 +14,9 @@ class Category
 
     public $error_validation;
 
-    function __construct($user_id)
+    function __construct()
     {
-        $this->user_id = $user_id;
+
         $this->DB = DB::getInstance();
     }
 
@@ -24,11 +25,11 @@ class Category
      * @param string | $type
      * @return array|bool|object
      */
-    static function getAll($user_id, $type)
+    static function getAll($type)
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "`" . " 
         WHERE type = '" . $type . "' 
-        AND user_id = " . $user_id . "
+        AND user_id = " . User::getId() . "
         ORDER BY name ASC";
 
         $DB = DB::getInstance();
@@ -39,7 +40,7 @@ class Category
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` 
         WHERE type = 'Pay' 
-        AND user_id = " . $this->user_id . "
+        AND user_id = " . User::getId() . "
         ORDER BY name ASC";
         return $this->DB->query($sql);
     }
@@ -48,7 +49,7 @@ class Category
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` 
         WHERE type = 'Income'  
-        AND user_id = " . $this->user_id . "
+        AND user_id = " . User::getId() . "
         ORDER BY name ASC";
         return $this->DB->query($sql);
     }
@@ -97,7 +98,7 @@ class Category
         $params = [
             ':name' => $this->name,
             ':type' => $this->type,
-            ':user_id' => $this->user_id,
+            ':user_id' => User::getId(),
             ':id' => $this->id,
         ];
 
@@ -124,7 +125,7 @@ class Category
 
         $params = [
             ':name' => $this->name,
-            ':user_id' => $this->user_id,
+            ':user_id' => User::getId(),
             ':type' => $this->type
         ];
 

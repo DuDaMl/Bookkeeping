@@ -19,7 +19,7 @@ class Income
     function index()
     {
         // Сохраненные настройки для контроллера.
-        $M_IncomeSetting = new M_IncomeSetting($this->user->getId());
+        $M_IncomeSetting = new M_IncomeSetting();
 
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
@@ -33,7 +33,6 @@ class Income
         if(!empty($_POST) && isset($_POST['category_id']))
         {
             $M_Income =  new M_Income();
-            $_POST['user_id'] = $this->user->getId();
             $M_Income->prepareFormat($_POST);
 
             if($M_Income->create())
@@ -52,7 +51,7 @@ class Income
         $data['incomes'] = M_Income::getAll($M_IncomeSetting);
 
         // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll($this->user->getId(), self::CONTROLLER_NAME);
+        $data['categories'] = M_Category::getAll( self::CONTROLLER_NAME);
         $data['controller_name'] = static::CONTROLLER_NAME;
         $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
@@ -71,7 +70,6 @@ class Income
 
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
-            $_POST['user_id'] = $this->user->getId();
             $M_Income->prepareFormat($_POST);
 
             if($M_Income->update())
@@ -83,14 +81,11 @@ class Income
 
         $data['income'] = $M_Income;
 
-        // id текущего авторизированного пользователя
-        $user_id = $this->user->getId();
-
         // Категории заданного типа (Расходы | Доходы | другое)
         $type_of_category = self::CONTROLLER_NAME;
 
         // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll($user_id, $type_of_category);
+        $data['categories'] = M_Category::getAll($type_of_category);
 
 
         $data['controller_name'] = static::CONTROLLER_NAME;

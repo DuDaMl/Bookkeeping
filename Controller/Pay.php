@@ -1,7 +1,7 @@
 <?php
 namespace bookkeeping\Controller;
 use bookkeeping\Controller\Controller as Controller;
-use bookkeeping\Model\User as M_User;
+use bookkeeping\Model\User;
 use bookkeeping\Model\Setting\PaySetting as M_PaySetting;
 use bookkeeping\Model\Pay as M_Pay;
 use bookkeeping\Model\Category as M_Category;
@@ -19,7 +19,7 @@ class Pay
     function index()
     {
         // Настройки для контроллера.
-        $M_PaySetting = new M_PaySetting($this->user->getId());
+        $M_PaySetting = new M_PaySetting( );
 
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
@@ -33,7 +33,6 @@ class Pay
         if(!empty($_POST) && isset($_POST['category_id']))
         {
             $M_Pay = new M_Pay();
-            $_POST['user_id'] = $this->user->getId();
             $M_Pay->prepareFormat($_POST);
 
             if($M_Pay->create())
@@ -52,7 +51,7 @@ class Pay
         $data['pays'] = M_Pay::getAll($M_PaySetting);
 
         // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll($this->user->getId(), static::CONTROLLER_NAME);
+        $data['categories'] = M_Category::getAll(static::CONTROLLER_NAME);
         $data['controller_name'] = static::CONTROLLER_NAME;
         $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
@@ -70,7 +69,6 @@ class Pay
 
         if(isset($_POST['category_id']) && $_POST['category_id'] != '')
         {
-            $_POST['user_id'] = $this->user->getId();
             $M_Pay->prepareFormat($_POST);
 
             if($M_Pay->update())
@@ -82,15 +80,11 @@ class Pay
 
         $data['pay'] = $M_Pay;
 
-        // id текущего авторизированного пользователя
-        $user_id = $this->user->getId();
-
         // Категории заданного типа (Расходы | Доходы | другое)
         $type_of_category = static::CONTROLLER_NAME;
 
         // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll($user_id, $type_of_category);
-
+        $data['categories'] = M_Category::getAll($type_of_category);
 
         $data['controller_name'] = static::CONTROLLER_NAME;
         $this->content = $this->getView(static::CONTROLLER_NAME . '/Edit.php', $data);

@@ -20,7 +20,7 @@ class Income extends Model
                WHERE income.date BETWEEN  '" . $setting->date_start ."' 
                AND '" . $setting->date_end ."'  
                AND category.type = 'Income'
-               AND income.user_id = " . $setting->getUserId() . "
+               AND income.user_id = " .  User::getId() . "
                ORDER BY date DESC, id DESC
                ";
 
