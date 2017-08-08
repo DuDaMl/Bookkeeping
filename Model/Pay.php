@@ -2,6 +2,7 @@
 namespace bookkeeping\Model;
 
 use bookkeeping\Model\Setting\Setting;
+//use bookkeeping\Model\Interfaces\Setting;
 
 class Pay extends Model
 {

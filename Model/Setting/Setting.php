@@ -1,11 +1,13 @@
 <?php
 namespace bookkeeping\Model\Setting;
 use \bookkeeping\Model\DB;
+//use bookkeeping\Model\Interfaces\Setting as I_Setting;
 use \bookkeeping\Model\User;
-//
 use \PDO;
 
-class Setting
+
+
+class Setting //implements I_Setting
 {
     use \bookkeeping\Model\Traits\ValidateDate;
 

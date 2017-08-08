@@ -5,7 +5,6 @@ header('Content-type: text/html; charset=utf-8');
 use bookkeeping\Model\Route;
 use bookkeeping\Core\ErrorHandler;
 
-
 //phpinfo();
 
 ini_set('display_errors', 'on');

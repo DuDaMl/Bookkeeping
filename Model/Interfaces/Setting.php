@@ -1,8 +1,7 @@
 <?php
-namespace bookkeeping\Model\Intefrace\Setting;
+namespace bookkeeping\Model\Interfaces;
 
 interface Setting
 {
-
     function get();
 }

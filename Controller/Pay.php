@@ -5,6 +5,7 @@ use bookkeeping\Model\User;
 use bookkeeping\Model\Setting\PaySetting as M_PaySetting;
 use bookkeeping\Model\Pay as M_Pay;
 use bookkeeping\Model\Category as M_Category;
+use bookkeeping\Model\Views\View as M_View;
 
 class Pay
     extends Controller
@@ -16,6 +17,7 @@ class Pay
         parent::__construct();
     }
 
+    // todo обработка ошибок возникшик при создании записи
     function index()
     {
         // Настройки для контроллера.
@@ -35,12 +37,24 @@ class Pay
 
             if($M_Pay->create($_POST))
             {
-                header("Location: /" . static::CONTROLLER_NAME);
+                header("Location: /" . static::CONTROLLER_NAME . "/");
                 exit();
             }
-            // todo обработка ошибок возникшик при создании записи
+
         }
 
+        $M_View = new M_View();
+        $M_View->settings = $M_PaySetting;
+        $M_View->pays = M_Pay::getAll($M_PaySetting);
+        $M_View->categories = M_Category::getAll(static::CONTROLLER_NAME);
+        $M_View->controller_name = static::CONTROLLER_NAME;
+        $M_View->current_page = static::CONTROLLER_NAME;
+        $M_View->user = $this->user;
+        $M_View->content = $M_View->render(static::CONTROLLER_NAME . '/Index.php');
+        $M_View->display();
+        exit();
+
+        /*
         // настройки представления
         $data['settings'] = $M_PaySetting;
 
@@ -53,16 +67,17 @@ class Pay
         $data['controller_name'] = static::CONTROLLER_NAME;
         $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
         $this->render();
+        */
     }
 
     /**
      * Редактирование записи (Платёж)
      * @param $id
      */
+    // todo права на редактирование данной записи
+    // todo существование данной записи
     function edit(int $id)
     {
-        // todo права на редактирование данной записи
-        // todo существование данной записи
         $M_Pay =  M_Pay::getById($id)[0];
 
         if(isset($_POST['category_id']) && $_POST['category_id'] != '')
