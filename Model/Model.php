@@ -17,8 +17,10 @@ class Model
      * Create record in db
      * @return bool
      */
-    public function create()
+    public function create($date)
     {
+        $this->prepareFormat($date);
+
         if( empty($this->amount)
             || empty($this->category_id)
             || empty($this->date))
@@ -58,8 +60,9 @@ class Model
      * update record in db
      * @return bool
      */
-    public function update()
+    public function update($date)
     {
+        $this->prepareFormat($date);
 
         if(! isset($this->id) || $this->id == '')
         {

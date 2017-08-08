@@ -63,8 +63,10 @@ class Setting
      * Обновление настроек в БД
      * @return bool
      */
-    public function update()
+    public function update($date)
     {
+        $this->prepareFormat($date);
+
         if( empty( $this->date_start ) ||
             empty( $this->date_end ) ||
             $this->format == ''
@@ -97,8 +99,10 @@ class Setting
      * @param  string | $value - сохранямые параметры
      * @return bool
      */
-    public function create()
+    public function create($date)
     {
+        $this->prepareFormat($date);
+
         $sql = "INSERT INTO  `" . static::TABLE_NAME . "` (
                 `user_id`,
                 `date_start`,

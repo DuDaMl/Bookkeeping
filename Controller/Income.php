@@ -24,8 +24,7 @@ class Income
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
         {
-            $M_IncomeSetting->prepareFormat($_POST);
-            $M_IncomeSetting->update();
+            $M_IncomeSetting->update($_POST);
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }
@@ -33,9 +32,8 @@ class Income
         if(!empty($_POST) && isset($_POST['category_id']))
         {
             $M_Income =  new M_Income();
-            $M_Income->prepareFormat($_POST);
 
-            if($M_Income->create())
+            if($M_Income->create($_POST))
             {
                 header("Location: /" . static::CONTROLLER_NAME);
                 exit();
@@ -70,9 +68,8 @@ class Income
 
         if(!empty($_POST) && $_POST['category_id'] != '')
         {
-            $M_Income->prepareFormat($_POST);
 
-            if($M_Income->update())
+            if($M_Income->update($_POST))
             {
                 header("Location: /" . static::CONTROLLER_NAME);
                 exit();

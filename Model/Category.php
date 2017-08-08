@@ -77,8 +77,10 @@ class Category
 
     }
 
-    public function update()
+    public function update($date)
     {
+        $this->prepareData($date);
+
         if(empty($this->name))
         {
             $this->error_validation = array(
@@ -105,8 +107,10 @@ class Category
         return $this->DB->execute($sql, $params);
     }
 
-    public function create()
+    public function create($date)
     {
+        $this->prepareData($date);
+
         if( empty($this->name) ||
             empty($this->type) )
         {

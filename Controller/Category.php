@@ -21,9 +21,8 @@ class Category
 
         if(isset($_POST['name']))
         {
-            $M_Category->prepareData($_POST);
 
-            if($M_Category->create())
+            if($M_Category->create($_POST))
             {
                 header("Location: /Category/");
                 exit();
@@ -45,9 +44,8 @@ class Category
         if(isset($_POST['name']))
         {
             $M_Category->setId($id);
-            $M_Category->prepareData($_POST);
 
-            if($M_Category->update())
+            if($M_Category->update($_POST))
             {
                 header("Location: /Category/");
                 exit();

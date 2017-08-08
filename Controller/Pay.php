@@ -19,13 +19,12 @@ class Pay
     function index()
     {
         // Настройки для контроллера.
-        $M_PaySetting = new M_PaySetting( );
+        $M_PaySetting = new M_PaySetting();
 
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
         {
-            $M_PaySetting->prepareFormat($_POST);
-            $M_PaySetting->update();
+            $M_PaySetting->update($_POST);
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }
@@ -33,9 +32,8 @@ class Pay
         if(!empty($_POST) && isset($_POST['category_id']))
         {
             $M_Pay = new M_Pay();
-            $M_Pay->prepareFormat($_POST);
 
-            if($M_Pay->create())
+            if($M_Pay->create($_POST))
             {
                 header("Location: /" . static::CONTROLLER_NAME);
                 exit();
@@ -69,9 +67,7 @@ class Pay
 
         if(isset($_POST['category_id']) && $_POST['category_id'] != '')
         {
-            $M_Pay->prepareFormat($_POST);
-
-            if($M_Pay->update())
+            if($M_Pay->update($_POST))
             {
                 header("Location: /" . static::CONTROLLER_NAME);
                 exit();
