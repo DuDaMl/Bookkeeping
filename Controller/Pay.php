@@ -21,16 +21,12 @@ class Pay
     // todo обработка ошибок возникшик при создании записи
     function index()
     {
-        // Настройки для контроллера.
-        //$M_PaySetting = new M_PaySetting();
-
-        $M_PaySetting = Setting::getInstance(static::CONTROLLER_NAME);
-
+         $Setting = Setting::getInstance(static::CONTROLLER_NAME);
 
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
         {
-            $M_PaySetting->update($_POST);
+            $Setting->update($_POST);
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }
@@ -47,30 +43,14 @@ class Pay
         }
 
         $M_View = new M_View();
-        $M_View->settings = $M_PaySetting;
-        $M_View->pays = M_Pay::getAll($M_PaySetting);
+        $M_View->settings = $Setting;
+        $M_View->pays = M_Pay::getAll($Setting);
         $M_View->categories = M_Category::getAll(static::CONTROLLER_NAME);
         $M_View->controller_name = static::CONTROLLER_NAME;
         $M_View->current_page = static::CONTROLLER_NAME;
         $M_View->user = $this->user;
         $M_View->content = $M_View->render(static::CONTROLLER_NAME . '/Index.php');
         $M_View->display();
-        exit();
-
-        /*
-        // настройки представления
-        $data['settings'] = $M_PaySetting;
-
-        // загрузка всех платежей текущего месяца
-        // todo перенести метод в другую модель
-        $data['pays'] = M_Pay::getAll($M_PaySetting);
-
-        // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll(static::CONTROLLER_NAME);
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
-        $this->render();
-        */
     }
 
     /**

@@ -127,5 +127,7 @@ class PaySetting
         {
             return false;
         }
+
+        return true;
     }
 }

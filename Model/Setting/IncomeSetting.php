@@ -125,6 +125,8 @@ class IncomeSetting extends Setting
          {
              return false;
          }
+
+         return true;
     }
 
 }

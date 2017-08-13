@@ -19,12 +19,12 @@ class Income
     function index()
     {
         // Сохраненные настройки для контроллера.
-        $M_IncomeSetting = new M_IncomeSetting();
+        $Setting = new M_IncomeSetting();
 
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
         {
-            $M_IncomeSetting->update($_POST);
+            $Setting->update($_POST);
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }
@@ -43,10 +43,10 @@ class Income
         }
 
         // настройки представления
-        $data['settings'] = $M_IncomeSetting;
+        $data['settings'] = $Setting;
 
         // загрузка всех платежей текущего месяца
-        $data['incomes'] = M_Income::getAll($M_IncomeSetting);
+        $data['incomes'] = M_Income::getAll($Setting);
 
         // загрузка всех категорий расходов
         $data['categories'] = M_Category::getAll( self::CONTROLLER_NAME);
