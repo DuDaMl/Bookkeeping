@@ -1,6 +1,7 @@
 <?php
 namespace bookkeeping\Controller;
 use bookkeeping\Controller\Controller as Controller;
+use bookkeeping\Model\Setting\Setting;
 use bookkeeping\Model\User;
 use bookkeeping\Model\Setting\PaySetting as M_PaySetting;
 use bookkeeping\Model\Pay as M_Pay;
@@ -21,7 +22,10 @@ class Pay
     function index()
     {
         // Настройки для контроллера.
-        $M_PaySetting = new M_PaySetting();
+        //$M_PaySetting = new M_PaySetting();
+
+        $M_PaySetting = Setting::getInstance(static::CONTROLLER_NAME);
+
 
         // Проверка существования запроса на изменение настроек представления
         if(isset($_POST['settings']))
@@ -40,7 +44,6 @@ class Pay
                 header("Location: /" . static::CONTROLLER_NAME . "/");
                 exit();
             }
-
         }
 
         $M_View = new M_View();
