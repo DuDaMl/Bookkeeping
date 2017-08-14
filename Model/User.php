@@ -60,7 +60,6 @@ class User
         return self::$id;
     }
 
-
     /**
      * Check Auth user
      * @return bool
@@ -94,9 +93,21 @@ class User
             return false;
         }
 
+        $this->fillDataUser($user);
+
         self::$id = $user_id;
         return true;
 
+    }
+
+    private function fillDataUser($user)
+    {
+        $this->email = $user->email;
+        $this->given_name = $user->given_name;
+        $this->family_name = $user->family_name;
+        $this->picture = $user->picture;
+        $this->link = $user->link;
+        $this->gender = $user->gender;
     }
 
     /**

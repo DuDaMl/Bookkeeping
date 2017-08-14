@@ -1,10 +1,28 @@
 <?php
 namespace bookkeeping\Model\Views;
+use bookkeeping\Model\Views\PayView;
+
 
 class View
 implements \Countable
 {
     protected $data = [];
+    protected static $conttoller;
+
+    public static function getInstance($type)
+    {
+        self::$conttoller = $type;
+
+        switch($type)
+        {
+            case 'Pay':
+                return  new PayView();
+                break;
+            case 'Income':
+                return new IncomeView();
+                break;
+        }
+    }
 
     public function __set($k, $v)
     {

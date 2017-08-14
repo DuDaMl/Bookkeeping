@@ -18,23 +18,23 @@ class Pay
         parent::__construct();
     }
 
-    // todo обработка ошибок возникшик при создании записи
     function index()
     {
+        // Объек хранящий настройки представления контроллера
          $Setting = Setting::getInstance(static::CONTROLLER_NAME);
 
-        // Проверка существования запроса на изменение настроек представления
-        if(isset($_POST['settings']))
+        // Обновление настроек контроллера
+        if($Setting->update($_POST))
         {
-            $Setting->update($_POST);
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }
 
-        if(!empty($_POST) && isset($_POST['category_id']))
+        if(! empty($_POST) && isset($_POST['category_id']))
         {
             $M_Pay = new M_Pay();
 
+            // Создание записи расходов.
             if($M_Pay->create($_POST))
             {
                 header("Location: /" . static::CONTROLLER_NAME . "/");
@@ -42,15 +42,10 @@ class Pay
             }
         }
 
-        $M_View = new M_View();
-        $M_View->settings = $Setting;
-        $M_View->pays = M_Pay::getAll($Setting);
-        $M_View->categories = M_Category::getAll(static::CONTROLLER_NAME);
-        $M_View->controller_name = static::CONTROLLER_NAME;
-        $M_View->current_page = static::CONTROLLER_NAME;
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
         $M_View->user = $this->user;
-        $M_View->content = $M_View->render(static::CONTROLLER_NAME . '/Index.php');
-        $M_View->display();
+        $M_View->index($Setting);
     }
 
     /**
@@ -72,17 +67,12 @@ class Pay
             }
         }
 
-        $data['pay'] = $M_Pay;
 
-        // Категории заданного типа (Расходы | Доходы | другое)
-        $type_of_category = static::CONTROLLER_NAME;
-
-        // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll($type_of_category);
-
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Edit.php', $data);
-        $this->render();
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->pay = $M_Pay;
+        $M_View->edit();
     }
 
     /**
@@ -102,9 +92,10 @@ class Pay
             }
         }
 
-        $data['pay'] = $M_Pay;
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
-        $this->render();
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->pay = $M_Pay;
+        $M_View->delete();
+
     }
 }

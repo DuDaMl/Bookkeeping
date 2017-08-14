@@ -58,6 +58,11 @@ class PaySetting
 
     public function update($date)
     {
+        if(empty($date['settings']))
+        {
+            return false;
+        }
+
         $this->prepareFormat($date);
 
         if(! $this->validate())

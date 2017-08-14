@@ -33,6 +33,7 @@ class IncomeSetting extends Setting
         $DB = DB::getInstance();
         $result = $DB->query($sql)[0];
 
+
         if(! $result)
         {
             // создание параметров по умолчанию
@@ -40,6 +41,7 @@ class IncomeSetting extends Setting
             $this->create( User::getId() );
 
         } else {
+
             $this->date_start = $result->date_start;
             $this->date_end = $result->date_end;
             $this->format = $result->format;
