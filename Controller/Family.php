@@ -2,9 +2,10 @@
 namespace bookkeeping\Controller;
 use bookkeeping\Controller\Controller as Controller;
 use bookkeeping\Model\Setting as M_Setting;
-use bookkeeping\Model\User as M_User;
+use bookkeeping\Model\User;
 use bookkeeping\Model\Family as M_Family;
 use bookkeeping\Model\Category as M_Category;
+use bookkeeping\Model\Views\View as M_View;
 
 class Family
     extends Controller
@@ -25,7 +26,10 @@ class Family
         
         if(! empty($_POST))
         {
-            $M_Family->sender_id = $this->user->getId();
+
+            $M_Family->sender_id = User::getId();
+
+
 
             // Создание запроса.
             if($M_Family->create($_POST['email']))
@@ -38,15 +42,11 @@ class Family
             $data['error'] = $M_Family->error_validation;
         }
 
-        $data['incomig_request'] = $M_Family->getIncomeRequest($this->user->getId());
-        $data['waiting_request'] = $M_Family->getSendedRequest($this->user->getId());
-        $data['confirmed_request'] = $M_Family->getConfirmedRequest($this->user->getId());
-        $data['user_id'] = $this->user->getId();
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->index();
 
-        $data['controller_name'] = static::CONTROLLER_NAME;
-
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
-        $this->render();
     }
 
     /**
@@ -60,7 +60,7 @@ class Family
 
         if(!empty($_POST) && $_POST['relationship_id'] != '')
         {
-            if($M_Family->confirmeRelationshiop($this->user->getId(), $_POST['relationship_id']))
+            if($M_Family->confirmeRelationshiop(User::getId(), $_POST['relationship_id']))
             {
                 header("Location: /" . static::CONTROLLER_NAME);
                 exit();
@@ -71,7 +71,8 @@ class Family
         }
 
         // Проверка существования записи
-        $relationship = $M_Family->getWaitingRequestById($id, $this->user->getId());
+        $relationship = $M_Family->getWaitingRequestById($id, User::getId());
+
         if($relationship == false)
         {
             $data['error'] = $M_Family->error_validation;
@@ -80,9 +81,13 @@ class Family
             $data['relationship'] = $relationship;
         }
 
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Confirme.php', $data);
-        $this->render();
+
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->relationship = $relationship;
+        $M_View->confirm();
+
     }
 
     /**
@@ -94,7 +99,7 @@ class Family
         $M_Family = new M_Family();
 
         // Проверка существования записи
-        $relationship = $M_Family->getDeleteableRequestById($id, $this->user->getId())[0];
+        $relationship = $M_Family->getDeleteableRequestById($id, User::getId())[0];
 
         if( !empty($_POST)
             && $_POST['relationship_id'] != ''
@@ -102,8 +107,8 @@ class Family
             && $relationship->id != '')
         {
             // Check allow for delete
-            if($relationship->receiver_id != $this->user->getId()
-                && $relationship->sender_id != $this->user->getId()
+            if($relationship->receiver_id != User::getId()
+                && $relationship->sender_id != User::getId()
             )
             {
                 $data['error'] = array(
@@ -125,11 +130,11 @@ class Family
         $data['relationship'] = $relationship;
 
         // get receiver_id as deleting user
-        if($relationship->sender_id == $this->user->getId())
+        if($relationship->sender_id == User::getId())
         {
-            $user = M_User::getById($relationship->receiver_id)[0];
+            $user = User::getById($relationship->receiver_id)[0];
         } else {
-            $user = M_User::getById($relationship->sender_id)[0];
+            $user = User::getById($relationship->sender_id)[0];
         }
 
 
@@ -141,9 +146,13 @@ class Family
             $data['deleting_user'] = $user;
         }
 
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
-        $this->render();
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->deleting_user = $user;
+        $M_View->relationship = $relationship;
+        $M_View->delete();
+
     }
 
     /**
@@ -154,7 +163,7 @@ class Family
     {
         $M_Family = new M_Family();
         // Проверка существования записи
-        $relationship = $M_Family->getIncomeRequestById($id, $this->user->getId())[0];
+        $relationship = $M_Family->getIncomeRequestById($id, User::getId())[0];
 
         if( !empty($_POST)
             && $_POST['relationship_id'] != ''

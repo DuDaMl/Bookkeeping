@@ -24,6 +24,9 @@ implements \Countable
             case 'Category':
                 return new CategoryView();
                 break;
+            case 'Family':
+                return new FamilyView();
+                break;
             default:
                 return new IndexView();
                 break;

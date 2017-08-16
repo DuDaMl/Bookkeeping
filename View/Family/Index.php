@@ -94,7 +94,7 @@
                 foreach ($confirmed_request as $request)
                 {
 
-                    if($request->user_id != $user_id)
+                    if($request->user_id != $user::getId())
                     {
 
                         $output .= '<li class="list-group-item">

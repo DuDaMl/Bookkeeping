@@ -41,7 +41,7 @@ class User
     /**
      * @return array|bool
      */
-    function getByEmail($email)
+    public static function getByEmail($email)
     {
         $DB = DB::getInstance();
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` WHERE  email = '" . $email ."'";

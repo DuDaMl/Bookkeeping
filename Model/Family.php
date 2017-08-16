@@ -2,7 +2,7 @@
 namespace bookkeeping\Model;
 use \DateTime;
 use \PDO;
-use bookkeeping\Models\User as M_Usaer;
+use bookkeeping\Model\User;
 
 class Family
 {
@@ -32,32 +32,50 @@ class Family
     function __construct()
     {
         $this->DB = DB::getInstance();
-        $this->M_User = new User();
+        //$this->M_User = new User();
     }
 
 
-    public function getSendedRequest($sender_id)
+    public static function getSendedRequest()
     {
         $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
         FROM `family` 
         LEFT JOIN `user`
         ON user.id = family.receiver_id
-        WHERE family.sender_id = " . $sender_id . " 
+        WHERE family.sender_id = " . User::getId() . " 
         AND family.status = " . Family::WAITING ;
-        $result = $this->DB->query($sql);
-        return $result;
+
+        $DB = DB::getInstance();
+        return $DB->query($sql);
     }
 
-    public function getIncomeRequest($receiver_id)
+    public static function getIncomeRequest()
     {
         $sql = "SELECT family.id, family.date, user.family_name, user.given_name, user.picture 
         FROM `family` 
         LEFT JOIN `user`
         ON user.id = family.sender_id
-        WHERE family.receiver_id = " . $receiver_id . " 
+        WHERE family.receiver_id = " . User::getId() . " 
         AND family.status = " . Family::WAITING ;
-        $result = $this->DB->query($sql);
-        return $result;
+
+        $DB = DB::getInstance();
+        return $DB->query($sql);
+    }
+
+    public static function getConfirmedRequest()
+    {
+        $sql = "SELECT family.id, family.date, user.id as user_id, user.family_name, user.given_name, user.picture 
+        FROM `family` 
+        LEFT JOIN `user`
+        ON user.id = family.receiver_id OR user.id = family.sender_id
+        WHERE family.sender_id = " . User::getId() . " 
+        AND family.status = " . Family::CONFIRMED . "
+        OR family.receiver_id = " . User::getId() . " 
+        AND family.status = " . Family::CONFIRMED . " 
+        ORDER BY family.id";
+
+        $DB = DB::getInstance();
+        return $DB->query($sql);
     }
 
     public function getIncomeRequestById($id, $receiver_id)
@@ -129,20 +147,7 @@ class Family
 
     }
 
-    public function getConfirmedRequest($user_id)
-    {
-        $sql = "SELECT family.id, family.date, user.id as user_id, user.family_name, user.given_name, user.picture 
-        FROM `family` 
-        LEFT JOIN `user`
-        ON user.id = family.receiver_id OR user.id = family.sender_id
-        WHERE family.sender_id = " . $user_id . " 
-        AND family.status = " . Family::CONFIRMED . "
-        OR family.receiver_id = " . $user_id . " 
-        AND family.status = " . Family::CONFIRMED . " 
-        ORDER BY family.id";
-        $result = $this->DB->query($sql);
-        return $result;
-    }
+
 
     /**
      * Подтверждение связи получателем
@@ -297,7 +302,7 @@ class Family
      */
     public function setReceiverByEmail($receiver_email)
     {
-        $receiver = $this->M_User->getByEmail($receiver_email)[0];
+        $receiver =  User::getByEmail($receiver_email)[0];
 
         // Проверка существования получателя
         if(! empty($receiver))
@@ -395,6 +400,8 @@ class Family
      */
     public function create($receiver_email)
     {
+        print_r($receiver_email);
+
         // Проверка существования пользователя с данным Email
         if(! $this->setReceiverByEmail($receiver_email))
         {
