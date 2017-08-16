@@ -185,12 +185,17 @@ class Family
             $data['error'] = $M_Family->error_validation;
         } else {
             // получение данных о получателе
-            $data['relationship'] = $relationship;
+            //$data['relationship'] = $relationship;
         }
+
+
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->relationship = $relationship;
+        $M_View->cancel();
 
         $data['controller_name'] = static::CONTROLLER_NAME;
 
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Cancel.php', $data);
-        $this->render();
     }
 }

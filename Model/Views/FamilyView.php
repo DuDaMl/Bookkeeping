@@ -37,7 +37,13 @@ class FamilyView extends View
         // загрузка всех категорий расходов
         $this->content = $this->render(self::$conttoller . '/Delete.php');
         $this->display();
+    }
 
+    public function cancel()
+    {
+        // загрузка всех категорий расходов
+        $this->content = $this->render(self::$conttoller . '/Cancel.php');
+        $this->display();
     }
 
 }
