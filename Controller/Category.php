@@ -3,7 +3,7 @@ namespace bookkeeping\Controller;
 use bookkeeping\Controller\Controller as Controller;
 use bookkeeping\Model\Pay as M_Pay;
 use bookkeeping\Model\Category as M_Category;
-
+use bookkeeping\Model\Views\View as M_View;
 
 class Category
     extends Controller
@@ -29,15 +29,15 @@ class Category
             }
         }
 
-        $data['categories_pays'] = $M_Category->getAllPays();
-        $data['categories_incomes'] = $M_Category->getAllIncomes();
-        $data['error'] = $M_Category->error_validation;
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        //$this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
-        //$this->render();
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->index();
+
     }
 
-    function edit($id)
+    //todo обработка несуществующих, не принадлежащих пользователю категорий
+    function edit(int $id)
     {
         $M_Category = new M_Category();
 
@@ -53,24 +53,11 @@ class Category
             $data['error'] = $M_Category->error_validation;
         }
 
-        $data['category'] = $M_Category->getById($id)[0];
-
-        if(empty($data['category']))
-        {
-            if(! empty($data['error']))
-            {
-                $data['error']['text'] = $data['error']['text'] . ' <br/> нет такой записи';
-            } else {
-                $data['error'] =  array(
-                    'error' => true,
-                    'text' => 'нет такой записи',
-                );
-            }
-        }
-
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Edit.php', $data);
-        $this->render();
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->category = $M_Category->getById($id)[0];
+        $M_View->user = $this->user;
+        $M_View->edit();
     }
 
     /**
@@ -106,8 +93,10 @@ class Category
             }
         }
 
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
-        $this->render();
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->category = $M_Category->getById($id)[0];
+        $M_View->user = $this->user;
+        $M_View->delete();
     }
 }

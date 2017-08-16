@@ -21,6 +21,12 @@ implements \Countable
             case 'Income':
                 return new IncomeView();
                 break;
+            case 'Category':
+                return new CategoryView();
+                break;
+            default:
+                return new IndexView();
+                break;
         }
     }
 
