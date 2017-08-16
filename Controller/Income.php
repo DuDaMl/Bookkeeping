@@ -2,9 +2,10 @@
 namespace bookkeeping\Controller;
 use bookkeeping\Controller\Controller as Controller;
 use bookkeeping\Model\User as M_User;
-use bookkeeping\Model\Setting\IncomeSetting as M_IncomeSetting;
+use bookkeeping\Model\Setting\Setting;
 use bookkeeping\Model\Income as M_Income;
 use bookkeeping\Model\Category as M_Category;
+use bookkeeping\Model\Views\View as M_View;
 
 class Income
     extends Controller
@@ -18,13 +19,13 @@ class Income
 
     function index()
     {
-        // Сохраненные настройки для контроллера.
-        $Setting = new M_IncomeSetting();
+        // Объек хранящий настройки представления контроллера
+        $Setting = Setting::getInstance(static::CONTROLLER_NAME);
 
         // Проверка существования запроса на изменение настроек представления
-        if(isset($_POST['settings']))
+        // Обновление настроек контроллера
+        if($Setting->update($_POST))
         {
-            $Setting->update($_POST);
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }
@@ -42,17 +43,12 @@ class Income
             // todo обработка ошибок возникшик при создании записи
         }
 
-        // настройки представления
-        $data['settings'] = $Setting;
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->index($Setting);
 
-        // загрузка всех платежей текущего месяца
-        $data['incomes'] = M_Income::getAll($Setting);
 
-        // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll( self::CONTROLLER_NAME);
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
-        $this->render();
     }
 
     /**
@@ -60,10 +56,10 @@ class Income
      * @param $id
      *
      */
+    // todo права на редактирование данной записи
+    // todo существование данной записи
     function edit($id)
     {
-        // todo права на редактирование данной записи
-        // todo существование данной записи
         $M_Income =  M_Income::getById($id)[0];
 
         if(!empty($_POST) && $_POST['category_id'] != '')
@@ -76,18 +72,13 @@ class Income
             }
         }
 
-        $data['income'] = $M_Income;
-
-        // Категории заданного типа (Расходы | Доходы | другое)
-        $type_of_category = self::CONTROLLER_NAME;
-
-        // загрузка всех категорий расходов
-        $data['categories'] = M_Category::getAll($type_of_category);
+        // Создание объекта представления для контроллера
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->income = $M_Income;
+        $M_View->edit();
 
 
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Edit.php', $data);
-        $this->render();
     }
 
     /**
@@ -109,10 +100,9 @@ class Income
             }
         }
 
-
-        $data['income'] = $M_Income;
-        $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Delete.php', $data);
-        $this->render();
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->income = $M_Income;
+        $M_View->delete();
     }
 }

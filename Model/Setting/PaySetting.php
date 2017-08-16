@@ -12,7 +12,6 @@ class PaySetting
     extends Setting
 {
     CONST TABLE_NAME = 'pay_setting';
-
     public $id;
     public $user_id;
     public $date_start;

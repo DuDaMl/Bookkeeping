@@ -58,6 +58,11 @@ class IncomeSetting extends Setting
 
     public function update($date)
     {
+        if(empty($date['settings']))
+        {
+            return false;
+        }
+
         $this->prepareFormat($date);
 
         if(! $this->validate())
