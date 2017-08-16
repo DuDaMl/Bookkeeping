@@ -19,6 +19,11 @@ class Model
      */
     public function create($date)
     {
+        if(empty ($date))
+        {
+            return false;
+        }
+
         $this->prepareFormat($date);
 
         if( empty($this->amount)
@@ -62,6 +67,11 @@ class Model
      */
     public function update($date)
     {
+        if(empty ($date))
+        {
+            return false;
+        }
+
         $this->prepareFormat($date);
 
         if(! isset($this->id) || $this->id == '')

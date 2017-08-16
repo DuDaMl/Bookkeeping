@@ -188,7 +188,6 @@ class Family
             //$data['relationship'] = $relationship;
         }
 
-
         // Создание объекта представления для контроллера
         $M_View = M_View::getInstance(static::CONTROLLER_NAME);
         $M_View->user = $this->user;

@@ -1,15 +1,10 @@
 <?php
 namespace bookkeeping\Controller;
-use bookkeeping\Controller\Controller as Controller;
 use bookkeeping\Model\Setting\Setting;
-use bookkeeping\Model\User;
-use bookkeeping\Model\Setting\PaySetting as M_PaySetting;
 use bookkeeping\Model\Pay as M_Pay;
-use bookkeeping\Model\Category as M_Category;
 use bookkeeping\Model\Views\View as M_View;
 
-class Pay
-    extends Controller
+class Pay extends Controller
 {
     const CONTROLLER_NAME = 'Pay';
 
@@ -18,28 +13,28 @@ class Pay
         parent::__construct();
     }
 
+    /**
+     * Отображение статистика расходов
+     */
     function index()
     {
         // Объек хранящий настройки представления контроллера
          $Setting = Setting::getInstance(static::CONTROLLER_NAME);
 
-        // Обновление настроек контроллера
+        // Обновление настроек контроллера Pay
         if($Setting->update($_POST))
         {
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }
 
-        if(! empty($_POST) && isset($_POST['category_id']))
-        {
-            $M_Pay = new M_Pay();
+        $M_Pay = new M_Pay();
 
-            // Создание записи расходов.
-            if($M_Pay->create($_POST))
-            {
-                header("Location: /" . static::CONTROLLER_NAME . "/");
-                exit();
-            }
+        // Создание записи расходов.
+        if($M_Pay->create($_POST))
+        {
+            header("Location: /" . static::CONTROLLER_NAME . "/");
+            exit();
         }
 
         // Создание объекта представления для контроллера
@@ -49,7 +44,7 @@ class Pay
     }
 
     /**
-     * Редактирование записи (Платёж)
+     * Редактирование записи (Расход)
      * @param $id
      */
     // todo права на редактирование данной записи
@@ -58,15 +53,12 @@ class Pay
     {
         $M_Pay =  M_Pay::getById($id)[0];
 
-        if(isset($_POST['category_id']) && $_POST['category_id'] != '')
+        // обновление данных о платеже
+        if($M_Pay->update($_POST))
         {
-            if($M_Pay->update($_POST))
-            {
-                header("Location: /" . static::CONTROLLER_NAME);
-                exit();
-            }
+            header("Location: /" . static::CONTROLLER_NAME);
+            exit();
         }
-
 
         // Создание объекта представления для контроллера
         $M_View = M_View::getInstance(static::CONTROLLER_NAME);
@@ -76,6 +68,7 @@ class Pay
     }
 
     /**
+     * Удаление записи (Расход)
      * @param $id
      */
     function delete($id)

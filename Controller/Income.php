@@ -30,18 +30,15 @@ class Income
             exit();
         }
 
-        if(!empty($_POST) && isset($_POST['category_id']))
-        {
-            $M_Income =  new M_Income();
+        $M_Income =  new M_Income();
 
-            if($M_Income->create($_POST))
-            {
-                header("Location: /" . static::CONTROLLER_NAME);
-                exit();
-            }
+        if($M_Income->create($_POST))
+        {
+            header("Location: /" . static::CONTROLLER_NAME);
+            exit();
+        }
 
             // todo обработка ошибок возникшик при создании записи
-        }
 
         // Создание объекта представления для контроллера
         $M_View = M_View::getInstance(static::CONTROLLER_NAME);
@@ -62,14 +59,10 @@ class Income
     {
         $M_Income =  M_Income::getById($id)[0];
 
-        if(!empty($_POST) && $_POST['category_id'] != '')
+        if($M_Income->update($_POST))
         {
-
-            if($M_Income->update($_POST))
-            {
-                header("Location: /" . static::CONTROLLER_NAME);
-                exit();
-            }
+            header("Location: /" . static::CONTROLLER_NAME);
+            exit();
         }
 
         // Создание объекта представления для контроллера
@@ -86,7 +79,6 @@ class Income
      */
     function delete($id)
     {
-
         // todo права на редактирование данной записи
         // todo существование данной записи
         $M_Income =  M_Income::getById($id)[0];
