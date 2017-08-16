@@ -33,8 +33,8 @@ class Category
         $data['categories_incomes'] = $M_Category->getAllIncomes();
         $data['error'] = $M_Category->error_validation;
         $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
-        $this->render();
+        //$this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
+        //$this->render();
     }
 
     function edit($id)

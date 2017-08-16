@@ -36,22 +36,25 @@ class Category
         return $DB->query($sql);
     }
 
-    function getAllPays()
+    static public function getAllPays()
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` 
         WHERE type = 'Pay' 
         AND user_id = " . User::getId() . "
         ORDER BY name ASC";
-        return $this->DB->query($sql);
+        $DB = DB::getInstance();
+        return $DB->query($sql);
+
     }
 
-    function getAllIncomes()
+    static public function getAllIncomes()
     {
         $sql = "SELECT * FROM `" . self::TABLE_NAME . "` 
         WHERE type = 'Income'  
         AND user_id = " . User::getId() . "
         ORDER BY name ASC";
-        return $this->DB->query($sql);
+        $DB = DB::getInstance();
+        return $DB->query($sql);
     }
 
     /**

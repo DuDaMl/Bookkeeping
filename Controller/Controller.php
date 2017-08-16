@@ -2,7 +2,7 @@
 namespace bookkeeping\Controller;
 use bookkeeping\Model\User as User;
 
-class Controller
+abstract class Controller
 {
     protected $user;
     protected $content;
@@ -46,6 +46,8 @@ class Controller
 
     }
 
+    abstract function index();
+/*
     function render()
     {
         $current_page = static::CONTROLLER_NAME;
@@ -71,4 +73,5 @@ class Controller
         include ('View/' . $path);
         return ob_get_clean();
     }
+*/
 }
