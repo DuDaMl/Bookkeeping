@@ -1,8 +1,11 @@
 <?php
 namespace bookkeeping\Controller;
+use bookkeeping\Model\Exceptions\DateNotFilledException;
 use bookkeeping\Model\Setting\Setting;
 use bookkeeping\Model\Pay as M_Pay;
 use bookkeeping\Model\Views\View as M_View;
+use bookkeeping\Model\Exceptions\MultiException;
+
 
 class Pay extends Controller
 {
@@ -11,6 +14,7 @@ class Pay extends Controller
     function __construct()
     {
         parent::__construct();
+
     }
 
     /**
@@ -18,12 +22,14 @@ class Pay extends Controller
      */
     function index()
     {
+        // Сборщик ошибок
+        $errors = new MultiException();
+
         // Объек хранящий настройки представления контроллера
-         $Setting = Setting::getInstance(static::CONTROLLER_NAME);
+        $Setting = Setting::getInstance(static::CONTROLLER_NAME);
 
         // Обновление настроек контроллера Pay
-        if($Setting->update($_POST))
-        {
+        if ($Setting->update($_POST)) {
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }
@@ -31,15 +37,27 @@ class Pay extends Controller
         $M_Pay = new M_Pay();
 
         // Создание записи расходов.
-        if($M_Pay->create($_POST))
-        {
-            header("Location: /" . static::CONTROLLER_NAME . "/");
-            exit();
-        }
+
+
+            if (! empty($_POST['add'])) {
+
+                try {
+                    $M_Pay->create($_POST);
+                    //header("Location: /" . static::CONTROLLER_NAME . "/");
+                    //exit();
+                    } catch (DateNotFilledException $e){
+                    $errors[] = $e;
+                    } catch (\ArgumentCountError  $e){
+                        // todo Ошибка обращения к классу. Записать в Лог администратора
+                }
+
+            }
+
 
         // Создание объекта представления для контроллера
         $M_View = M_View::getInstance(static::CONTROLLER_NAME);
         $M_View->user = $this->user;
+        $M_View->errors = $errors;
         $M_View->index($Setting);
     }
 

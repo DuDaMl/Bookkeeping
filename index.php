@@ -4,14 +4,18 @@ require('vendor/autoload.php');
 header('Content-type: text/html; charset=utf-8');
 use bookkeeping\Model\Route;
 use bookkeeping\Core\ErrorHandler;
+use bookkeeping\Model\Exceptions\DateNotFilledException;
 
 //phpinfo();
 
 ini_set('display_errors', 'on');
 //(new ErrorHandler())->register();
 
+
 $Route = new  Route($_SERVER['REQUEST_URI']);
 $Route::start();
+
+
 
 /*
 try {

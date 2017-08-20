@@ -1,6 +1,8 @@
 <?php
 namespace bookkeeping\Model;
 
+use bookkeeping\Model\Exceptions\DateNotFilledException;
+
 class Model
 {
     use \bookkeeping\Model\Traits\ValidateDate;
@@ -14,24 +16,22 @@ class Model
     public $date;
 
     /**
-     * Create record in db
-     * @return bool
+     * Создание запись о расходе
+     * @param array $date
+     * @return ????
+     * @throws DateNotFilledException     данные не заполены
      */
     public function create($date)
     {
-        if(empty ($date))
-        {
-            return false;
-        }
-
         $this->prepareFormat($date);
 
         if( empty($this->amount)
             || empty($this->category_id)
             || empty($this->date))
         {
-            // todo Exception notFillingData
-            return false;
+            // todo разделить важность ошибок. на незаполненные пользователем и не переданные из системы(category_id).
+            $e = new DateNotFilledException('Необходимые данные не заполнены');
+            throw $e;
         }
 
         $sql = "INSERT INTO `" . static::TABLE_NAME . "`

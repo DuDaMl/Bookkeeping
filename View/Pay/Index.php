@@ -1,4 +1,5 @@
 <?php
+
 ?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
@@ -99,6 +100,7 @@
 
     <h1>Расходы</h1>
     <form action="/<?= $controller_name ?>/" method="post">
+        <input type='hidden' class="form-control" value="1" name="add"/>
         <div class="row">
             <div class="col-lg-3">
                 <div class="form-group">
@@ -139,21 +141,14 @@
         <br/>
         <br/>
     </form>
-    <?php
-    // Отображение ошибок добавления новой записи
-    if(isset($data['error']))
-    {
-        $form_error = $data['error'];
 
-        if($form_error['error'] == 1)
-        {
-            unset($form_error['error']);
-            foreach ($form_error as $item){
-                echo '<div class="alert alert-danger" role="alert">' . $item . '</div>';
-            }
-        }
-    }
-    ?>
+
+    <?php foreach ($errors as $error): ?>
+        <div class="alert alert-danger">
+            <?php echo $error->getMessage(); ?>
+        </div>
+    <?php endforeach; ?>
+
     <ul class="list-group">
         <?php
         // проверка существования $pays
