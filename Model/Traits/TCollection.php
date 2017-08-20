@@ -55,4 +55,9 @@ trait TCollection
     {
         reset($this->data);
     }
+
+    public function count()
+    {
+        return count($this->data);
+    }
 }

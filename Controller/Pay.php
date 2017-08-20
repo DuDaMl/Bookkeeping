@@ -34,25 +34,26 @@ class Pay extends Controller
             exit();
         }
 
+        if (! class_exists('M_Pay'))
+        {
+           // todo Ошибка для админа
+        }
+
         $M_Pay = new M_Pay();
 
         // Создание записи расходов.
-
-
-            if (! empty($_POST['add'])) {
-
-                try {
-                    $M_Pay->create($_POST);
-                    //header("Location: /" . static::CONTROLLER_NAME . "/");
-                    //exit();
-                    } catch (DateNotFilledException $e){
-                    $errors[] = $e;
-                    } catch (\ArgumentCountError  $e){
-                        // todo Ошибка обращения к классу. Записать в Лог администратора
-                }
-
+        if (! empty($_POST['add']))
+        {
+            try {
+                $M_Pay->create($_POST);
+                //header("Location: /" . static::CONTROLLER_NAME . "/");
+                //exit();
+                } catch (DateNotFilledException $e){
+                $errors[] = $e;
+                } catch (\ArgumentCountError  $e){
+                    // todo Ошибка обращения к классу. Записать в Лог администратора
             }
-
+        }
 
         // Создание объекта представления для контроллера
         $M_View = M_View::getInstance(static::CONTROLLER_NAME);

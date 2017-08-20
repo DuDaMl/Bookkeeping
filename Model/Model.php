@@ -30,7 +30,7 @@ class Model
             || empty($this->date))
         {
             // todo разделить важность ошибок. на незаполненные пользователем и не переданные из системы(category_id).
-            $e = new DateNotFilledException('Необходимые данные не заполнены');
+            $e = new DateNotFilledException('Необходимые данные не заполнены (Сумма)');
             throw $e;
         }
 
