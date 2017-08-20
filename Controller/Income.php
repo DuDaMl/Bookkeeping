@@ -6,6 +6,9 @@ use bookkeeping\Model\Setting\Setting;
 use bookkeeping\Model\Income as M_Income;
 use bookkeeping\Model\Category as M_Category;
 use bookkeeping\Model\Views\View as M_View;
+use bookkeeping\Model\Exceptions\MultiException;
+use bookkeeping\Model\Exceptions\DateNotFilledException;
+
 
 class Income
     extends Controller
@@ -19,6 +22,9 @@ class Income
 
     function index()
     {
+        // Сборщик ошибок
+        $errors = new MultiException();
+
         // Объек хранящий настройки представления контроллера
         $Setting = Setting::getInstance(static::CONTROLLER_NAME);
 
@@ -32,17 +38,24 @@ class Income
 
         $M_Income =  new M_Income();
 
-        if($M_Income->create($_POST))
+        // Создание записи расходов.
+        if (! empty($_POST['add']))
         {
-            header("Location: /" . static::CONTROLLER_NAME);
-            exit();
+            try {
+                $M_Income->create($_POST);
+                header("Location: /" . static::CONTROLLER_NAME . "/");
+                exit();
+            } catch (DateNotFilledException $e){
+                $errors[] = $e;
+            } catch (\ArgumentCountError  $e){
+                // todo Ошибка обращения к классу. Записать в Лог администратора
+            }
         }
-
-            // todo обработка ошибок возникшик при создании записи
 
         // Создание объекта представления для контроллера
         $M_View = M_View::getInstance(static::CONTROLLER_NAME);
         $M_View->user = $this->user;
+        $M_View->errors = $errors;
         $M_View->index($Setting);
 
 

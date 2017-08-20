@@ -1,11 +1,10 @@
 <?php
 namespace bookkeeping\Controller;
-use bookkeeping\Model\Exceptions\DateNotFilledException;
 use bookkeeping\Model\Setting\Setting;
 use bookkeeping\Model\Pay as M_Pay;
 use bookkeeping\Model\Views\View as M_View;
 use bookkeeping\Model\Exceptions\MultiException;
-
+use bookkeeping\Model\Exceptions\DateNotFilledException;
 
 class Pay extends Controller
 {
@@ -46,12 +45,12 @@ class Pay extends Controller
         {
             try {
                 $M_Pay->create($_POST);
-                //header("Location: /" . static::CONTROLLER_NAME . "/");
-                //exit();
+                header("Location: /" . static::CONTROLLER_NAME . "/");
+                exit();
                 } catch (DateNotFilledException $e){
                 $errors[] = $e;
                 } catch (\ArgumentCountError  $e){
-                    // todo Ошибка обращения к классу. Записать в Лог администратора
+                    // todo Ошибка обращения к классу. Записать в Лог администратора (неверный тип передаваемых параметров)
             }
         }
 
