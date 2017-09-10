@@ -83,7 +83,9 @@ class Model
             || empty($this->category_id)
             || empty($this->date))
         {
-            return false;
+            // todo разделить важность ошибок. на незаполненные пользователем и не переданные из системы(category_id).
+            $e = new DateNotFilledException('Необходимые данные не заполнены (Сумма)');
+            throw $e;
         }
 
         $sql = "UPDATE `" . static::TABLE_NAME . "` SET

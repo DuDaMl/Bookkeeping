@@ -48,4 +48,18 @@ class Pay extends Model
         return $answer;
     }
 
+    static function getChartData(Setting $setting)
+    {
+        $sql = "SELECT DISTINCT(pay.category_id), sum(pay.amount) as sum, category.name
+                FROM `" . self::TABLE_NAME . "`     
+                LEFT JOIN category 
+                ON pay.category_id = category.id
+                WHERE pay.date BETWEEN  '" . $setting->date_start ."' 
+                AND '" . $setting->date_end ."'
+                AND pay.user_id = " .  User::getId() . "
+                GROUP BY pay.category_id
+                ";
+        $DB = DB::getInstance();
+        return $DB->query($sql, static::class);
+    }
 }

@@ -19,6 +19,9 @@ class PayView extends View
         $this->settings = $Setting;
         $this->pays = M_Pay::getAll($Setting);
         $this->categories = M_Category::getAll(self::$conttoller);
+        $this->js = ["https://www.gstatic.com/charts/loader.js" ,
+                     "/assets/js/pay/index.js"];
+        $this->chartData = M_Pay::getChartData($Setting);
         $this->content = $this->render(self::$conttoller . '/Index.php');
         $this->display();
     }
@@ -38,5 +41,4 @@ class PayView extends View
         $this->display();
 
     }
-
 }

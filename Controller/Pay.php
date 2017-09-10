@@ -34,11 +34,6 @@ class Pay extends Controller
             exit();
         }
 
-        if (! class_exists('M_Pay'))
-        {
-           // todo Ошибка для админа
-        }
-
         $M_Pay = new M_Pay();
 
         // Создание записи расходов.

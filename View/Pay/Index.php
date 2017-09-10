@@ -1,5 +1,5 @@
 <?php
-
+//echo $js;
 ?>
 <!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
@@ -99,6 +99,18 @@
     </div>
 
     <h1>Расходы</h1>
+
+        <?php
+                foreach ($chartData as $index => $pay)
+                {
+                    echo "<input type='checkbox' value='" . $pay->category_id . "'> " . $pay->category_id . " "  . $pay->name . " " . $pay->sum . "<br/>";
+                }
+        ?>
+
+    <!-- График отображения расходов -->
+    <div id="piechart" style="width: 100%; height: 500px; margin-bottom: 20px"></div>
+
+   <!-- Форма отправки настроек представления -->
     <form action="/<?= $controller_name ?>/" method="post">
         <input type='hidden' class="form-control" value="1" name="add"/>
         <div class="row">
