@@ -28,7 +28,8 @@ class Pay extends Controller
         $Setting = Setting::getInstance(static::CONTROLLER_NAME);
 
         // Обновление настроек контроллера Pay
-        if ($Setting->update($_POST)) {
+        if ($Setting->update($_POST))
+        {
             header('Location: /' . static::CONTROLLER_NAME . "/");
             exit();
         }

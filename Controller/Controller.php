@@ -10,9 +10,7 @@ abstract class Controller
     function __construct()
     {
         $this->user = new User();
-
         $this->checkAuth();
-
     }
 
     /**

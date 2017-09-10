@@ -2,6 +2,7 @@
 namespace bookkeeping\Controller;
 use bookkeeping\Controller\Controller as Controller;
 use bookkeeping\Model\User as M_User;
+use bookkeeping\Model\Views\View as M_View;
 
 class Index
     extends Controller
@@ -28,8 +29,11 @@ class Index
     function index()
     {
         $data['controller_name'] = static::CONTROLLER_NAME;
-        $this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
-        $this->render();
+        //$this->content = $this->getView(static::CONTROLLER_NAME . '/Index.php', $data);
+        //$this->render();
+        $M_View = M_View::getInstance(static::CONTROLLER_NAME);
+        $M_View->user = $this->user;
+        $M_View->index( );
     }
 
     function login()
